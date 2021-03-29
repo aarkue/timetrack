@@ -1,0 +1,7 @@
+{
+  "name": "aarPm",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
