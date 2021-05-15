@@ -29,7 +29,7 @@ build:
   stage: build
   script:
     - ./android/gradlew build
-    - /android/gradlew tasks
+    - ./android/gradlew tasks
   artifacts:
     paths:
     - ./android/app/build/outputs/
