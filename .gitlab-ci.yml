@@ -25,20 +25,11 @@ stages:
   - build
   - test
 
-lintDebug:
+build:
   stage: build
   script:
-    - ./android/gradlew -Pci --console=plain :app:lintDebug -PbuildDir=lint
-
-assembleDebug:
-  stage: build
-  script:
-    - ./android/gradlew assembleDebug
+    - ./android/gradlew build
   artifacts:
     paths:
     - app/build/outputs/
 
-debugTests:
-  stage: test
-  script:
-    - ./android/gradlew -Pci --console=plain :app:testDebug
