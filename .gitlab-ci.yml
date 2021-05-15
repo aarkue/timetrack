@@ -28,7 +28,7 @@ stages:
 build:
   stage: build
   script:
-    - ./android/gradlew build
+    - ./android/gradlew assemble
     - ls -la ./android/app/
   artifacts:
     paths:
