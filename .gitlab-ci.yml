@@ -23,7 +23,7 @@ before_script:
 
 stages:
   - build
-  - test
+  - assemble
 
 build:
   stage: build
@@ -31,5 +31,6 @@ build:
     - ./android/gradlew build
   artifacts:
     paths:
-    - app/build/outputs/
+    - ./app/build/outputs/
+
 
