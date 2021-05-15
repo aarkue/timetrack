@@ -33,7 +33,6 @@ build_android:
     - ls -la
   script:
     - ./gradlew build
-    - find ./app/build
   artifacts:
     paths:
     - ./android/app/build/outputs
