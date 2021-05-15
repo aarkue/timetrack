@@ -21,7 +21,8 @@ before_script:
   - set +o pipefail
   - yes | android-sdk-linux/tools/bin/sdkmanager --licenses
   - set -o pipefail
-  - cd ./android
+  - cd android
+  - ls -la
 
 stages:
   - build
