@@ -32,8 +32,8 @@ build_android:
     - cd android
     - ls -la
   script:
-    - ./gradlew tasks
     - ./gradlew build
+    - find ./app/build
   artifacts:
     paths:
     - ./app/build/outputs/
