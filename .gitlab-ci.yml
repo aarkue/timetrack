@@ -36,7 +36,7 @@ build_android:
     - find ./app/build
   artifacts:
     paths:
-    - ./app/build/outputs/
+    - ./android/app/build/outputs
 
 build_project:
   image: node:latest
