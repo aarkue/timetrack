@@ -1,4 +1,4 @@
-image: openjdk:8-jdk
+
 
 variables:
   ANDROID_COMPILE_SDK: "28"
@@ -25,11 +25,12 @@ before_script:
   - ls -la
 
 stages:
-  - build
-  - assemble
+  - build_project
+  - build_android
 
-build:
-  stage: build
+build_android:
+  image: openjdk:8-jdk
+  stage: build_android
   script:
     - ./gradlew tasks
     - ./gradlew build
@@ -37,4 +38,16 @@ build:
     paths:
     - ./app/build/outputs/
 
+build_project:
+  image: node:latest
+  stage: build_project
+  cache:
+    paths:
+      - node_modules/
+  script:
+      - npm install
+      - ionic cap copy android
+  artifacts:
+    paths:
+      - node_modules
 
