@@ -32,6 +32,6 @@ build:
     - ls 
   artifacts:
     paths:
-    - ./app/build/outputs/
+    - ./android/app/build/outputs/
 
 
