@@ -1,0 +1,29 @@
+
+svg {
+    height: 50%;
+    width: 50%;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#polygon1161{
+    transition: all .4s ease-in-out;
+    transform-origin: left;
+    transform-box: fill-box;
+}
+
+#circle1151:hover ~ #polygon1161, #polygon1161:hover{
+    transform: rotate(30deg);
+
+}
+
+#ellipse1165 {
+    transition: all .4s ease-in-out;
+    transform-origin: left;
+    transform-box: fill-box;
+}
+
+#ellipse1165.down{
+    transform: translate(0px,35%);
+}

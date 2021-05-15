@@ -1,0 +1,5 @@
+<ion-item (contextmenu)="showActionSheet($event)">
+  <ion-label>{{todo.name}}</ion-label>
+  <ion-checkbox ngModel [ngModel]="todo.isDone" (ngModelChange)="isDoneChange($event)" slot="start" mode="ios"></ion-checkbox>
+  <ion-button fill="clear" size="small" slot="end" color="medium" (click)="showActionSheet($event)"><ion-icon name="ellipsis-vertical-outline" slot="icon-only" ></ion-icon></ion-button>
+</ion-item>

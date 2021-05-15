@@ -1,7 +1,7 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>
-      Tab 3
+      Account
     </ion-title>
   </ion-toolbar>
 </ion-header>
@@ -9,9 +9,66 @@
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">Tab 3</ion-title>
+      <ion-title size="large">Account</ion-title>
     </ion-toolbar>
   </ion-header>
 
-  <app-explore-container name="Tab 3 page"></app-explore-container>
+  <ion-card  *ngIf="accountService.isLoggedIn()">
+    <ion-card-header>
+      <ion-card-subtitle>{{accountService.getAcc().email}}</ion-card-subtitle>
+      <ion-card-title>{{accountService.getAcc().username}}</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <h2>Sweat: {{accountService.getMoney()}}</h2> 
+      <h2>Experience: {{accountService.getExperience()}}</h2>
+      <h2 class="level">Level: {{gamificationService.getCurrentLevel()}}</h2>
+      <ion-progress-bar [value]="gamificationService.getLevelProgressPercent()/100"></ion-progress-bar>
+    </ion-card-content>
+    <ion-button color="warning" label="Logout" size="block" *ngIf="accountService.isLoggedIn()" (click)="logOut()">
+      <ion-label>Logout</ion-label>
+      <ion-icon name="log-out-outline"></ion-icon>
+    </ion-button>
+  </ion-card>
+
+
+  <form [formGroup]="loginForm" (ngSubmit)="logIn()" *ngIf="!accountService.isLoggedIn()">
+    <ion-item>
+      <ion-label>Username</ion-label>
+      <ion-input type="text" formControlName="username" required></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label>Password</ion-label>
+      <ion-input type="password" formControlName="password" required></ion-input>
+    </ion-item>
+    <input type="submit" style="display: none" />
+    <ion-button type="submit" color="primary" expand="block" [disabled]="!loginForm.valid">Login</ion-button>
+    <!-- <ion-button color="primary" expand="block" (click)="logIn()">Login</ion-button> -->
+  </form>
+  
+
+  <ion-item-divider>
+    </ion-item-divider>
+
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Leaderboard</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-list>
+        <ion-list-header lines="inset">
+          <ion-label>Username</ion-label>
+          <ion-label>Experience</ion-label>
+          <ion-label>Sweat</ion-label>
+        </ion-list-header>
+       <ion-item *ngFor="let entry of gamificationService.getLeaderboard()">
+        <ion-label>{{entry.username}}</ion-label>
+        <ion-label>{{entry.experience}}</ion-label>
+        <ion-label>{{entry.sweat}}</ion-label>
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+
+
+
 </ion-content>

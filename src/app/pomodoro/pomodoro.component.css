@@ -1,0 +1,21 @@
+ion-progress-bar {
+    margin-top: 10px;
+}
+ion-card {
+    max-width: 95%;
+    margin: auto;
+    margin-top: 20px;
+
+}
+
+ion-card-content {
+    text-align: center;
+}
+
+.right-button {
+    float: right;
+}
+
+.status-big {
+    font-size: 3em;
+}

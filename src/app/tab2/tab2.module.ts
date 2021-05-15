@@ -7,6 +7,8 @@ import { Tab2Page } from './tab2.page';
 import { ExploreContainerComponentModule } from '../explore-container/explore-container.module';
 
 import { Tab2PageRoutingModule } from './tab2-routing.module';
+import { PomodoroComponent } from '../pomodoro/pomodoro.component';
+import { SvgClockComponent } from '../pomodoro/svg-clock/svg-clock.component';
 
 @NgModule({
   imports: [
@@ -16,6 +18,6 @@ import { Tab2PageRoutingModule } from './tab2-routing.module';
     ExploreContainerComponentModule,
     Tab2PageRoutingModule
   ],
-  declarations: [Tab2Page]
+  declarations: [Tab2Page, PomodoroComponent, SvgClockComponent]
 })
 export class Tab2PageModule {}

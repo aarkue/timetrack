@@ -24,3 +24,12 @@
 @import "~@ionic/angular/css/text-alignment.css";
 @import "~@ionic/angular/css/text-transformation.css";
 @import "~@ionic/angular/css/flex-utils.css";
+
+
+.action-sheet-group .danger {
+    color: var(--ion-color-danger, red);
+}
+
+.action-sheet-group .danger .action-sheet-icon{
+    color: var(--ion-color-danger, red);
+}

@@ -1,0 +1,35 @@
+  <ion-header translucent>
+    <ion-toolbar>
+      <ion-title>Edit todo</ion-title>
+      <ion-buttons slot="end">
+        <ion-button (click)="dismissModal(false)">Cancel</ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-header>
+  <ion-content>
+    <form [formGroup]="editTodoForm">
+    <ion-item>
+      <ion-label position="stacked">Name</ion-label>
+      <ion-input formControlName="name"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked">Description</ion-label>
+      <ion-textarea formControlName="description"></ion-textarea>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked">Priority (1-10)</ion-label>
+      <ion-input type="number" pattern="[0-9]*" [min]="1" [max]="10" formControlName="priority"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked">Estimated duration (minutes)</ion-label>
+      <ion-input type="number" pattern="[0-9]*" [min]="0" formControlName="estimatedDuration"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked">Deadline</ion-label>
+      <ion-toggle [(ngModel)]="this.enableDeadline" [ngModelOptions]="{standalone: true}"></ion-toggle>
+      <ion-datetime picker-format="DD.MM.YYYY | HH:mm" display-format="DD.MM.YYYY | HH:mm" formControlName="deadline"></ion-datetime>
+    </ion-item>
+    <br>
+    <ion-button color="primary" expand="block" [disabled]="!editTodoForm.valid" (click)="dismissModal(true)">Save</ion-button>
+  </form>
+    </ion-content>

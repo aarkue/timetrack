@@ -1,0 +1,47 @@
+<ion-card>
+  <ion-card-header>
+    <ion-card-title>Pomodoro</ion-card-title>
+    <ion-card-subtitle
+      >{{ this.status?.toString() }} {{(this.status.toString() == 'Work')? '('+pomodoros+')' : ''}}
+      {{ this.isPaused ? "- Paused" : "" }}</ion-card-subtitle
+    >
+  </ion-card-header>
+  <ion-card-content>
+    <h1 class="status-big" [style]="isPaused ? 'color: dimgray' : ''">
+      {{ this.status?.toString() }}
+    </h1>
+    <h1 *ngIf="showSeconds">
+      {{
+        (currDuration - timePassed) / 60 -
+          ((currDuration - timePassed) % 60) / 60 | number: "1.0-0"
+      }}
+      min {{ (currDuration - timePassed) % 60 | number: "2.0-0" }} sec
+    </h1>
+    <h1 *ngIf="!showSeconds">
+      {{
+        (currDuration - timePassed) / 60 -
+          ((currDuration - timePassed) % 60) / 60 | number: "1.0-0"
+      }}
+      min
+    </h1>
+    <ion-button
+      mat-stroked-button
+      [color]="this.isPaused ? 'primary' : 'secondary'"
+      (click)="buttonClick()"
+    >
+      {{ this.isPaused ? "Resume" : "Pause" }}
+    </ion-button>
+
+    <br />
+    <ion-progress-bar *ngIf="showProgressBar"
+    [value]="(this.timePassed / this.currDuration)"
+    [color]="this.status?.toString() === 'Break' ? 'success' : 'primary'"
+    ></ion-progress-bar>
+  </ion-card-content>
+  <app-svg-clock mat-card-image [isDown]="!isPaused"></app-svg-clock>
+  <div>
+    <ion-button mat-stroked-button color="danger" (click)="clear()">Clear</ion-button>
+    <ion-button mat-stroked-button (click)="showOptions()" color="tertiary">Options</ion-button>
+    <ion-button mat-stroked-button class="right-button" (click)="timeUp()">Skip</ion-button>
+  </div>
+</ion-card>
