@@ -31,7 +31,6 @@ build_android:
     - set -o pipefail
     - cd android
     # Secrets
-    - echo $ALIAS
     - echo "$KEYSTORE" | base64 -d > app/key.jks
     - echo "RELEASE_STORE_FILE=key.jks" >> gradle.properties
     - echo "RELEASE_STORE_PASSWORD=$KEYSTORE_PASSWORD" >> gradle.properties
