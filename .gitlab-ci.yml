@@ -53,8 +53,10 @@ build_project:
   script:
       - npm install -g @ionic/cli
       - npm install
+      - ionic build
       - ionic cap copy android
   artifacts:
     paths:
       - node_modules
+      - www
 
