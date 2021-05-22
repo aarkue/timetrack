@@ -32,12 +32,13 @@ build_android:
     - cd android
     # Secrets
     - echo "$KEYSTORE" | base64 -d > app/key.jks
-    - base64 app/key.jks
     - echo "RELEASE_STORE_FILE=key.jks" >> gradle.properties
     - echo "RELEASE_STORE_PASSWORD=$KEYSTORE_PASSWORD" >> gradle.properties
     - echo "RELEASE_KEY_ALIAS=$ALIAS" >> gradle.properties
     - echo "RELEASE_KEY_PASSWORD=$KEY_PASSWORD" >> gradle.properties
   script:
+    - base64 app/key.jks
+    - cat gradle.properties
     - ./gradlew build
   artifacts:
     paths:
