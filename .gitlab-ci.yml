@@ -29,6 +29,7 @@ build_android:
     - set +o pipefail
     - yes | android-sdk-linux/tools/bin/sdkmanager --licenses
     - set -o pipefail
+    - cp -r www/ android/app/src/main/assets/public/
     - cd android
     # Secrets
     - echo "$KEYSTORE" | base64 -d > app/key.jks
