@@ -32,7 +32,7 @@ build_android:
     - cd android
     # Secrets
     - echo $ALIAS
-    - echo $KEYSTORE | base64 -d > app/key.jks
+    - echo "$KEYSTORE" | base64 -d > app/key.jks
     - echo "keystorePath=key.jks" >> gradle.properties
     - echo "keystorePassword=$KEYSTORE_PASSWORD" >> gradle.properties
     - echo "keyAlias=$ALIAS" >> gradle.properties
