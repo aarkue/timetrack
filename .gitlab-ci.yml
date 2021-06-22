@@ -31,13 +31,14 @@ build_android:
     - set -o pipefail
     - cd android
     # Secrets
-    - echo $KEYSTORE | base64 -d > app/key.jks
-    - echo "keystorePath=key.jks" >> gradle.properties
-    - echo "keystorePassword=$KEYSTORE_PASSWORD" >> gradle.properties
-    - echo "keyAlias=$ALIAS" >> gradle.properties
-    - echo "keyPassword=$KEY_PASSWORD" >> gradle.properties
-    - ls -la
+    - echo "$KEYSTORE" | base64 -d > app/key.jks
+    - echo "RELEASE_STORE_FILE=key.jks" >> gradle.properties
+    - echo "RELEASE_STORE_PASSWORD=$KEYSTORE_PASSWORD" >> gradle.properties
+    - echo "RELEASE_KEY_ALIAS=$ALIAS" >> gradle.properties
+    - echo "RELEASE_KEY_PASSWORD=$KEY_PASSWORD" >> gradle.properties
   script:
+    - base64 app/key.jks
+    - cat gradle.properties
     - ./gradlew build
   artifacts:
     paths:
@@ -52,8 +53,10 @@ build_project:
   script:
       - npm install -g @ionic/cli
       - npm install
+      - ionic build
       - ionic cap copy android
   artifacts:
     paths:
       - node_modules
+      - ./android
 
