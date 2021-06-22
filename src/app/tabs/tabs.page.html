@@ -1,5 +1,5 @@
 <ion-tabs>
-
+  <ion-progress-bar class="experience-progress" [value]="gamificationService.getLevelProgressPercent()/100"></ion-progress-bar>
   <ion-tab-bar slot="bottom">
     <ion-tab-button tab="tab1" [disabled]="!accountService.isLoggedIn()" >
       <ion-icon name="checkbox-outline"></ion-icon>

@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { AccountService } from '../services/account.service';
+import { GamificationService } from '../services/gamification.service';
 
 @Component({
   selector: 'app-tabs',
@@ -8,6 +9,6 @@ import { AccountService } from '../services/account.service';
 })
 export class TabsPage {
 
-  constructor(public accountService : AccountService) {}
+  constructor(public accountService : AccountService, public gamificationService: GamificationService) {}
 
 }
