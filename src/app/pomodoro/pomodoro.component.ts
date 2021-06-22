@@ -7,6 +7,8 @@ import { PomodoroStatus } from './pomodoro-status';
 // import {Howl, Howler} from 'howler';
 
 import { Plugins } from '@capacitor/core';
+import { ModalController } from '@ionic/angular';
+import { PomodoroOptionsDialogComponent } from './pomodoro-options-dialog/pomodoro-options-dialog.component';
 const { LocalNotifications } = Plugins;
 
 @Component({
@@ -41,7 +43,8 @@ export class PomodoroComponent implements OnInit, OnDestroy {
   constructor(
     // private snackbar: MatSnackBar,
     // private pomodoroOptionsDialog: MatDialog,
-    private router:Router
+    private router:Router,
+    public modalController: ModalController
   ) {}
 
   ngOnInit(): void {
@@ -281,7 +284,28 @@ export class PomodoroComponent implements OnInit, OnDestroy {
     }
   }
 
-  showOptions() {
+  async showOptions() {
+    const modalRef = await this.modalController.create(
+      {component: PomodoroOptionsDialogComponent,
+        componentProps: {
+                workMinutes: this.workSeconds / 60,
+                shortBreakMinutes: this.shortBreakSeconds / 60,
+                longBreakMinutes: this.longBreakSeconds / 60,
+                workSessionsBeforeLongBreak: this.workSessionReward,
+                showSeconds: this.showSeconds,
+                showProgressBar: this.showProgressBar}
+      });
+      modalRef.onWillDismiss().then((res) => {
+        this.workSeconds = res.data.workMinutes * 60;
+        this.shortBreakSeconds = res.data.shortBreakMinutes * 60;
+        this.longBreakSeconds = res.data.longBreakMinutes * 60;
+        this.workSessionReward = res.data.workSessionsBeforeLongBreak;
+        this.showSeconds = res.data.showSeconds;
+        this.showProgressBar = res.data.showProgressBar;
+        this.saveOptions();
+      })
+    return await modalRef.present();
+
     // let dialogRef = this.pomodoroOptionsDialog.open(
     //   PomodoroOptionsDialogComponent,
     //   {

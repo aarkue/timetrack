@@ -9,6 +9,7 @@ import { ExploreContainerComponentModule } from '../explore-container/explore-co
 import { Tab2PageRoutingModule } from './tab2-routing.module';
 import { PomodoroComponent } from '../pomodoro/pomodoro.component';
 import { SvgClockComponent } from '../pomodoro/svg-clock/svg-clock.component';
+import { PomodoroOptionsDialogComponent } from '../pomodoro/pomodoro-options-dialog/pomodoro-options-dialog.component';
 
 @NgModule({
   imports: [
@@ -18,6 +19,6 @@ import { SvgClockComponent } from '../pomodoro/svg-clock/svg-clock.component';
     ExploreContainerComponentModule,
     Tab2PageRoutingModule
   ],
-  declarations: [Tab2Page, PomodoroComponent, SvgClockComponent]
+  declarations: [Tab2Page, PomodoroComponent, SvgClockComponent,PomodoroOptionsDialogComponent]
 })
 export class Tab2PageModule {}

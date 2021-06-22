@@ -1,0 +1,51 @@
+
+<ion-header translucent>
+  <ion-toolbar>
+    <ion-title>Pomodoro Options</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismissModal()">Close</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+<ion-list lines="full">
+  <ion-list-header lines="full">
+    <ion-label>
+      Durations (in minutes)
+    </ion-label>
+  </ion-list-header>
+<ion-item>
+  <ion-label position="floating">Work (minutes)</ion-label>
+  <ion-input type="number" min="0" [(ngModel)]="workMinutes"></ion-input>
+</ion-item>
+<ion-item>
+  <ion-label position="floating">Short Break (minutes)</ion-label>
+  <ion-input type="number" min="0" [(ngModel)]="shortBreakMinutes"></ion-input>
+</ion-item>
+<ion-item>
+  <ion-label position="floating">Long Break (minutes)</ion-label>
+  <ion-input type="number" min="0" [(ngModel)]="longBreakMinutes"></ion-input>
+</ion-item>
+</ion-list>
+
+<ion-list lines="full">
+  <ion-list-header lines="full">
+    <ion-label>
+      Other Settings
+    </ion-label>
+  </ion-list-header>
+<ion-item>
+  <ion-label position="floating">Work Sessions before Long Break</ion-label>
+  <ion-input type="number" min="0" [(ngModel)]="workSessionsBeforeLongBreak"></ion-input>
+</ion-item>
+<ion-item>
+  <ion-label>Show seconds</ion-label>
+  <ion-toggle mode="ios" [(ngModel)]="showSeconds"></ion-toggle>
+</ion-item>
+<ion-item>
+  <ion-label>Show progress bar</ion-label>
+  <ion-toggle mode="ios" [(ngModel)]="showProgressBar"></ion-toggle>
+</ion-item>
+</ion-list>
+</ion-content>
