@@ -44,7 +44,7 @@ export class Tab1Page implements OnInit{
 
   async refreshData(){
     this.lists = this.todoService.getListsData();
-
+    this.accountService.updateAcc();
   }
 
   async doRefresh(event) {
