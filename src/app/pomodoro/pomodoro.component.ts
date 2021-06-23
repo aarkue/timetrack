@@ -4,10 +4,11 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 // import { PomodoroOptionsDialogComponent } from 'src/app/dialogs/pomodoro-options-dialog/pomodoro-options-dialog.component';
 import { PomodoroStatus } from './pomodoro-status';
+import { PomodoroTimerData } from './pomodoro-timer-data';
 import {Howl, Howler} from 'howler';
 
 import { Plugins } from '@capacitor/core';
-import { ModalController } from '@ionic/angular';
+import { ModalController, PopoverController } from '@ionic/angular';
 import { PomodoroOptionsDialogComponent } from './pomodoro-options-dialog/pomodoro-options-dialog.component';
 const { LocalNotifications, Haptics, Storage } = Plugins;
 import { Platform } from '@ionic/angular';
@@ -37,13 +38,14 @@ export class PomodoroComponent implements OnInit, OnDestroy {
 
   notifs = [];
   sound = undefined;
-
+  timerHistory : PomodoroTimerData[] = [];
   constructor(
     // private snackbar: MatSnackBar,
     // private pomodoroOptionsDialog: MatDialog,
     private router:Router,
     public modalController: ModalController,
-    public platform: Platform
+    public platform: Platform,
+    public popoverController: PopoverController
   ) {}
 
   ngOnInit(): void {
@@ -53,6 +55,7 @@ export class PomodoroComponent implements OnInit, OnDestroy {
    
     
     this.initSessionValues();
+    this.timerHistory.unshift({startDate: null, duration: this.getCurrDuration(), type: this.getStatus(), endDate: null})
     this.timePassed = Math.min(this.timePassedBefore, this.getCurrDuration());
     this.startClock();
       this.sound = new Howl({
@@ -79,7 +82,10 @@ export class PomodoroComponent implements OnInit, OnDestroy {
       this.setIsPaused(false);
       this.setTimePassedBefore(this.timePassed);
       this.startDate = Date.now();
-    } else {
+      if(this.getTimePassedBefore() === 0){
+      this.timerHistory[this.timerHistory.length-1].startDate = Date.now();
+      }
+   } else {
       this.setIsPaused(true);
     }
   }
@@ -107,7 +113,7 @@ export class PomodoroComponent implements OnInit, OnDestroy {
     this.setIsPaused(true);
     this.setTimePassedBefore(0);
     this.timePassed = 0;
-
+    this.timerHistory[this.timerHistory.length-1].endDate = Date.now();
     if (this.getStatus() === PomodoroStatus.Work) {
       this.notify('Time for a break!', {});
       
@@ -124,6 +130,7 @@ export class PomodoroComponent implements OnInit, OnDestroy {
       this.setStatus(PomodoroStatus.Work);
       this.setCurrDuration(this.workSeconds);
     }
+    this.timerHistory.push({startDate: null, duration: this.getCurrDuration(), type: this.getStatus(), endDate: null})
   }
 
   async notify(title: string, options: NotificationOptions) {
@@ -412,4 +419,5 @@ export class PomodoroComponent implements OnInit, OnDestroy {
       console.log('Error loading localStorage Options for Pomodoro' + error);
     }
   }
+
 }

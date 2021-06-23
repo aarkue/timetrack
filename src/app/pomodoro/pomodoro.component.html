@@ -46,3 +46,15 @@
     <ion-button mat-stroked-button class="right-button" (click)="timeUp()">Skip</ion-button>
   </div>
 </ion-card>
+<div id="pomodoroHistory">
+<ion-chip *ngFor="let el of timerHistory" [color]="el.type.toString() === 'Break' ? 'success' : 'primary'" [outline]="el.endDate == null" [ngStyle]="{width: (el.duration/(10*60))*50+80+'px'}">
+  <ion-label>{{el.duration/60}}</ion-label>
+  <ion-icon name="timer-outline"></ion-icon>
+</ion-chip>
+<br>
+<div class="centered">
+  <ion-button class="centered" size="small" color="danger" mat-stroked-button mode="ios" (click)="this.timerHistory.splice(0,this.timerHistory.length-1)">
+  Delete History
+  </ion-button>
+</div>
+</div>
