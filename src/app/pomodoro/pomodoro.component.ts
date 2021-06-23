@@ -130,19 +130,20 @@ export class PomodoroComponent implements OnInit, OnDestroy {
         console.log("Notifications constructor is not supported! "+e);
       }
     }
-    await LocalNotifications.schedule({
+    let result = await LocalNotifications.schedule({
       notifications: [
         {
           title: title,
           body: "",
           id: 1,
-          sound: null,
+          sound: 'assets/notification.mp3',
           attachments: null,
           actionTypeId: "",
           extra: null,
         }
       ]
     });
+    console.log(result);
 
     // this.snackbar.open(title, 'Ok', {
     //   duration: 3000,

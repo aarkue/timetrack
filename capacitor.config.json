@@ -11,7 +11,7 @@
     "LocalNotifications": {
       "smallIcon": "assets/favicon.png",
       "iconColor": "#49991F",
-      "sound": "assets/notification.wav"
+      "sound": "assets/notification.mp3"
     }
   },
   "cordova": {},
