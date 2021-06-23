@@ -24,19 +24,20 @@
       }}
       min
     </h1>
-    <ion-button
+    <ion-button expand="block" size="large"
       mat-stroked-button
-      [color]="this.isPaused ? 'primary' : 'secondary'"
+      [color]="this.isPaused ? 'primary' : (this.status?.toString() === 'Break'? 'success' : 'secondary')"
+      [fill]="this.isPaused ? 'solid' : 'solid'"
       (click)="buttonClick()"
+      mode="ios"
     >
       {{ this.isPaused ? "Resume" : "Pause" }}
     </ion-button>
-
-    <br />
     <ion-progress-bar *ngIf="showProgressBar"
     [value]="(this.timePassed / this.currDuration)"
-    [color]="this.status?.toString() === 'Break' ? 'success' : 'primary'"
+    [ngClass]="this.status?.toString() === 'Break' ? 'onBreak' : 'working'" 
     ></ion-progress-bar>
+
   </ion-card-content>
   <app-svg-clock mat-card-image [isDown]="!isPaused"></app-svg-clock>
   <div>

@@ -4,17 +4,17 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 // import { PomodoroOptionsDialogComponent } from 'src/app/dialogs/pomodoro-options-dialog/pomodoro-options-dialog.component';
 import { PomodoroStatus } from './pomodoro-status';
-// import {Howl, Howler} from 'howler';
+import {Howl, Howler} from 'howler';
 
 import { Plugins } from '@capacitor/core';
 import { ModalController } from '@ionic/angular';
 import { PomodoroOptionsDialogComponent } from './pomodoro-options-dialog/pomodoro-options-dialog.component';
-const { LocalNotifications } = Plugins;
-
+const { LocalNotifications, Haptics, Storage } = Plugins;
+import { Platform } from '@ionic/angular';
 @Component({
   selector: 'app-pomodoro',
   templateUrl: './pomodoro.component.html',
-  styleUrls: ['./pomodoro.component.css'],
+  styleUrls: ['./pomodoro.component.scss'],
 })
 export class PomodoroComponent implements OnInit, OnDestroy {
   private workSeconds = 25 * 60;
@@ -36,23 +36,30 @@ export class PomodoroComponent implements OnInit, OnDestroy {
   timePassedBefore: number = 0;
 
   notifs = [];
-  
-  // readonly sound = new Howl({
-  //   src: ['/assets/notification.webm','/assets/notification.mp3']
-  // });
+  sound = undefined;
+
   constructor(
     // private snackbar: MatSnackBar,
     // private pomodoroOptionsDialog: MatDialog,
     private router:Router,
-    public modalController: ModalController
+    public modalController: ModalController,
+    public platform: Platform
   ) {}
 
   ngOnInit(): void {
-    this.loadOptions();
-    this.initDefaults();
+    this.loadOptions().then(() => {
+      this.initDefaults();
+    });
+   
+    
     this.initSessionValues();
     this.timePassed = Math.min(this.timePassedBefore, this.getCurrDuration());
     this.startClock();
+      this.sound = new Howl({
+        src: ['/assets/notification.mp3','/assets/notification.wav']
+      });
+      console.log(this.sound)
+      
   }
   ngOnDestroy(): void {
     if(this.interval && this.saveinterval){
@@ -62,8 +69,8 @@ export class PomodoroComponent implements OnInit, OnDestroy {
   }
 
   async buttonClick() {
-    let x = await LocalNotifications.requestPermission();
-    console.log(x);
+      let x = await LocalNotifications.requestPermission();
+      console.log(x);
     if ('Notification' in window) {
       Notification.requestPermission();
     }
@@ -101,8 +108,6 @@ export class PomodoroComponent implements OnInit, OnDestroy {
     this.setTimePassedBefore(0);
     this.timePassed = 0;
 
-    // Play the sound.
-    // this.sound.play();
     if (this.getStatus() === PomodoroStatus.Work) {
       this.notify('Time for a break!', {});
       
@@ -123,20 +128,23 @@ export class PomodoroComponent implements OnInit, OnDestroy {
 
   async notify(title: string, options: NotificationOptions) {
     if ('Notification' in window) {
-      try{
+      // DISABLED: LocalNotification seems to have WebImplementation
+      // try{
 
-        new Notification(title, options);
-      } catch (e){
-        console.log("Notifications constructor is not supported! "+e);
-      }
-    }
+      //   new Notification(title, options);
+      // } catch (e){
+      //   console.log("Notifications constructor is not supported! "+e);
+      // }
+    }      
+  
+    
     let result = await LocalNotifications.schedule({
       notifications: [
         {
           title: title,
           body: "",
           id: 1,
-          sound: 'assets/notification.mp3',
+          sound: null,
           attachments: null,
           actionTypeId: "",
           extra: null,
@@ -144,7 +152,12 @@ export class PomodoroComponent implements OnInit, OnDestroy {
       ]
     });
     console.log(result);
-
+    
+    if(this.platform.is("hybrid")){
+      Haptics.vibrate();
+    }
+      this.sound.play();
+    
     // this.snackbar.open(title, 'Ok', {
     //   duration: 3000,
     //   panelClass: 'success',
@@ -297,6 +310,7 @@ export class PomodoroComponent implements OnInit, OnDestroy {
                 showProgressBar: this.showProgressBar}
       });
       modalRef.onWillDismiss().then((res) => {
+        if(res.data){
         this.workSeconds = res.data.workMinutes * 60;
         this.shortBreakSeconds = res.data.shortBreakMinutes * 60;
         this.longBreakSeconds = res.data.longBreakMinutes * 60;
@@ -304,6 +318,10 @@ export class PomodoroComponent implements OnInit, OnDestroy {
         this.showSeconds = res.data.showSeconds;
         this.showProgressBar = res.data.showProgressBar;
         this.saveOptions();
+        if (this.timePassed === 0 && this.timePassedBefore === 0) {
+          this.clear();
+        }
+      }
       })
     return await modalRef.present();
 
@@ -337,50 +355,59 @@ export class PomodoroComponent implements OnInit, OnDestroy {
     // });
   }
 
-  saveOptions() {
+  async saveToStorage(key: string, value: string){
+    await Storage.set({key: key, value: value});
+  }
+
+  getFromStorage(key: string){
+    return Storage.get({key: key})
+  }
+  async saveOptions() {
+    
     try {
-      localStorage.setItem(
+      this.saveToStorage(
         'shortBreakSeconds',
         this.shortBreakSeconds.toString()
       );
-      localStorage.setItem(
+      this.saveToStorage(
         'longBreakSeconds',
         this.longBreakSeconds.toString()
       );
-      localStorage.setItem('workSeconds', this.workSeconds.toString());
-      localStorage.setItem(
+      this.saveToStorage('workSeconds', this.workSeconds.toString());
+      this.saveToStorage(
         'workSessionReward',
         this.workSessionReward.toString()
       );
-      localStorage.setItem('showSeconds', this.showSeconds.toString());
-      localStorage.setItem('showProgressBar', this.showProgressBar.toString());
+      this.saveToStorage('showSeconds', this.showSeconds.toString());
+      this.saveToStorage('showProgressBar', this.showProgressBar.toString());
     } catch (error) {
       console.log('Error saving localStorage Options for Pomodoro' + error);
     }
   }
 
-  loadOptions() {
+  async loadOptions() {
     try {
       this.shortBreakSeconds = parseInt(
-        localStorage.getItem('shortBreakSeconds') ||
+        (await this.getFromStorage('shortBreakSeconds')).value ||
           this.shortBreakSeconds.toString()
       );
       this.longBreakSeconds = parseInt(
-        localStorage.getItem('longBreakSeconds') ||
+        (await this.getFromStorage('longBreakSeconds')).value ||
           this.longBreakSeconds.toString()
       );
       this.workSeconds = parseInt(
-        localStorage.getItem('workSeconds') || this.workSeconds.toString()
+        (await this.getFromStorage('workSeconds')).value || this.workSeconds.toString()
       );
+      console.log(this.workSeconds);
       this.workSessionReward = parseInt(
-        localStorage.getItem('workSessionReward') ||
+       ( await this.getFromStorage('workSessionReward')).value ||
           this.workSessionReward.toString()
       );
 
-      this.showSeconds = localStorage.getItem('showSeconds') !== 'false';
+      this.showSeconds = (await this.getFromStorage('showSeconds')).value !== 'false';
 
       this.showProgressBar =
-        localStorage.getItem('showProgressBar') !== 'false';
+       ( await this.getFromStorage('showProgressBar')).value !== 'false';
     } catch (error) {
       console.log('Error loading localStorage Options for Pomodoro' + error);
     }
