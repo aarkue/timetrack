@@ -1,7 +1,8 @@
 
 svg {
-    height: 50%;
+    height: 30%;
     width: 50%;
+    max-height: 300px;
     display: block;
     margin-left: auto;
     margin-right: auto;
