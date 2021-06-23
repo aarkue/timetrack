@@ -11,9 +11,12 @@
     "LocalNotifications": {
       "smallIcon": "assets/favicon.png",
       "iconColor": "#49991F",
-      "sound": "assets/notification.wav"
+      "sound": "assets/notification.mp3"
     }
   },
   "cordova": {},
-  "linuxAndroidStudioPath": "/usr/bin/android-studio"
+  "linuxAndroidStudioPath": "/usr/bin/android-studio",
+  "server": {
+    "url": "http://192.168.178.39:8100"
+  }
 }
