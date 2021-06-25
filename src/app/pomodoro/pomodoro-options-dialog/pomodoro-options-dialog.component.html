@@ -3,7 +3,7 @@
   <ion-toolbar>
     <ion-title>Pomodoro Options</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="dismissModal()">Close</ion-button>
+      <ion-button (click)="dismissModal()">Cancel</ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
@@ -11,7 +11,7 @@
 <ion-content>
 <ion-list lines="full">
   <ion-list-header lines="full">
-    <ion-label>
+    <ion-label color="medium">
       Durations (in minutes)
     </ion-label>
   </ion-list-header>
@@ -27,11 +27,8 @@
   <ion-label position="floating">Long Break (minutes)</ion-label>
   <ion-input type="number" min="0" [(ngModel)]="longBreakMinutes"></ion-input>
 </ion-item>
-</ion-list>
-
-<ion-list lines="full">
   <ion-list-header lines="full">
-    <ion-label>
+    <ion-label color="medium">
       Other Settings
     </ion-label>
   </ion-list-header>
@@ -47,5 +44,17 @@
   <ion-label>Show progress bar</ion-label>
   <ion-toggle mode="ios" [(ngModel)]="showProgressBar"></ion-toggle>
 </ion-item>
+<ion-item>
+  <ion-label>Automatically start timer</ion-label>
+  <ion-toggle mode="ios" [(ngModel)]="autoNext"></ion-toggle>
+</ion-item>
 </ion-list>
+<br>
+<br>
+<br>
+<ion-fab vertical="bottom" horizontal="end" slot="fixed">
+  <ion-fab-button (click)="dismissModal(true)">
+    <ion-icon name="save"></ion-icon>
+  </ion-fab-button>
+</ion-fab>
 </ion-content>

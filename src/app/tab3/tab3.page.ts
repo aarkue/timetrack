@@ -31,7 +31,7 @@ export class Tab3Page {
       this.loginForm.reset();
       const toastNot = await  this.toastController.create({
         header: "Login successful",
-        position: "bottom",
+        position: "middle",
         color: "success",
         duration: 1500,
         buttons: [{text: " Ok", icon: "checkmark-outline", role: "cancel", handler: () => {}}],
@@ -41,7 +41,7 @@ export class Tab3Page {
     const toastNot = await  this.toastController.create({
         header: "Login failed",
         message: "Could not login. Please check username and password or try again later.",
-        position: "bottom",
+        position: "middle",
         color: "danger",
         duration: 3000,
         buttons: [{text: " Ok", icon: "checkmark-outline", role: "cancel", handler: () => {}}],
@@ -57,7 +57,7 @@ export class Tab3Page {
     if(logOutRes){
       const toastNot = await  this.toastController.create({
         header: "Logout successful",
-        position: "bottom",
+        position: "middle",
         color: "success",
         duration: 1500,
         buttons: [{text: " Ok", icon: "checkmark-outline", role: "cancel", handler: () => {}}],
@@ -66,7 +66,7 @@ export class Tab3Page {
     }else{
     const toastNot = await  this.toastController.create({
         header: "Logout failed",
-        position: "bottom",
+        position: "middle",
         color: "danger",
         duration: 3000,
         buttons: [{text: " Ok", icon: "checkmark-outline", role: "cancel", handler: () => {}}],

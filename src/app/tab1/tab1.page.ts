@@ -33,7 +33,7 @@ export class Tab1Page implements OnInit{
   async showUpdateFailedToast(){
     const toastNot = await  this.toastController.create({
       header: "Failed to load data. Are you offline?",
-      position: "bottom",
+      position: "middle",
       color: "danger",
       duration: 3000,
       buttons: [{text: " Ok", icon: "checkmark-outline", role: "cancel", handler: () => {}}],

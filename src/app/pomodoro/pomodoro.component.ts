@@ -8,10 +8,11 @@ import { PomodoroTimerData } from './pomodoro-timer-data';
 import {Howl, Howler} from 'howler';
 
 import { Plugins } from '@capacitor/core';
-import { ModalController, PopoverController } from '@ionic/angular';
+import { AlertController, ModalController, PopoverController } from '@ionic/angular';
 import { PomodoroOptionsDialogComponent } from './pomodoro-options-dialog/pomodoro-options-dialog.component';
 const { LocalNotifications, Haptics, Storage } = Plugins;
 import { Platform } from '@ionic/angular';
+import { timer } from 'rxjs';
 @Component({
   selector: 'app-pomodoro',
   templateUrl: './pomodoro.component.html',
@@ -32,6 +33,8 @@ export class PomodoroComponent implements OnInit, OnDestroy {
   pomodoros: number = 1;
   showSeconds: boolean = true;
   showProgressBar: boolean = true;
+
+  autoNext: boolean = false;
   timePassed: number = 0;
 
   timePassedBefore: number = 0;
@@ -45,7 +48,8 @@ export class PomodoroComponent implements OnInit, OnDestroy {
     private router:Router,
     public modalController: ModalController,
     public platform: Platform,
-    public popoverController: PopoverController
+    public popoverController: PopoverController,
+    private alertController: AlertController
   ) {}
 
   ngOnInit(): void {
@@ -118,19 +122,23 @@ export class PomodoroComponent implements OnInit, OnDestroy {
       this.notify('Time for a break!', {});
       
       this.setStatus(PomodoroStatus.Break);
-      this.setPomodoros(this.getPomodoros()+1);
-
       if (this.getPomodoros() % this.workSessionReward === 0) {
         this.setCurrDuration(this.longBreakSeconds);
       } else {
         this.setCurrDuration(this.shortBreakSeconds);
       }
+
+      this.setPomodoros(this.getPomodoros()+1);
     } else {
       this.notify('Ready to get back to work?', {});
       this.setStatus(PomodoroStatus.Work);
       this.setCurrDuration(this.workSeconds);
     }
     this.timerHistory.push({startDate: null, duration: this.getCurrDuration(), type: this.getStatus(), endDate: null})
+  
+    if(this.autoNext){
+      this.buttonClick();
+    }
   }
 
   async notify(title: string, options: NotificationOptions) {
@@ -171,17 +179,18 @@ export class PomodoroComponent implements OnInit, OnDestroy {
     // });
   }
 
-  getCurrTotalSeconds() {
-    if (this.getStatus() === PomodoroStatus.Break) {
-      if (this.pomodoros % this.workSessionReward == 0) {
-        return this.longBreakSeconds;
-      } else {
-        return this.shortBreakSeconds;
-      }
-    } else {
-      return this.workSeconds;
-    }
-  }
+  // Unused?
+  // getCurrTotalSeconds() {
+  //   if (this.getStatus() === PomodoroStatus.Break) {
+  //     if (this.pomodoros % this.workSessionReward == 0) {
+  //       return this.longBreakSeconds;
+  //     } else {
+  //       return this.shortBreakSeconds;
+  //     }
+  //   } else {
+  //     return this.workSeconds;
+  //   }
+  // }
 
   setCurrDuration(duration: number) {
     sessionStorage.setItem('currDuration', duration.toString());
@@ -300,6 +309,8 @@ export class PomodoroComponent implements OnInit, OnDestroy {
       this.getStatus();
       this.getIsPaused();
       this.getPomodoros();
+      this.timerHistory[this.timerHistory.length-1] = {startDate: null, duration: this.getCurrDuration(), type: this.getStatus(), endDate: null};
+
     } catch (error) {
       console.log('Error getting session values for Pomodoro' + error);
     }
@@ -314,7 +325,8 @@ export class PomodoroComponent implements OnInit, OnDestroy {
                 longBreakMinutes: this.longBreakSeconds / 60,
                 workSessionsBeforeLongBreak: this.workSessionReward,
                 showSeconds: this.showSeconds,
-                showProgressBar: this.showProgressBar}
+                showProgressBar: this.showProgressBar,
+                autoNext: this.autoNext},
       });
       modalRef.onWillDismiss().then((res) => {
         if(res.data){
@@ -324,6 +336,7 @@ export class PomodoroComponent implements OnInit, OnDestroy {
         this.workSessionReward = res.data.workSessionsBeforeLongBreak;
         this.showSeconds = res.data.showSeconds;
         this.showProgressBar = res.data.showProgressBar;
+        this.autoNext = res.data.autoNext;
         this.saveOptions();
         if (this.timePassed === 0 && this.timePassedBefore === 0) {
           this.clear();
@@ -387,6 +400,7 @@ export class PomodoroComponent implements OnInit, OnDestroy {
       );
       this.saveToStorage('showSeconds', this.showSeconds.toString());
       this.saveToStorage('showProgressBar', this.showProgressBar.toString());
+      this.saveToStorage('autoNext', this.autoNext.toString());
     } catch (error) {
       console.log('Error saving localStorage Options for Pomodoro' + error);
     }
@@ -405,7 +419,6 @@ export class PomodoroComponent implements OnInit, OnDestroy {
       this.workSeconds = parseInt(
         (await this.getFromStorage('workSeconds')).value || this.workSeconds.toString()
       );
-      console.log(this.workSeconds);
       this.workSessionReward = parseInt(
        ( await this.getFromStorage('workSessionReward')).value ||
           this.workSessionReward.toString()
@@ -415,9 +428,35 @@ export class PomodoroComponent implements OnInit, OnDestroy {
 
       this.showProgressBar =
        ( await this.getFromStorage('showProgressBar')).value !== 'false';
+       this.autoNext =
+       ( await this.getFromStorage('autoNext')).value !== 'false';
     } catch (error) {
       console.log('Error loading localStorage Options for Pomodoro' + error);
     }
+  }
+
+  async showHistoryInfo(timerData: PomodoroTimerData){
+    let secondDifference = 0;
+    let endDateString = "-";
+    let startDateString = "-"
+    if(timerData.startDate && timerData.endDate){
+      secondDifference = Math.floor((timerData.endDate - timerData.startDate)/(1000));
+      endDateString = new Date(timerData.endDate).toLocaleTimeString();
+      startDateString = new Date(timerData.startDate).toLocaleTimeString();
+    }else if(timerData.startDate){
+      secondDifference = Math.floor((Date.now() - timerData.startDate)/(1000));
+      startDateString = new Date(timerData.startDate).toLocaleTimeString();
+    }
+    const alert = await this.alertController.create({
+      header: "History Information",
+      message: `Type: ${timerData.type.toString()}<br><br>
+                Actual Duration: ${(secondDifference-(secondDifference%60))/60} min ${(secondDifference%60)} sec
+                Goal Duration: ${timerData.duration/60} min<br\>
+                Start Date: ${startDateString}<br\>
+                End Date: ${endDateString}<br\> `,
+      buttons: ['OK']
+  });
+  await alert.present();
   }
 
 }

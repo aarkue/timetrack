@@ -120,6 +120,7 @@ export class AccountService {
         } else {
           await Storage.set({key: "jwt", value: ""});
           await Storage.set({key: "acc", value: JSON.stringify(null)});
+          this.acc = null;
           resolve(false);
         }
       });
