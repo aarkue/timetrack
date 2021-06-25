@@ -1,0 +1,22 @@
+.activityButton{
+  text-align: center;
+  // background-color:	var(--ion-color-primary);
+  // border: 1mm black solid;
+  width: 100px;
+  background-color: #00000000;
+}
+
+.activeButton > ion-icon{
+  color:	var(--ion-color-primary) !important;
+}
+.activeButton > ion-label{
+  color:	var(--ion-color-primary) !important;
+}
+.activeButton{
+background: rgba(195, 192, 192, 0.555);
+border-radius: 10px;
+}
+.ripple-parent {
+  position: relative;
+  overflow: hidden;
+}

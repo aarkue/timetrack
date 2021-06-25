@@ -10,7 +10,9 @@ import { Tab2PageRoutingModule } from './tab2-routing.module';
 import { PomodoroComponent } from '../pomodoro/pomodoro.component';
 import { SvgClockComponent } from '../pomodoro/svg-clock/svg-clock.component';
 import { PomodoroOptionsDialogComponent } from '../pomodoro/pomodoro-options-dialog/pomodoro-options-dialog.component';
-
+import { TimeTrackerComponent } from '../time-tracker/time-tracker.component';
+import {IconSelectorComponent } from '../icon-selector/icon-selector.component'
+import { NewActivityModalComponent } from '../time-tracker/new-activity-modal/new-activity-modal.component';
 @NgModule({
   imports: [
     IonicModule,
@@ -19,6 +21,6 @@ import { PomodoroOptionsDialogComponent } from '../pomodoro/pomodoro-options-dia
     ExploreContainerComponentModule,
     Tab2PageRoutingModule
   ],
-  declarations: [Tab2Page, PomodoroComponent, SvgClockComponent,PomodoroOptionsDialogComponent]
+  declarations: [Tab2Page, PomodoroComponent, SvgClockComponent,PomodoroOptionsDialogComponent, TimeTrackerComponent,NewActivityModalComponent ,IconSelectorComponent]
 })
 export class Tab2PageModule {}

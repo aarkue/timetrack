@@ -1,0 +1,26 @@
+<ion-grid>
+  <ion-row>
+    <ion-col size-sm="3" size-md="3" size-lg="3" size-xl="3" *ngFor="let el of activities;let i=index">
+    <button class="activityButton ion-activatable ripple-parent"
+    [ngClass]="{'activeButton': activeIndex===i}"
+    (click)="activeIndex!=i ? activeIndex=i : activeIndex = -1"
+    >
+      <ion-icon style="color: {{el.color}}" [name]="el.icon" size="large"></ion-icon>
+      <br>
+    <ion-label class="activityLabel">{{el.name}}</ion-label>
+    <ion-ripple-effect type="unbounded"></ion-ripple-effect>
+    </button>
+    </ion-col>
+    <ion-col size-sm="3" size-md="3" size-lg="3" size-xl="3">
+      <button class="activityButton ion-activatable ripple-parent"
+      (click)="addNewActivity()"
+      >
+        <ion-icon color="medium" name="add-circle" size="large"></ion-icon>
+        <br>
+      <ion-label class="activityLabel" color="medium">Add...</ion-label>
+      <ion-ripple-effect type="unbounded"></ion-ripple-effect>
+      </button>
+    </ion-col>
+  </ion-row>
+</ion-grid>
+<br>
