@@ -87,9 +87,12 @@ export class PomodoroComponent implements OnInit, OnDestroy {
       this.setTimePassedBefore(this.timePassed);
       this.startDate = Date.now();
       if(this.getTimePassedBefore() === 0){
-      this.timerHistory[this.timerHistory.length-1].startDate = Date.now();
+        if( this.timerHistory.length >= 2){
+          this.timerHistory[this.timerHistory.length-2].endDate = Date.now();
+        }
+        this.timerHistory[this.timerHistory.length-1].startDate = Date.now();
       }
-   } else {
+    } else {
       this.setIsPaused(true);
     }
   }
@@ -107,7 +110,7 @@ export class PomodoroComponent implements OnInit, OnDestroy {
       }
     }, 100);
 
-   this.saveinterval = setInterval(() => {
+    this.saveinterval = setInterval(() => {
       this.setTimePassedBefore(this.timePassed);
       this.startDate = Date.now();
     }, 1000);
@@ -117,7 +120,6 @@ export class PomodoroComponent implements OnInit, OnDestroy {
     this.setIsPaused(true);
     this.setTimePassedBefore(0);
     this.timePassed = 0;
-    this.timerHistory[this.timerHistory.length-1].endDate = Date.now();
     if (this.getStatus() === PomodoroStatus.Work) {
       this.notify('Time for a break!', {});
       
@@ -426,10 +428,8 @@ export class PomodoroComponent implements OnInit, OnDestroy {
 
       this.showSeconds = (await this.getFromStorage('showSeconds')).value !== 'false';
 
-      this.showProgressBar =
-       ( await this.getFromStorage('showProgressBar')).value !== 'false';
-       this.autoNext =
-       ( await this.getFromStorage('autoNext')).value !== 'false';
+      this.showProgressBar =( await this.getFromStorage('showProgressBar')).value !== 'false';
+      this.autoNext =!(( await this.getFromStorage('autoNext')).value !== 'true');
     } catch (error) {
       console.log('Error loading localStorage Options for Pomodoro' + error);
     }
@@ -450,8 +450,8 @@ export class PomodoroComponent implements OnInit, OnDestroy {
     const alert = await this.alertController.create({
       header: "History Information",
       message: `Type: ${timerData.type.toString()}<br><br>
-                Actual Duration: ${(secondDifference-(secondDifference%60))/60} min ${(secondDifference%60)} sec
-                Goal Duration: ${timerData.duration/60} min<br\>
+                Actual Duration: ${(secondDifference-(secondDifference%60))/60} m ${(secondDifference%60)} s<br\>
+                Goal Duration: ${(timerData.duration-(timerData.duration%60))/60} m ${(timerData.duration%60)} s<br\>
                 Start Date: ${startDateString}<br\>
                 End Date: ${endDateString}<br\> `,
       buttons: ['OK']
