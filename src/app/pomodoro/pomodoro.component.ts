@@ -55,18 +55,19 @@ export class PomodoroComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loadOptions().then(() => {
       this.initDefaults();
+      this.initSessionValues();
+      this.saveTimerHistory();
+      this.timePassed = Math.min(this.timePassedBefore, this.getCurrDuration());
+      this.startClock();
+        this.sound = new Howl({
+          src: ['/assets/notification.mp3','/assets/notification.wav']
+        });
+        console.log(this.sound)
+        
     });
    
     
-    this.initSessionValues();
-    this.timerHistory.unshift({startDate: null, duration: this.getCurrDuration(), type: this.getStatus(), endDate: null})
-    this.timePassed = Math.min(this.timePassedBefore, this.getCurrDuration());
-    this.startClock();
-      this.sound = new Howl({
-        src: ['/assets/notification.mp3','/assets/notification.wav']
-      });
-      console.log(this.sound)
-      
+
   }
   ngOnDestroy(): void {
     if(this.interval && this.saveinterval){
@@ -91,6 +92,7 @@ export class PomodoroComponent implements OnInit, OnDestroy {
           this.timerHistory[this.timerHistory.length-2].endDate = Date.now();
         }
         this.timerHistory[this.timerHistory.length-1].startDate = Date.now();
+        this.saveTimerHistory();
       }
     } else {
       this.setIsPaused(true);
@@ -137,7 +139,7 @@ export class PomodoroComponent implements OnInit, OnDestroy {
       this.setCurrDuration(this.workSeconds);
     }
     this.timerHistory.push({startDate: null, duration: this.getCurrDuration(), type: this.getStatus(), endDate: null})
-  
+    this.saveTimerHistory();
     if(this.autoNext){
       this.buttonClick();
     }
@@ -235,9 +237,11 @@ export class PomodoroComponent implements OnInit, OnDestroy {
 
   getStatus(): PomodoroStatus {
     let sessionStatus: string | null = sessionStorage.getItem('status');
+    console.log(sessionStatus);
     if (sessionStatus) {
       this.status =
         PomodoroStatus[sessionStatus as keyof typeof PomodoroStatus];
+        console.log(this.status );
     } else {
       sessionStorage.setItem('status', this.status);
     }
@@ -306,13 +310,12 @@ export class PomodoroComponent implements OnInit, OnDestroy {
 
   initSessionValues() {
     try {
+      this.getStatus();
+      this.getTimerHistory();
       this.getCurrDuration();
       this.timePassedBefore = this.getTimePassedBefore();
-      this.getStatus();
       this.getIsPaused();
       this.getPomodoros();
-      this.timerHistory[this.timerHistory.length-1] = {startDate: null, duration: this.getCurrDuration(), type: this.getStatus(), endDate: null};
-
     } catch (error) {
       console.log('Error getting session values for Pomodoro' + error);
     }
@@ -456,7 +459,27 @@ export class PomodoroComponent implements OnInit, OnDestroy {
                 End Date: ${endDateString}<br\> `,
       buttons: ['OK']
   });
-  await alert.present();
+  await alert.present()
   }
 
+
+  getTimerHistory(){
+    let res = sessionStorage.getItem('timerHistory');
+    console.log("timerHistory from session:",res)
+    if(res && res.length > 0){
+      this.timerHistory = JSON.parse(res);
+      console.log(this.timerHistory);
+    }else{
+      this.timerHistory = [{startDate: null, duration: this.getCurrDuration(), type: this.getStatus(), endDate: null}];
+    }
+  }
+
+  saveTimerHistory(){
+    sessionStorage.setItem('timerHistory', JSON.stringify(this.timerHistory));
+  }
+
+  deleteHistory(){
+    this.timerHistory.splice(0,this.timerHistory.length-1);
+    this.saveTimerHistory();
+  }
 }
