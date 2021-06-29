@@ -25,7 +25,7 @@
       min
     </h1>
     <ion-button expand="block" size="large"
-      mat-stroked-button
+      
       [color]="this.isPaused ? 'primary' : (this.status?.toString() === 'Break'? 'success' : 'secondary')"
       [fill]="this.isPaused ? 'solid' : 'solid'"
       (click)="buttonClick()"
@@ -41,9 +41,9 @@
   </ion-card-content>
   <app-svg-clock mat-card-image [isDown]="!isPaused"></app-svg-clock>
   <div>
-    <ion-button mat-stroked-button color="danger" (click)="clear()">Clear</ion-button>
-    <ion-button mat-stroked-button (click)="showOptions()" color="tertiary">Options</ion-button>
-    <ion-button mat-stroked-button class="right-button" (click)="timeUp()">Skip</ion-button>
+    <ion-button mode="ios" size="small" color="danger" (click)="clear()">Clear</ion-button>
+    <ion-button mode="ios" size="small"(click)="showOptions()" color="tertiary">Options</ion-button>
+    <ion-button mode="ios" size="small" class="right-button" (click)="timeUp()">Skip</ion-button>
   </div>
 </ion-card>
 
@@ -59,7 +59,7 @@
 </ion-chip>
 <br>
 <div class="centered">
-  <ion-button class="centered" fill="outline" size="small" color="danger" mat-stroked-button mode="ios" (click)="this.timerHistory.splice(0,this.timerHistory.length-1)">
+  <ion-button class="centered" fill="outline" size="small" color="danger"  mode="ios" (click)="this.timerHistory.splice(0,this.timerHistory.length-1)">
   Delete History
   </ion-button>
 </div>
