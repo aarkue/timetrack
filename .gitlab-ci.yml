@@ -8,6 +8,7 @@ variables:
 
 stages:
   - build_project
+  - upload_web
   - build_android
 
 build_android:
@@ -53,10 +54,12 @@ build_project:
   script:
       - npm install -g @ionic/cli
       - npm install
-      - ionic build
+      - ionic build --prod
+      - npx @getmeli/cli upload     --url https://siter.eu     --site b77c0e03-4f6a-43cd-8d7c-be967a4d3eda  --branch main   --token $SITER_TOKEN  www/
       - ionic cap copy android
   artifacts:
     paths:
       - node_modules
       - ./android
+
 
