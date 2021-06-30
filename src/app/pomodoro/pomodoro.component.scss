@@ -46,3 +46,12 @@ ion-chip {
     position: absolute;
     z-index: -1;
 }
+
+h1.overtime {
+    color: var(--ion-color-warning);
+}
+
+.chipLabel {
+    text-align: center;
+    margin-right: 2px;
+}

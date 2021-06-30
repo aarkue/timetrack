@@ -34,7 +34,9 @@ export class PomodoroComponent implements OnInit, OnDestroy {
   showSeconds: boolean = true;
   showProgressBar: boolean = true;
 
-  autoNext: boolean = false;
+  autoStart: boolean = true;
+  autoFinish : boolean = false;
+
   timePassed: number = 0;
 
   timePassedBefore: number = 0;
@@ -42,6 +44,9 @@ export class PomodoroComponent implements OnInit, OnDestroy {
   notifs = [];
   sound = undefined;
   timerHistory : PomodoroTimerData[] = [];
+
+  isOvertime : boolean = false; 
+
   constructor(
     // private snackbar: MatSnackBar,
     // private pomodoroOptionsDialog: MatDialog,
@@ -53,11 +58,10 @@ export class PomodoroComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.loadOptions().then(() => {
+    this.loadOptions().then(async () => {
       this.initDefaults();
-      this.initSessionValues();
-      this.saveTimerHistory();
-      this.timePassed = Math.min(this.timePassedBefore, this.getCurrDuration());
+      await this.retrieveCurrentState();
+      this.timePassed = Math.min(this.timePassedBefore, this.currDuration);
       this.startClock();
         this.sound = new Howl({
           src: ['/assets/notification.mp3','/assets/notification.wav']
@@ -65,7 +69,6 @@ export class PomodoroComponent implements OnInit, OnDestroy {
         console.log(this.sound)
         
     });
-   
     
 
   }
@@ -83,30 +86,32 @@ export class PomodoroComponent implements OnInit, OnDestroy {
       Notification.requestPermission();
     }
 
-    if (this.getIsPaused()) {
+    if (this.isPaused) {
       this.setIsPaused(false);
       this.setTimePassedBefore(this.timePassed);
       this.startDate = Date.now();
-      if(this.getTimePassedBefore() === 0){
+      if(this.timePassedBefore === 0){
         if( this.timerHistory.length >= 2){
           this.timerHistory[this.timerHistory.length-2].endDate = Date.now();
         }
         this.timerHistory[this.timerHistory.length-1].startDate = Date.now();
-        this.saveTimerHistory();
+        this.saveCurrentState();
       }
     } else {
-      this.setIsPaused(true);
+      if(this.isOvertime){
+        this.nextTimer();
+      }else{
+        this.setIsPaused(true);
+      }
     }
   }
 
   startClock() {
     this.interval = setInterval(() => {
-      if (!this.getIsPaused()) {
-        this.timePassed = Math.min(
-          this.timePassedBefore + this.calcTimePassed(),
-          this.getCurrDuration()
-        );
-        if (this.timePassed >= this.getCurrDuration()) {
+      if (!this.isPaused) {
+        this.timePassed = this.timePassedBefore + this.calcTimePassed();
+        if (this.timePassed >= this.currDuration && !this.isOvertime) {
+          this.isOvertime = true;
           this.timeUp();
         }
       }
@@ -119,28 +124,46 @@ export class PomodoroComponent implements OnInit, OnDestroy {
   }
 
   timeUp() {
+    if (this.status === PomodoroStatus.Work) {
+      this.notify('Time for a break!', {});
+    } else {
+      this.notify('Ready to get back to work?', {});
+    }
+   // this.timerHistory.push({startDate: null, duration: this.currDuration, type: this.status, endDate: null})
+   // this.saveCurrentState();
+    if(this.autoFinish){
+      this.nextTimer();
+    }
+  }
+
+  nextTimer(){
+    this.isOvertime = false;
     this.setIsPaused(true);
     this.setTimePassedBefore(0);
     this.timePassed = 0;
-    if (this.getStatus() === PomodoroStatus.Work) {
-      this.notify('Time for a break!', {});
-      
+    if (this.status === PomodoroStatus.Work) {
       this.setStatus(PomodoroStatus.Break);
-      if (this.getPomodoros() % this.workSessionReward === 0) {
+      if (this.pomodoros % this.workSessionReward === 0) {
         this.setCurrDuration(this.longBreakSeconds);
       } else {
         this.setCurrDuration(this.shortBreakSeconds);
       }
-
-      this.setPomodoros(this.getPomodoros()+1);
+      this.setPomodoros(this.pomodoros+1);
     } else {
-      this.notify('Ready to get back to work?', {});
       this.setStatus(PomodoroStatus.Work);
       this.setCurrDuration(this.workSeconds);
     }
-    this.timerHistory.push({startDate: null, duration: this.getCurrDuration(), type: this.getStatus(), endDate: null})
-    this.saveTimerHistory();
-    if(this.autoNext){
+    if(!this.timerHistory[this.timerHistory.length-1].startDate){
+      this.timerHistory[this.timerHistory.length-1].startDate = Date.now();
+    }
+    if(!this.timerHistory[this.timerHistory.length-1].endDate){
+      this.timerHistory[this.timerHistory.length-1].endDate = Date.now();
+    }
+
+    this.timerHistory.push({startDate: null, duration: this.currDuration, type: this.status, endDate: null})
+    this.saveCurrentState();
+
+    if(this.autoStart){
       this.buttonClick();
     }
   }
@@ -185,7 +208,7 @@ export class PomodoroComponent implements OnInit, OnDestroy {
 
   // Unused?
   // getCurrTotalSeconds() {
-  //   if (this.getStatus() === PomodoroStatus.Break) {
+  //   if (this.status === PomodoroStatus.Break) {
   //     if (this.pomodoros % this.workSessionReward == 0) {
   //       return this.longBreakSeconds;
   //     } else {
@@ -197,104 +220,93 @@ export class PomodoroComponent implements OnInit, OnDestroy {
   // }
 
   setCurrDuration(duration: number) {
-    sessionStorage.setItem('currDuration', duration.toString());
     this.currDuration = duration;
+    this.saveCurrentState();
   }
 
   setPomodoros(pomodoros: number) {
-    sessionStorage.setItem('pomodoros', pomodoros.toString());
-    this.currDuration = pomodoros;
+    this.pomodoros = pomodoros;
+    this.saveCurrentState();
   }
 
   setTimePassedBefore(time: number) {
-    sessionStorage.setItem('timePassedBefore', time.toString());
     this.timePassedBefore = time;
+    this.saveCurrentState();
   }
 
   setStatus(status: PomodoroStatus) {
-    sessionStorage.setItem('status', status.toString());
     this.status = status;
+    this.saveCurrentState();
   }
 
   setIsPaused(paused: boolean) {
-    sessionStorage.setItem('paused', paused + '');
     this.isPaused = paused;
+    this.saveCurrentState();
   }
 
-  getIsPaused(): boolean {
-    let sessionIsPaused: string | null = sessionStorage.getItem('paused');
-    if (sessionIsPaused !== null) {
-      if ('true' === sessionIsPaused) {
-        this.isPaused = true;
-      } else {
-        this.isPaused = false;
-      }
-    } else {
-      sessionStorage.setItem('paused', this.isPaused + '');
-    }
-    return this.isPaused;
+  async saveCurrentState(){
+    await this.saveToStorage('timePassedBefore', this.timePassedBefore.toString());
+    await this.saveToStorage('status', this.status.toString());
+    await this.saveToStorage('paused', this.isPaused+'');
+    await this.saveToStorage('pomodoros', this.pomodoros.toString());
+    await this.saveToStorage('currDuration', this.currDuration.toString());
+    await this.saveToStorage('timerHistory', JSON.stringify(this.timerHistory));
   }
 
-  getStatus(): PomodoroStatus {
-    let sessionStatus: string | null = sessionStorage.getItem('status');
-    console.log(sessionStatus);
-    if (sessionStatus) {
-      this.status =
-        PomodoroStatus[sessionStatus as keyof typeof PomodoroStatus];
-        console.log(this.status );
-    } else {
-      sessionStorage.setItem('status', this.status);
+  async retrieveCurrentState(){
+    let timePassedBefore = await this.getFromStorage('timePassedBefore');
+    let status = await this.getFromStorage('status');
+    let isPaused =  await this.getFromStorage('paused');
+    let pomodoros = await this.getFromStorage('pomodoros');
+    let currDuration = await this.getFromStorage('currDuration');
+    let timerHistory = await this.getFromStorage('timerHistory');
+
+    this.isPaused = !('false' === isPaused.value)
+
+    let parsedPomodoros = parseInt(pomodoros.value);
+    if(!isNaN(parsedPomodoros)){
+      this.pomodoros = parsedPomodoros;
     }
-    return this.status;
+
+    let parsedCurrDuration = parseInt(currDuration.value);
+    if(!isNaN(parsedCurrDuration)){
+      console.log(parsedCurrDuration);
+      this.currDuration = parsedCurrDuration;
+    }
+
+    let parsedStatus =  PomodoroStatus[status.value as keyof typeof PomodoroStatus];
+    if(parsedStatus){
+      this.status = parsedStatus;
+    }
+
+    let parsedTimePassedBefore = parseFloat(timePassedBefore.value);
+    if(!isNaN(parsedTimePassedBefore)){
+      this.timePassedBefore = parsedTimePassedBefore;
+    }
+
+    if(timerHistory.value && timerHistory.value.length > 0){
+      this.timerHistory = JSON.parse(timerHistory.value);
+    }else{
+      this.timerHistory = [{startDate: null, duration: this.currDuration, type: this.status, endDate: null}];
+    }
   }
 
-  getCurrDuration(): number {
-    let sessionCurrDuration: string | null = sessionStorage.getItem(
-      'currDuration'
-    );
-    if (sessionCurrDuration !== null) {
-      this.currDuration = parseInt(sessionCurrDuration);
-    } else {
-      sessionStorage.setItem('secondsLeft', this.currDuration.toString());
-    }
-    return this.currDuration;
+  deleteHistory(){
+    this.timerHistory.splice(0,this.timerHistory.length-1);
+    this.saveCurrentState();
   }
 
-  getPomodoros(): number {
-    let sessionPomodoros: string | null = sessionStorage.getItem(
-      'pomodoros'
-    );
-    if (sessionPomodoros !== null) {
-      this.pomodoros = parseInt(sessionPomodoros);
-    } else {
-      sessionStorage.setItem('pomodoros', this.pomodoros.toString());
-    }
-    return this.pomodoros;
-  }
-
-  getTimePassedBefore(): number {
-    let sessionTimePassedBefore: string | null = sessionStorage.getItem(
-      'timePassedBefore'
-    );
-    if (sessionTimePassedBefore !== null) {
-      this.timePassedBefore = parseFloat(sessionTimePassedBefore);
-    } else {
-      sessionStorage.setItem(
-        'timePassedBefore',
-        this.timePassedBefore.toString()
-      );
-    }
-    return this.timePassedBefore;
-  }
 
   calcTimePassed(): number {
     return (Date.now() - this.startDate) / 1000;
   }
 
   clear() {
-    sessionStorage.clear();
     this.initDefaults();
-    this.initSessionValues();
+    this.timerHistory[this.timerHistory.length-1].type = this.status;
+    this.timerHistory[this.timerHistory.length-1].duration = this.currDuration;
+    this.timerHistory[this.timerHistory.length-1].startDate = null;
+    this.saveCurrentState();
   }
 
   initDefaults() {
@@ -306,20 +318,9 @@ export class PomodoroComponent implements OnInit, OnDestroy {
     this.timePassed = 0;
 
     this.timePassedBefore = 0;
+    this.isOvertime = false;
   }
 
-  initSessionValues() {
-    try {
-      this.getStatus();
-      this.getTimerHistory();
-      this.getCurrDuration();
-      this.timePassedBefore = this.getTimePassedBefore();
-      this.getIsPaused();
-      this.getPomodoros();
-    } catch (error) {
-      console.log('Error getting session values for Pomodoro' + error);
-    }
-  }
 
   async showOptions() {
     const modalRef = await this.modalController.create(
@@ -331,7 +332,8 @@ export class PomodoroComponent implements OnInit, OnDestroy {
                 workSessionsBeforeLongBreak: this.workSessionReward,
                 showSeconds: this.showSeconds,
                 showProgressBar: this.showProgressBar,
-                autoNext: this.autoNext},
+                autoStart: this.autoStart,
+                autoFinish: this.autoFinish},
       });
       modalRef.onWillDismiss().then((res) => {
         if(res.data){
@@ -341,7 +343,8 @@ export class PomodoroComponent implements OnInit, OnDestroy {
         this.workSessionReward = res.data.workSessionsBeforeLongBreak;
         this.showSeconds = res.data.showSeconds;
         this.showProgressBar = res.data.showProgressBar;
-        this.autoNext = res.data.autoNext;
+        this.autoStart = res.data.autoStart;
+        this.autoFinish = res.data.autoFinish;
         this.saveOptions();
         if (this.timePassed === 0 && this.timePassedBefore === 0) {
           this.clear();
@@ -405,7 +408,8 @@ export class PomodoroComponent implements OnInit, OnDestroy {
       );
       this.saveToStorage('showSeconds', this.showSeconds.toString());
       this.saveToStorage('showProgressBar', this.showProgressBar.toString());
-      this.saveToStorage('autoNext', this.autoNext.toString());
+      this.saveToStorage('autoStart', this.autoStart.toString());
+      this.saveToStorage('autoFinish', this.autoFinish.toString());
     } catch (error) {
       console.log('Error saving localStorage Options for Pomodoro' + error);
     }
@@ -425,14 +429,16 @@ export class PomodoroComponent implements OnInit, OnDestroy {
         (await this.getFromStorage('workSeconds')).value || this.workSeconds.toString()
       );
       this.workSessionReward = parseInt(
-       ( await this.getFromStorage('workSessionReward')).value ||
+        ( await this.getFromStorage('workSessionReward')).value ||
           this.workSessionReward.toString()
       );
 
       this.showSeconds = (await this.getFromStorage('showSeconds')).value !== 'false';
 
       this.showProgressBar =( await this.getFromStorage('showProgressBar')).value !== 'false';
-      this.autoNext =!(( await this.getFromStorage('autoNext')).value !== 'true');
+      this.autoStart =(( await this.getFromStorage('autoStart')).value !== 'false');
+      this.autoFinish =!(( await this.getFromStorage('autoFinish')).value !== 'true');
+
     } catch (error) {
       console.log('Error loading localStorage Options for Pomodoro' + error);
     }
@@ -462,24 +468,38 @@ export class PomodoroComponent implements OnInit, OnDestroy {
   await alert.present()
   }
 
-
-  getTimerHistory(){
-    let res = sessionStorage.getItem('timerHistory');
-    console.log("timerHistory from session:",res)
-    if(res && res.length > 0){
-      this.timerHistory = JSON.parse(res);
-      console.log(this.timerHistory);
-    }else{
-      this.timerHistory = [{startDate: null, duration: this.getCurrDuration(), type: this.getStatus(), endDate: null}];
+  public getDurationDifferenceMin(timerData : PomodoroTimerData){
+    let actualSec = 0;
+    let isRunning = true;
+    if(timerData.startDate && timerData.endDate){
+      actualSec = Math.floor((timerData.endDate - timerData.startDate)/(1000));
+      isRunning = false;
+    }else if(timerData.startDate){
+      actualSec = Math.floor((Date.now() - timerData.startDate)/(1000));
     }
+
+    let secDifference = (actualSec - timerData.duration);
+
+    let minDifference = Math.trunc((secDifference)/60);
+
+    if(minDifference < 0 && !isRunning){
+      return minDifference;
+    }else if(minDifference > 0){
+      return "+" + minDifference;
+    }else if(isRunning){
+      return "";
+    }else{
+      return ""
+    }
+
   }
 
-  saveTimerHistory(){
-    sessionStorage.setItem('timerHistory', JSON.stringify(this.timerHistory));
+  public getMinLeft(){
+    return (this.currDuration - this.timePassed) / 60 -
+    ((this.currDuration - this.timePassed) % 60) / 60;
   }
 
-  deleteHistory(){
-    this.timerHistory.splice(0,this.timerHistory.length-1);
-    this.saveTimerHistory();
+  public getSecLeft(){
+    return (this.currDuration - this.timePassed) % 60;
   }
 }

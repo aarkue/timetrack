@@ -46,7 +46,11 @@
 </ion-item>
 <ion-item>
   <ion-label>Automatically start timer</ion-label>
-  <ion-toggle mode="ios" [(ngModel)]="autoNext"></ion-toggle>
+  <ion-toggle mode="ios" [(ngModel)]="autoStart"></ion-toggle>
+</ion-item>
+<ion-item>
+  <ion-label>Automatically finish timer when time is up</ion-label>
+  <ion-toggle mode="ios" [(ngModel)]="autoFinish"></ion-toggle>
 </ion-item>
 </ion-list>
 <br>

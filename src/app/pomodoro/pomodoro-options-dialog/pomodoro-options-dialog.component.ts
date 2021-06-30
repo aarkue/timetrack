@@ -18,7 +18,9 @@ export class PomodoroOptionsDialogComponent implements OnInit {
   @Input() workSessionsBeforeLongBreak: number;
   @Input() showSeconds: boolean;
   @Input() showProgressBar: boolean;
-  @Input() autoNext: boolean;
+  @Input() autoStart: boolean;
+  @Input() autoFinish: boolean;
+
   public dismissModal(save : boolean = false){
     if(save){
       this.modalController.dismiss({workMinutes: this.workMinutes,
@@ -27,7 +29,8 @@ export class PomodoroOptionsDialogComponent implements OnInit {
         workSessionsBeforeLongBreak: this.workSessionsBeforeLongBreak,
         showSeconds: this.showSeconds,
         showProgressBar: this.showProgressBar,
-        autoNext: this.autoNext
+        autoStart: this.autoStart,
+        autoFinish: this.autoFinish
       });
     }else{
       this.modalController.dismiss();
