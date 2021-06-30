@@ -10,20 +10,20 @@
 
 <ion-content>
   <div class="previewResult">
-    <app-activity-button [label]="label" [color]="color" [icon]="icon" [active]="false"></app-activity-button>
+    <app-activity-button [activity]="activity" [active]="false"></app-activity-button>
     </div>
   <ion-list lines="full">
 <ion-item>
   <ion-label position="fixed">Label</ion-label>
-  <ion-input type="text" [(ngModel)]="label" ></ion-input>
+  <ion-input type="text" [(ngModel)]="activity.label" ></ion-input>
 </ion-item>
 <ion-item>
   <ion-label position="fixed">Color</ion-label>
-  <ion-input type="color" [(ngModel)]="color"></ion-input>
+  <ion-input type="color" [(ngModel)]="activity.color"></ion-input>
 </ion-item>
 <ion-item disabled=true>
   <ion-label position="fixed">Icon</ion-label>
-  <ion-input type="text" [(ngModel)]="icon"></ion-input>
+  <ion-input type="text" [(ngModel)]="activity.icon"></ion-input>
   <ion-icon name="search" color="medium" slot="end" (click)="showIconPicker()"></ion-icon>
 </ion-item>
 </ion-list>

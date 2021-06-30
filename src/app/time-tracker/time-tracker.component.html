@@ -10,7 +10,7 @@
     <ion-label class="activityLabel">{{el.name}}</ion-label>
     <ion-ripple-effect type="unbounded"></ion-ripple-effect>
     </button> -->
-    <app-activity-button [label]="el.label" [color]="el.color" [icon]="el.icon" [active]="activeIndex===i"></app-activity-button>
+    <app-activity-button [activity]="el" [active]="activeIndex===i" (activityClick)="onActivityButtonClick($event)"></app-activity-button>
     </ion-col>
     <ion-col size-sm="3" size-md="3" size-lg="3" size-xl="3">
       <button class="activityButton ion-activatable ripple-parent"
@@ -24,4 +24,11 @@
     </ion-col>
   </ion-row>
 </ion-grid>
+<ion-list>
+  <ion-item *ngFor="let t of timeTracked">
+    <ion-label>{{t.activity.label}}</ion-label>
+    <ion-icon [name]="t.activity.icon" slot="start" [ngStyle]="{'color': t.activity.color}"></ion-icon>
+    <ion-label>{{t.startDate | date:'HH:mm'}} – {{t.endDate | date:'HH:mm'}}</ion-label>
+  </ion-item>
+</ion-list>
 <br>

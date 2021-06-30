@@ -1,4 +1,5 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Activity } from '../activity';
 
 @Component({
   selector: 'app-activity-button',
@@ -10,18 +11,19 @@ export class ActivityButtonComponent implements OnInit {
   @Input('active')
   public active : boolean;
 
-  @Input('label')
-  public label : string;
+  @Input('activity')
+  public activity : Activity;
 
-  @Input('icon')
-  public icon : string;
 
-  @Input('color')
-  public color : string;
-
+  @Output('activityClick')
+  private clickEmitter : EventEmitter<Activity> = new EventEmitter();
 
   constructor() { }
 
   ngOnInit() {}
+
+  onClicked(){
+    this.clickEmitter.emit(this.activity);
+  }
 
 }

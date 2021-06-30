@@ -1,9 +1,9 @@
 <button class="activityButton ion-activatable ripple-parent"
-    [ngClass]="{'activeButton': active}"
-    (click)="active=!active"
+    [ngClass]="{'activeButton': activity.startDate}"
+    (click)="onClicked()"
     >
-      <ion-icon [ngStyle]="{color: color}" [name]="icon" size="large"></ion-icon>
+      <ion-icon [ngStyle]="{color: activity.color}" [name]="activity.icon" size="large"></ion-icon>
       <br>
-    <ion-label class="activityLabel">{{label}}</ion-label>
+    <ion-label class="activityLabel">{{activity.label}}</ion-label>
     <ion-ripple-effect type="unbounded"></ion-ripple-effect>
     </button>
