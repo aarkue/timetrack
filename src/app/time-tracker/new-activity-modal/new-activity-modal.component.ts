@@ -9,7 +9,7 @@ import { IconSelectorComponent } from 'src/app/icon-selector/icon-selector.compo
 export class NewActivityModalComponent implements OnInit {
 
   public icon : string = "leaf"
-  public name : string = ""
+  public label : string = ""
   public color : string = "#1f9e4b"
   constructor(private modalController : ModalController) { }
 
@@ -17,7 +17,7 @@ export class NewActivityModalComponent implements OnInit {
 
   dismissModal(saveData: boolean = false){
     if(saveData){
-    this.modalController.dismiss({name: this.name, icon: this.icon, color: this.color});
+    this.modalController.dismiss({label: this.label, icon: this.icon, color: this.color});
     }else{
       this.modalController.dismiss();
     }
@@ -26,7 +26,7 @@ export class NewActivityModalComponent implements OnInit {
   async showIconPicker(){
     const modal = await this.modalController.create({
       component: IconSelectorComponent,
-      componentProps : {name: this.name, icon: this.icon, color: this.color},
+      componentProps : {label: this.label, icon: this.icon, color: this.color},
     });
     await modal.present()
   }

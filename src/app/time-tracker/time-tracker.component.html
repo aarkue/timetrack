@@ -1,7 +1,7 @@
 <ion-grid>
   <ion-row>
     <ion-col size-sm="3" size-md="3" size-lg="3" size-xl="3" *ngFor="let el of activities;let i=index">
-    <button class="activityButton ion-activatable ripple-parent"
+    <!-- <button class="activityButton ion-activatable ripple-parent"
     [ngClass]="{'activeButton': activeIndex===i}"
     (click)="activeIndex!=i ? activeIndex=i : activeIndex = -1"
     >
@@ -9,7 +9,8 @@
       <br>
     <ion-label class="activityLabel">{{el.name}}</ion-label>
     <ion-ripple-effect type="unbounded"></ion-ripple-effect>
-    </button>
+    </button> -->
+    <app-activity-button [label]="el.label" [color]="el.color" [icon]="el.icon" [active]="activeIndex===i"></app-activity-button>
     </ion-col>
     <ion-col size-sm="3" size-md="3" size-lg="3" size-xl="3">
       <button class="activityButton ion-activatable ripple-parent"

@@ -10,21 +10,12 @@
 
 <ion-content>
   <div class="previewResult">
-    <button class="activityButton ion-activatable ripple-parent">
-      <ion-icon style="color: {{color}}" [name]="icon" size="large"></ion-icon>
-      <br>
-    <ion-label class="activityLabel">{{name}}</ion-label>
-    </button>
+    <app-activity-button [label]="label" [color]="color" [icon]="icon" [active]="false"></app-activity-button>
     </div>
   <ion-list lines="full">
-  <!-- <ion-list-header lines="full">
-    <ion-label color="medium">
-      Durations (in minutes)
-    </ion-label>
-  </ion-list-header> -->
 <ion-item>
-  <ion-label position="fixed">Name</ion-label>
-  <ion-input type="text" [(ngModel)]="name" ></ion-input>
+  <ion-label position="fixed">Label</ion-label>
+  <ion-input type="text" [(ngModel)]="label" ></ion-input>
 </ion-item>
 <ion-item>
   <ion-label position="fixed">Color</ion-label>

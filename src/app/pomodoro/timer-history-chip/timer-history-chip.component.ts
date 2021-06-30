@@ -23,7 +23,8 @@ export class TimerHistoryChipComponent implements OnInit {
 
   constructor(private alertController : AlertController) { }
 
-  ngOnInit() {}
+  ngOnInit() {
+  }
 
 
 

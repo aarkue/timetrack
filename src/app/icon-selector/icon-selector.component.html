@@ -1,6 +1,7 @@
+
 <ion-searchbar animated [(ngModel)]="searchText" (keyup.ENTER)="refreshFiltered()"></ion-searchbar>
 
-<!-- <ion-content class="iconList"> -->
+<ion-content class="iconList">
 <ion-list>
   <ion-item *ngFor="let el of shownIconsFiltered" (click)="onIconSelected(el)">
     <ion-icon name="{{el}}" slot="start"></ion-icon>
@@ -13,4 +14,4 @@
     loadingText="Loading more data...">
   </ion-infinite-scroll-content>
 </ion-infinite-scroll>
-<!-- </ion-content> -->
+</ion-content>
