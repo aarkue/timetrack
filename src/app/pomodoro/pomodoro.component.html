@@ -44,13 +44,21 @@
   </div>
 </ion-card>
 
-<div id="pomodoroHistory">
-  <ion-item><h2>History</h2></ion-item>
-  <app-timer-history-chip *ngFor="let el of timerHistory;" [timerData]="el" [progress]="el.endDate ? 1 : (this.timePassed / this.currDuration)" [showProgress]="this.showProgressBar"></app-timer-history-chip>
-<br>
-<div class="centered">
-  <ion-button class="centered" fill="outline" size="small" color="danger"  mode="ios" (click)="this.deleteHistory()">
-  Delete History
-  </ion-button>
-</div>
-</div>
+<div class="outerPomodoroHistory">
+  <ion-item lines="full">
+    <h3>History</h3>
+    <ion-button slot="end" class="centered" fill="none" size="small" (click)="this.deleteHistory()">
+      <ion-icon name="trash" slot="icon-only"  color="danger"></ion-icon>
+      </ion-button>
+      <ion-button slot="end" fill="none" (click)="toggleExpandHistory()">
+        <ion-icon [name]="this.historyExpanded ? 'contract' : 'expand'" slot="icon-only">
+      </ion-icon>
+      </ion-button>
+  </ion-item>
+  <div class="pomodoroHistory" #pomodoroHistoryDiv [ngClass]="{'historyExpanded': this.historyExpanded}">
+    <app-timer-history-chip *ngFor="let el of timerHistory;"
+      [timerData]="el" [progress]="el.endDate ? 1 : (this.timePassed / this.currDuration)"
+      [showProgress]="this.showProgressBar">
+    </app-timer-history-chip>
+  </div>
+  </div>

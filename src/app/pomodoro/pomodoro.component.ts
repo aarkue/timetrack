@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 // import { MatDialog } from '@angular/material/dialog';
 // import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
@@ -47,6 +47,11 @@ export class PomodoroComponent implements OnInit, OnDestroy {
 
   isOvertime : boolean = false; 
 
+  @ViewChild('pomodoroHistoryDiv')
+  private pomodoroHistoryDiv : ElementRef<HTMLDivElement> 
+
+
+  public historyExpanded : boolean = false;
   constructor(
     // private snackbar: MatSnackBar,
     // private pomodoroOptionsDialog: MatDialog,
@@ -61,12 +66,16 @@ export class PomodoroComponent implements OnInit, OnDestroy {
     this.loadOptions().then(async () => {
       this.initDefaults();
       await this.retrieveCurrentState();
+      setTimeout(() => {
+        this.scrollHistoryIntoView();
+      },100)
+      
       this.timePassed = Math.min(this.timePassedBefore, this.currDuration);
       this.startClock();
     });
-    
-
   }
+
+
   ngOnDestroy(): void {
     if(this.interval && this.saveinterval){
       clearInterval(this.interval);
@@ -160,8 +169,10 @@ export class PomodoroComponent implements OnInit, OnDestroy {
     }
 
     this.timerHistory.push({startDate: null, duration: this.currDuration, type: this.status, endDate: null})
+    this.scrollHistoryIntoView();
     this.saveCurrentState();
 
+  
     if(this.autoStart){
       this.buttonClick();
     }
@@ -292,9 +303,26 @@ export class PomodoroComponent implements OnInit, OnDestroy {
     }
   }
 
-  deleteHistory(){
-    this.timerHistory.splice(0,this.timerHistory.length-1);
-    this.saveCurrentState();
+  async deleteHistory(){
+    const alert = await this.alertController.create({
+      header: 'Delete Pomodoro History',
+      message: 'Are you sure?',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          handler: () => {
+          }
+        }, {
+          text: 'Yes',
+          handler: () => {
+            this.timerHistory.splice(0,this.timerHistory.length-1);
+            this.saveCurrentState();
+          }
+        }
+      ]
+    });
+    await alert.present();
   }
 
 
@@ -353,35 +381,6 @@ export class PomodoroComponent implements OnInit, OnDestroy {
       }
       })
     return await modalRef.present();
-
-    // let dialogRef = this.pomodoroOptionsDialog.open(
-    //   PomodoroOptionsDialogComponent,
-    //   {
-    //     data: {
-    //       workDuration: this.workSeconds / 60,
-    //       shortBreakDuration: this.shortBreakSeconds / 60,
-    //       longBreakDuration: this.longBreakSeconds / 60,
-    //       workSessionReward: this.workSessionReward,
-    //       showSeconds: this.showSeconds,
-    //       showProgressBar: this.showProgressBar,
-    //     },
-    //   }
-    // );
-
-    // dialogRef.afterClosed().subscribe(async (options: any) => {
-    //   if (options) {
-    //     this.shortBreakSeconds = options.shortBreakDuration * 60;
-    //     this.longBreakSeconds = options.longBreakDuration * 60;
-    //     this.workSeconds = options.workDuration * 60;
-    //     this.workSessionReward = options.workSessionReward;
-    //     this.showSeconds = options.showSeconds;
-    //     this.showProgressBar = options.showProgressBar;
-    //     this.saveOptions();
-    //     if (this.timePassed === 0 && this.timePassedBefore === 0) {
-    //       this.clear();
-    //     }
-    //   }
-    // });
   }
 
   async saveToStorage(key: string, value: string){
@@ -452,5 +451,17 @@ export class PomodoroComponent implements OnInit, OnDestroy {
 
   public getSecLeft(){
     return (this.currDuration - this.timePassed) % 60;
+  }
+
+  toggleExpandHistory(){
+    this.historyExpanded = !this.historyExpanded;
+    this.scrollHistoryIntoView();
+  }
+
+  scrollHistoryIntoView() {
+    setTimeout(() => {
+      this.pomodoroHistoryDiv.nativeElement.scrollTop = this.pomodoroHistoryDiv.nativeElement.scrollHeight;
+      this.pomodoroHistoryDiv.nativeElement.scrollLeft = this.pomodoroHistoryDiv.nativeElement.scrollWidth;
+    },30)
   }
 }
