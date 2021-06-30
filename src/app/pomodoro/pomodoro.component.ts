@@ -63,11 +63,6 @@ export class PomodoroComponent implements OnInit, OnDestroy {
       await this.retrieveCurrentState();
       this.timePassed = Math.min(this.timePassedBefore, this.currDuration);
       this.startClock();
-        this.sound = new Howl({
-          src: ['/assets/notification.mp3','/assets/notification.wav']
-        });
-        console.log(this.sound)
-        
     });
     
 
@@ -80,8 +75,12 @@ export class PomodoroComponent implements OnInit, OnDestroy {
   }
 
   async buttonClick() {
-      let x = await LocalNotifications.requestPermission();
-      console.log(x);
+    if(!this.sound){
+      this.sound = new Howl({
+        src: ['/assets/notification.mp3','/assets/notification.wav']
+      });
+    }
+    await LocalNotifications.requestPermission();
     if ('Notification' in window) {
       Notification.requestPermission();
     }
@@ -198,7 +197,9 @@ export class PomodoroComponent implements OnInit, OnDestroy {
     if(this.platform.is("hybrid")){
       Haptics.vibrate();
     }
+    if(this.sound){
       this.sound.play();
+    }
     
     // this.snackbar.open(title, 'Ok', {
     //   duration: 3000,
@@ -442,56 +443,6 @@ export class PomodoroComponent implements OnInit, OnDestroy {
     } catch (error) {
       console.log('Error loading localStorage Options for Pomodoro' + error);
     }
-  }
-
-  async showHistoryInfo(timerData: PomodoroTimerData){
-    let secondDifference = 0;
-    let endDateString = "-";
-    let startDateString = "-"
-    if(timerData.startDate && timerData.endDate){
-      secondDifference = Math.floor((timerData.endDate - timerData.startDate)/(1000));
-      endDateString = new Date(timerData.endDate).toLocaleTimeString();
-      startDateString = new Date(timerData.startDate).toLocaleTimeString();
-    }else if(timerData.startDate){
-      secondDifference = Math.floor((Date.now() - timerData.startDate)/(1000));
-      startDateString = new Date(timerData.startDate).toLocaleTimeString();
-    }
-    const alert = await this.alertController.create({
-      header: "History Information",
-      message: `Type: ${timerData.type.toString()}<br><br>
-                Actual Duration: ${(secondDifference-(secondDifference%60))/60} m ${(secondDifference%60)} s<br\>
-                Goal Duration: ${(timerData.duration-(timerData.duration%60))/60} m ${(timerData.duration%60)} s<br\>
-                Start Date: ${startDateString}<br\>
-                End Date: ${endDateString}<br\> `,
-      buttons: ['OK']
-  });
-  await alert.present()
-  }
-
-  public getDurationDifferenceMin(timerData : PomodoroTimerData){
-    let actualSec = 0;
-    let isRunning = true;
-    if(timerData.startDate && timerData.endDate){
-      actualSec = Math.floor((timerData.endDate - timerData.startDate)/(1000));
-      isRunning = false;
-    }else if(timerData.startDate){
-      actualSec = Math.floor((Date.now() - timerData.startDate)/(1000));
-    }
-
-    let secDifference = (actualSec - timerData.duration);
-
-    let minDifference = Math.trunc((secDifference)/60);
-
-    if(minDifference < 0 && !isRunning){
-      return minDifference;
-    }else if(minDifference > 0){
-      return "+" + minDifference;
-    }else if(isRunning){
-      return "";
-    }else{
-      return ""
-    }
-
   }
 
   public getMinLeft(){

@@ -46,14 +46,7 @@
 
 <div id="pomodoroHistory">
   <ion-item><h2>History</h2></ion-item>
-<ion-chip *ngFor="let el of timerHistory;" (click)="showHistoryInfo(el)" [color]="el.type.toString() === 'Break' ? 'success' : 'primary'" [outline]="el.endDate != null" [ngStyle]="{width: (el.duration/(10*60))*50+80+'px'}">
-  <ion-label class="chipLabel" [color]="el.endDate ? '' : 'dark'"><b>{{el.duration/60 | number: "1.1-2"}}</b> <br><i>{{getDurationDifferenceMin(el)}}</i></ion-label>
-  <ion-icon name="timer-outline" [color]="el.endDate ? '' : 'dark'"></ion-icon>
-  <ion-progress-bar *ngIf="showProgressBar && !el.endDate " class="chipProgress"
-  [value]="(this.timePassed / this.currDuration)"
-  [color]="el.type.toString() === 'Break' ? 'success' : 'secondary'"
-  ></ion-progress-bar>
-</ion-chip>
+  <app-timer-history-chip *ngFor="let el of timerHistory;" [timerData]="el" [progress]="el.endDate ? 1 : (this.timePassed / this.currDuration)" [showProgress]="this.showProgressBar"></app-timer-history-chip>
 <br>
 <div class="centered">
   <ion-button class="centered" fill="outline" size="small" color="danger"  mode="ios" (click)="this.deleteHistory()">

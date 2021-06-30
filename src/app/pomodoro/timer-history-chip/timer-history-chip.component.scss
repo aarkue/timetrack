@@ -1,0 +1,18 @@
+ion-chip {
+  justify-content: center;
+}
+.chipProgress{
+  margin: 0;
+  height: 100%;
+  position: absolute;
+  z-index: -1;
+}
+.chipLabel {
+  text-align: center;
+  margin-right: 2px;
+}
+
+.selected {
+  background-color: rgba(var(--ion-color-tertiary-rgb),0.2);
+  border: 1px dashed var(--ion-color-medium);
+}

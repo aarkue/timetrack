@@ -31,27 +31,14 @@ ion-card-content {
     font-size: 3em;
 }
 
-ion-chip {
-    justify-content: center;
-}
 
 .centered {
     margin: 0 auto;
     text-align: center;
 }
 
-.chipProgress{
-    margin: 0;
-    height: 100%;
-    position: absolute;
-    z-index: -1;
-}
+
 
 h1.overtime {
     color: var(--ion-color-warning);
-}
-
-.chipLabel {
-    text-align: center;
-    margin-right: 2px;
 }

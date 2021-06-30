@@ -1,8 +1,14 @@
-<!-- <ion-chip *ngFor="let el of timerHistory;" (click)="showHistoryInfo(el)" [color]="el.type.toString() === 'Break' ? 'success' : 'primary'" [outline]="el.endDate != null" [ngStyle]="{width: (el.duration/(10*60))*50+80+'px'}">
-  <ion-label class="chipLabel" [color]="el.endDate ? '' : 'dark'"><b>{{el.duration/60 | number: "1.1-2"}}</b> <br><i>{{getDurationDifferenceMin(el)}}</i></ion-label>
-  <ion-icon name="timer-outline" [color]="el.endDate ? '' : 'dark'"></ion-icon>
-  <ion-progress-bar *ngIf="showProgressBar && !el.endDate " class="chipProgress"
-  [value]="(this.timePassed / this.currDuration)"
-  [color]="el.type.toString() === 'Break' ? 'success' : 'secondary'"
+<ion-chip #chip (click)="showHistoryInfo()" [color]="timerData.type.toString() === 'Break' ? 'success' : 'primary'"
+          [outline]="timerData.endDate != null" [ngStyle]="{width: (timerData.duration/(10*60))*50+80+'px'}"
+          [ngClass]="{'selected': this.selected}">
+  <ion-label class="chipLabel" [color]="timerData.endDate ? '' : 'dark'">
+    <b>{{timerData.duration/60 | number: "1.1-2"}}</b>
+    <br>
+    <i>{{getDurationDifferenceString()}}</i>
+  </ion-label>
+  <ion-icon name="timer-outline" [color]="timerData.endDate ? '' : 'dark'"></ion-icon>
+  <ion-progress-bar *ngIf="showProgress && !timerData.endDate " class="chipProgress"
+  [value]="(this.progress)"
+  [color]="timerData.type.toString() === 'Break' ? 'success' : 'secondary'"
   ></ion-progress-bar>
-</ion-chip> -->
+</ion-chip>
