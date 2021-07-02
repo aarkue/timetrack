@@ -18,12 +18,20 @@ export class ActivityButtonComponent implements OnInit {
   @Output('activityClick')
   private clickEmitter : EventEmitter<Activity> = new EventEmitter();
 
+  @Output('activityHold')
+  private holdEmitter : EventEmitter<{activity: Activity,event: MouseEvent}> = new EventEmitter();
+
   constructor() { }
 
   ngOnInit() {}
 
   onClicked(){
     this.clickEmitter.emit(this.activity);
+  }
+
+  onHold(event: MouseEvent){
+    event.preventDefault();
+    this.holdEmitter.emit({activity: this.activity,event: event});
   }
 
 }

@@ -1,6 +1,7 @@
 <button class="activityButton ion-activatable ripple-parent"
     [ngClass]="{'activeButton': activity.startDate}"
     (click)="onClicked()"
+    (contextmenu)="onHold($event)"
     >
       <ion-icon [ngStyle]="{color: activity.color}" [name]="activity.icon" size="large"></ion-icon>
       <br>

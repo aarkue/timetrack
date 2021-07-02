@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { IconSelectorComponent } from 'src/app/icon-selector/icon-selector.component';
 import { Activity } from '../activity';
@@ -9,17 +9,36 @@ import { Activity } from '../activity';
 })
 export class NewActivityModalComponent implements OnInit {
 
+  @Input('activity')
+  public activity : Activity;
 
-  public activity : Activity = { icon : "leaf",label : "", color :"#1f9e4b"}
+  public newActivity = false;
 
+  private previousColor;
+  private previousLabel;
+  private previousIcon;
   constructor(private modalController : ModalController) { }
 
-  ngOnInit() {}
+  ngOnInit() {
+    if(!this.activity){
+      this.newActivity = true;
+      this.activity = { icon : "leaf",label : "", color :"#1f9e4b"}
+    }else{
+      this.previousColor = this.activity.color;
+      this.previousLabel = this.activity.label;
+      this.previousIcon = this.activity.icon;
+    }
+  }
 
   dismissModal(saveData: boolean = false){
     if(saveData){
     this.modalController.dismiss({activity: this.activity});
     }else{
+      if(!this.newActivity){
+        this.activity.color = this.previousColor;
+        this.activity.label = this.previousLabel;
+        this.activity.icon = this.previousIcon;
+      }
       this.modalController.dismiss();
     }
   }

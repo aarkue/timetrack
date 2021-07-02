@@ -1,7 +1,7 @@
 
 <ion-header translucent>
   <ion-toolbar>
-    <ion-title>Create new Activity</ion-title>
+    <ion-title>{{this.newActivity ?  "Create new Activity" : "Edit Activity"}}</ion-title>
     <ion-buttons slot="end">
       <ion-button (click)="dismissModal()">Cancel</ion-button>
     </ion-buttons>
