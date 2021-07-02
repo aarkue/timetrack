@@ -12,7 +12,7 @@ import { AlertController, ModalController, PopoverController } from '@ionic/angu
 import { PomodoroOptionsDialogComponent } from './pomodoro-options-dialog/pomodoro-options-dialog.component';
 const { LocalNotifications, Haptics, Storage } = Plugins;
 import { Platform } from '@ionic/angular';
-import { timer } from 'rxjs';
+import { EditCurrentComponent } from './edit-current/edit-current.component';
 @Component({
   selector: 'app-pomodoro',
   templateUrl: './pomodoro.component.html',
@@ -463,5 +463,40 @@ export class PomodoroComponent implements OnInit, OnDestroy {
       this.pomodoroHistoryDiv.nativeElement.scrollTop = this.pomodoroHistoryDiv.nativeElement.scrollHeight;
       this.pomodoroHistoryDiv.nativeElement.scrollLeft = this.pomodoroHistoryDiv.nativeElement.scrollWidth;
     },30)
+  }
+
+  async editCurrent(){
+    let wasPaused = this.isPaused;
+    this.isPaused = true;
+    const modalRef = await this.modalController.create(
+      {component: EditCurrentComponent,
+        componentProps: {
+                currDurationMin: this.currDuration / 60,
+                timePassedMin: this.timePassed / 60,
+                pomodoros: this.pomodoros,
+                isBreak: this.status === PomodoroStatus.Break
+              },
+      });
+      modalRef.onWillDismiss().then((res) => {
+        if(res.data){
+          console.log(res.data);
+          this.currDuration = res.data.currDurationMin * 60;
+          this.timePassedBefore = res.data.timePassedMin * 60;
+          this.timePassed = this.timePassedBefore;
+          this.startDate = Date.now();
+          this.pomodoros = res.data.pomodoros;
+          if(res.data.isBreak){
+            this.status = PomodoroStatus.Break
+          }else{
+            this.status = PomodoroStatus.Work
+          }
+          let currHistoryEl = this.timerHistory[this.timerHistory.length-1];
+          currHistoryEl.duration = this.currDuration;
+          currHistoryEl.type = this.status;
+      }
+      this.isPaused = wasPaused;
+      this.saveCurrentState();
+      })
+    return await modalRef.present();
   }
 }

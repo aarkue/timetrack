@@ -1,9 +1,7 @@
 <ion-card>
   <ion-card-header>
     <ion-card-title>Pomodoro</ion-card-title>
-    <ion-card-subtitle
-      >{{ this.status?.toString() }} {{(this.status.toString() == 'Work')? '('+pomodoros+')' : ''}}
-      {{ this.isPaused ? "- Paused" : "" }}</ion-card-subtitle
+    <ion-card-subtitle>Completed Pomodoros: {{pomodoros-1}}</ion-card-subtitle
     >
   </ion-card-header>
   <ion-card-content>
@@ -41,6 +39,7 @@
     <ion-button mode="ios" size="small" color="danger" (click)="clear()">Clear</ion-button>
     <ion-button mode="ios" size="small"(click)="showOptions()" color="tertiary">Options</ion-button>
     <ion-button mode="ios" size="small" class="right-button" (click)="nextTimer()">Skip</ion-button>
+    <ion-button mode="ios" size="small" class="right-button" color="secondary" (click)="editCurrent()">Edit</ion-button>
   </div>
 </ion-card>
 

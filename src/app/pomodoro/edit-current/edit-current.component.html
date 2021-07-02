@@ -1,0 +1,39 @@
+
+<ion-header translucent>
+  <ion-toolbar>
+    <ion-title>Edit current Pomodoro</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismissModal()">Cancel</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+<ion-list lines="full">
+<ion-item>
+  <ion-label position="floating">Current duration (minutes)</ion-label>
+  <ion-input type="number" min="0" [(ngModel)]="currDurationMin"></ion-input>
+</ion-item>
+<ion-item>
+  <ion-label position="floating">Time passed (minutes)</ion-label>
+  <ion-input type="number" min="0" [(ngModel)]="timePassedMin"></ion-input>
+</ion-item>
+<ion-item>
+  <ion-label position="floating">Completed Pomodoros</ion-label>
+  <ion-input type="number" min="0" [(ngModel)]="pomodoros"></ion-input>
+</ion-item>
+<ion-item>
+  <ion-label>Currently in Break?</ion-label>
+  <ion-label slot="end">{{isBreak? "Break" : "Work"}}</ion-label>
+  <ion-toggle mode="ios" [(ngModel)]="isBreak"></ion-toggle>
+</ion-item>
+</ion-list>
+<br>
+<br>
+<br>
+<ion-fab vertical="bottom" horizontal="end" slot="fixed">
+  <ion-fab-button (click)="dismissModal(true)">
+    <ion-icon name="save"></ion-icon>
+  </ion-fab-button>
+</ion-fab>
+</ion-content>
