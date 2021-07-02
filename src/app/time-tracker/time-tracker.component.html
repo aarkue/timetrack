@@ -1,16 +1,9 @@
 <ion-grid>
   <ion-row>
     <ion-col size-sm="3" size-md="3" size-lg="3" size-xl="3" *ngFor="let el of activities;let i=index">
-    <!-- <button class="activityButton ion-activatable ripple-parent"
-    [ngClass]="{'activeButton': activeIndex===i}"
-    (click)="activeIndex!=i ? activeIndex=i : activeIndex = -1"
-    >
-      <ion-icon style="color: {{el.color}}" [name]="el.icon" size="large"></ion-icon>
-      <br>
-    <ion-label class="activityLabel">{{el.name}}</ion-label>
-    <ion-ripple-effect type="unbounded"></ion-ripple-effect>
-    </button> -->
-    <app-activity-button [activity]="el" [active]="activeIndex===i" (activityClick)="onActivityButtonClick($event)"></app-activity-button>
+    <app-activity-button [activity]="el" [active]="activeIndex===i"
+      (activityClick)="onActivityButtonClick($event)" (activityHold)="onActivityButtonHold($event)">
+    </app-activity-button>
     </ion-col>
     <ion-col size-sm="3" size-md="3" size-lg="3" size-xl="3">
       <button class="activityButton ion-activatable ripple-parent"
@@ -25,10 +18,32 @@
   </ion-row>
 </ion-grid>
 <ion-list>
-  <ion-item *ngFor="let t of timeTracked">
+  <ion-item-sliding *ngFor="let t of timeTracked;let i=index">
+    <ion-item>
     <ion-label>{{t.activity.label}}</ion-label>
     <ion-icon [name]="t.activity.icon" slot="start" [ngStyle]="{'color': t.activity.color}"></ion-icon>
-    <ion-label>{{t.startDate | date:'HH:mm'}} – {{t.endDate | date:'HH:mm'}}</ion-label>
+    <ion-label class="detailLabel" color="medium">
+      {{t.startDate | date:'HH:mm'}}
+      <!-- – {{t.endDate | date:'HH:mm'}} -->
+    </ion-label>
+    <ion-label class="detailLabel">{{getFormattedDuration(t.startDate,t.endDate)}}</ion-label>
   </ion-item>
+    <ion-item-options side="start">
+      <ion-item-option color="danger" (click)="deleteTimeTrack(i)">
+        <ion-icon slot="icon-only" name="trash"></ion-icon>
+      </ion-item-option>
+      <ion-item-option (click)="editTimeTrack(i)">
+        <ion-icon slot="icon-only" name="pencil"></ion-icon>
+      </ion-item-option>
+    </ion-item-options>
+    <!-- <ion-item-options side="end">
+      <ion-item-option color="danger">
+        <ion-icon slot="icon-only" name="trash"></ion-icon>
+      </ion-item-option>
+      <ion-item-option>
+        <ion-icon slot="icon-only" name="pencil"></ion-icon>
+      </ion-item-option>
+    </ion-item-options> -->
+  </ion-item-sliding>
 </ion-list>
 <br>
