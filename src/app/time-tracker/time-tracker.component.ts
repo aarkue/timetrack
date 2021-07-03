@@ -84,6 +84,7 @@ export class TimeTrackerComponent implements OnInit {
       activity.startDate = undefined;
     }else{
       activity.startDate = Date.now();
+      this.saveDataToStorage();
     }
   }
 
@@ -111,24 +112,25 @@ export class TimeTrackerComponent implements OnInit {
   
   deleteTimeTrack(index: number){
     this.timeTracked.splice(index,1);
+    this.saveDataToStorage();
   }
 
   async editTimeTrack(index: number){
     // 2021-07-02T19:53:13.026Z vs. 2021-07-02T19:52
-    let startDate = new Date(this.timeTracked[index].startDate).toISOString().substring(0,16)
-    let endDate = new Date(this.timeTracked[index].endDate).toISOString().substring(0,16)
+    let startDate = new Date(this.timeTracked[index].startDate).toISOString()//.substring(0,16)
+    let endDate = new Date(this.timeTracked[index].endDate).toISOString()//.substring(0,16)
     let alert = await this.alertController.create({
-      header: "Edit Start & End",
+      header: "Label",
       inputs: [
         { 
-          name: "startDate",
-          type: "datetime-local",
-          value: startDate,
+          name: "label",
+          type: "text",
+          value: this.timeTracked[index].activity.label,
         },
         { 
-          name: "endDate",
-          type: "datetime-local",
-          value: endDate,
+          name: "icon",
+          type: "text",
+          value: this.timeTracked[index].activity.icon,
         }
       ],
       buttons: [
@@ -137,8 +139,9 @@ export class TimeTrackerComponent implements OnInit {
           handler: (data) => {
             // console.log(Date.parse(data.startDate+":00.026Z"));
             console.log(data);
-            this.timeTracked[index].startDate = Date.parse(data.startDate)
-            this.timeTracked[index].endDate = Date.parse(data.endDate)
+            this.timeTracked[index].activity.label = data.label;
+            this.timeTracked[index].activity.icon = data.icon;
+            this.saveDataToStorage();
           }
         }
       ]
@@ -160,4 +163,14 @@ export class TimeTrackerComponent implements OnInit {
 
   }
 
+
+  getLocalIsoDatetime(time: number){
+    // console.log(Date.parse( new Date(time).toISOString()));
+    return new Date(time).toISOString();
+  }
+
+  getNumberFromIsoDatetime(iso: string){
+    // console.log(Date.parse(iso));
+    return Date.parse(iso);
+  }
 }
