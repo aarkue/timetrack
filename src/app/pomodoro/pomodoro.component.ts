@@ -300,7 +300,7 @@ export class PomodoroComponent implements OnInit, OnDestroy {
       this.startDate = parsedstartDate;
       console.log("sec since last check in", (Date.now() - parsedstartDate)/1000)
       let dif = Date.now() - parsedstartDate;
-      if(!this.isPaused && (Date.now() - parsedstartDate) > 1 * 1000){
+      if(!this.isPaused && (Date.now() - parsedstartDate) > 60 * 1000){
         this.isPaused = true;
         const alert = await this.alertController.create({
           header: 'Welcome back',
