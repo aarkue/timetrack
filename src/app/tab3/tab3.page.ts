@@ -1,11 +1,11 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Plugins } from '@capacitor/core';
-import { IonInput, ToastController } from '@ionic/angular';
+import { FilesystemDirectory, Plugins } from '@capacitor/core';
+import { IonInput, Platform, ToastController } from '@ionic/angular';
 import { AccountService } from '../services/account.service';
 import { GamificationService } from '../services/gamification.service';
 
-const { Storage } = Plugins;
+const { Storage, Filesystem  } = Plugins;
 @Component({
   selector: 'app-tab3',
   templateUrl: 'tab3.page.html',
@@ -27,10 +27,16 @@ export class Tab3Page {
 
   @ViewChild('exportDownload')
   private exportDownload : ElementRef<HTMLAnchorElement>;
+
+  private platform: Platform;
+  
   constructor(public accountService : AccountService,
               public toastController: ToastController, 
               public formBuilder: FormBuilder,
-              public gamificationService: GamificationService) {
+              public gamificationService: GamificationService,
+              platform : Platform) {
+
+    this.platform = platform;
     this.loginForm = formBuilder.group({
       username : ['', [Validators.required]],
       password : ['', [Validators.required]],
@@ -135,8 +141,20 @@ export class Tab3Page {
     let json = JSON.stringify(dict);
     console.log(json);
     let toExport = new Blob([json],{type: 'text/plain'});
-    this.exportDownload.nativeElement.href = URL.createObjectURL(toExport);
-    this.exportDownload.nativeElement.download = "smartime.json"
-    this.exportDownload.nativeElement.click();
-  }
+    if (!this.platform.is('hybrid')) {
+      this.exportDownload.nativeElement.href = URL.createObjectURL(toExport);
+      this.exportDownload.nativeElement.download = "smartime.json"
+      this.exportDownload.nativeElement.click();
+    }else{
+      let blobText = await toExport.text();
+      console.log("blobtext:",blobText);
+      Filesystem.appendFile({
+        data: blobText,
+        path:"smartime.json",
+        directory: FilesystemDirectory.Documents
+    }).then(c=> {
+      console.log("Downloaded!")
+    })}
+    }
+
 }
