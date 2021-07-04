@@ -69,6 +69,29 @@
     </ion-card-content>
   </ion-card>
 
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Export</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-button (click)="exportFile()">
+        Export
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
 
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Import</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <input type="file" #fileInputRef>
+      <br>
+      <ion-button (click)="importFile()">
+        Import
+      </ion-button>
+      <a #exportDownload></a>
+    </ion-card-content>
+  </ion-card>
 
 </ion-content>
