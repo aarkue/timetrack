@@ -72,6 +72,7 @@ export class PomodoroComponent implements OnInit, OnDestroy {
       
       this.timePassed = Math.min(this.timePassedBefore, this.currDuration);
       this.startClock();
+      this.saveCurrentState();
     });
   }
 
@@ -103,7 +104,6 @@ export class PomodoroComponent implements OnInit, OnDestroy {
           this.timerHistory[this.timerHistory.length-2].endDate = Date.now();
         }
         this.timerHistory[this.timerHistory.length-1].startDate = Date.now();
-        this.saveCurrentState();
       }
     } else {
       if(this.isOvertime){
@@ -112,6 +112,7 @@ export class PomodoroComponent implements OnInit, OnDestroy {
         this.setIsPaused(true);
       }
     }
+    this.saveCurrentState();
   }
 
   startClock() {
@@ -263,6 +264,8 @@ export class PomodoroComponent implements OnInit, OnDestroy {
     await this.saveToStorage('pomodoros', this.pomodoros.toString());
     await this.saveToStorage('currDuration', this.currDuration.toString());
     await this.saveToStorage('timerHistory', JSON.stringify(this.timerHistory));
+    await this.saveToStorage('startDate', this.startDate.toString());
+    
   }
 
   async retrieveCurrentState(){
@@ -272,12 +275,46 @@ export class PomodoroComponent implements OnInit, OnDestroy {
     let pomodoros = await this.getFromStorage('pomodoros');
     let currDuration = await this.getFromStorage('currDuration');
     let timerHistory = await this.getFromStorage('timerHistory');
+    let startDate = await this.getFromStorage('startDate');
 
     this.isPaused = !('false' === isPaused.value)
 
     let parsedPomodoros = parseInt(pomodoros.value);
     if(!isNaN(parsedPomodoros)){
       this.pomodoros = parsedPomodoros;
+    }
+
+    let parsedstartDate = parseInt(startDate.value);
+    console.log(parsedstartDate);
+    if(!isNaN(parsedstartDate)){
+      this.startDate = parsedstartDate;
+      console.log("sec since last check in", (Date.now() - parsedstartDate)/1000)
+      let dif = Date.now() - parsedstartDate;
+      if(!this.isPaused && (Date.now() - parsedstartDate) > 1 * 1000){
+        this.isPaused = true;
+        const alert = await this.alertController.create({
+          header: 'Welcome back',
+          message: "<p>The last timer update was <b>" + (dif - (dif%(1000*60)))/(1000*60) + "min</b> ago.<br>Do you want to count that time?</p>",
+          buttons: [
+            {
+              text: 'No',
+              handler: () => {
+                this.startDate = Date.now();
+                this.isPaused = false;
+              }
+            },
+            {
+              text: 'Yes',
+              role: 'cancel',
+              handler: () => {
+                this.startDate = parsedstartDate;
+                this.isPaused = false;
+              }
+            }
+          ]
+        });
+        await alert.present();
+      }
     }
 
     let parsedCurrDuration = parseInt(currDuration.value);
