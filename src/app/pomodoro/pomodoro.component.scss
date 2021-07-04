@@ -52,7 +52,7 @@ h1.overtime {
     height: 55px;
     white-space: nowrap;
     overflow-y: hidden;
-    overflow-x: scroll;
+    overflow-x: auto;
 
 }
 
@@ -61,6 +61,6 @@ h1.overtime {
     // max-height: 120px;
     height:  160px;
     white-space: inherit;
-    overflow-y: scroll;
+    overflow-y: auto;
     overflow-x: hidden;
 }
