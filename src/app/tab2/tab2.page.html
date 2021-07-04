@@ -12,7 +12,15 @@
       <ion-title size="large">Pomodoro</ion-title>
     </ion-toolbar>
   </ion-header>
-  <app-pomodoro></app-pomodoro>
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content
+      pullingIcon="bubbles"
+      pullingText="Pull to refresh"
+      refreshingSpinner="bubbles"
+      refreshingText="Refreshing...">
+    </ion-refresher-content>
+  </ion-refresher>
+  <app-pomodoro #pomodoro ></app-pomodoro>
   <ion-item></ion-item>
-  <app-time-tracker></app-time-tracker>
+  <app-time-tracker #timeTracker></app-time-tracker>
 </ion-content>

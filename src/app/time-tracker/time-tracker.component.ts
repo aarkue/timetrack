@@ -37,6 +37,19 @@ export class TimeTrackerComponent implements OnInit {
     })
   }
 
+  async refresh(){
+    let activities = (await this.getFromStorage('activities')).value;
+    let parsedActivities = JSON.parse(activities);
+    if(parsedActivities){
+      this.activities = parsedActivities;
+    }
+    let timeTracked = (await this.getFromStorage('timeTracked')).value;
+    let parsedTimeTracked = JSON.parse(timeTracked);
+    if(parsedTimeTracked){
+      this.timeTracked = parsedTimeTracked;
+    }
+  }
+
   async addNewActivity(){
     const modal = await this.modalController.create({
       component: NewActivityModalComponent,

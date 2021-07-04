@@ -1,11 +1,10 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { FilesystemDirectory, Plugins } from '@capacitor/core';
+import { FilesystemDirectory, FilesystemEncoding, Plugins } from '@capacitor/core';
 import { IonInput, Platform, ToastController } from '@ionic/angular';
 import { AccountService } from '../services/account.service';
 import { GamificationService } from '../services/gamification.service';
-
-const { Storage, Filesystem  } = Plugins;
+const { Storage, Directory, Encoding, Filesystem } = Plugins;
 @Component({
   selector: 'app-tab3',
   templateUrl: 'tab3.page.html',
@@ -97,7 +96,8 @@ export class Tab3Page {
   }
 
 
-  importFile(){
+  async importFile(){
+    if (!this.platform.is('hybrid')) {
     let file = this.fileInput.nativeElement.files[0];
     if(file){
       let reader = new FileReader();
@@ -108,14 +108,6 @@ export class Tab3Page {
             await Storage.set({key: key, value: res[key]})
           }
         }
-        const toastNot = await  this.toastController.create({
-          header: "Import successful! Restart app to see changes.",
-          position: "middle",
-          color: "success",
-          duration: 1500,
-          buttons: [{text: " Ok", icon: "checkmark-outline", role: "cancel", handler: () => {}}],
-        });
-      toastNot.present();
       }
       reader.onerror = async (evt) => {
         const toastNot = await  this.toastController.create({
@@ -128,8 +120,30 @@ export class Tab3Page {
       }
 
       reader.readAsText(file);
-
     }
+  }else{
+    let perRes = await Filesystem.requestPermissions();
+    console.log("Permission", perRes);
+    const res = await Filesystem.readFile({
+      path:"smartime.json",
+      encoding: FilesystemEncoding.UTF8,
+      directory: FilesystemDirectory.External
+    });
+  let res_json = JSON.parse(res.data);
+  for(const key in res_json){
+    if(this.localKeys.indexOf(key) > -1){
+      await Storage.set({key: key, value: res_json[key]})
+    }
+  }
+  }
+  const toastNot = await  this.toastController.create({
+    header: "Import successful! Refresh app to see changes.",
+    position: "middle",
+    color: "success",
+    duration: 1500,
+    buttons: [{text: " Ok", icon: "checkmark-outline", role: "cancel", handler: () => {}}],
+  });
+  toastNot.present();
   }
 
   async exportFile(){
@@ -146,15 +160,24 @@ export class Tab3Page {
       this.exportDownload.nativeElement.download = "smartime.json"
       this.exportDownload.nativeElement.click();
     }else{
+      let perRes = await Filesystem.requestPermissions();
+      console.log("Permission", perRes);
       let blobText = await toExport.text();
       console.log("blobtext:",blobText);
-      Filesystem.writeFile({
+      const res = await Filesystem.writeFile({
         data: blobText,
         path:"smartime.json",
-        directory: FilesystemDirectory.Documents
-    }).then(c=> {
-      console.log("Downloaded!")
-    })}
+        encoding: FilesystemEncoding.UTF8,
+        directory: FilesystemDirectory.External
+    });
     }
-
+    const toastNot = await  this.toastController.create({
+      header: "Export successfull!",
+      position: "middle",
+      color: "success",
+      duration: 1500,
+      buttons: [{text: " Ok", icon: "checkmark-outline", role: "cancel", handler: () => {}}],
+    });
+    await toastNot.present();
+  }
 }

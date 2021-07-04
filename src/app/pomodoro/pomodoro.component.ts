@@ -69,8 +69,18 @@ export class PomodoroComponent implements OnInit, OnDestroy {
       setTimeout(() => {
         this.scrollHistoryIntoView();
       },100)
-      
-      this.timePassed = Math.min(this.timePassedBefore, this.currDuration);
+      this.startClock();
+      this.saveCurrentState();
+    });
+  }
+
+  async refresh(){
+    this.loadOptions().then(async () => {
+      this.initDefaults();
+      await this.retrieveCurrentState();
+      setTimeout(() => {
+        this.scrollHistoryIntoView();
+      },100)
       this.startClock();
       this.saveCurrentState();
     });
