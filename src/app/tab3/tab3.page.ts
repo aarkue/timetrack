@@ -148,7 +148,7 @@ export class Tab3Page {
     }else{
       let blobText = await toExport.text();
       console.log("blobtext:",blobText);
-      Filesystem.appendFile({
+      Filesystem.writeFile({
         data: blobText,
         path:"smartime.json",
         directory: FilesystemDirectory.Documents
