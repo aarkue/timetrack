@@ -44,6 +44,7 @@ build_android:
   artifacts:
     paths:
     - ./android/app/build/outputs
+    expire_in: 1 week
 
 build_project:
   image: node:latest
@@ -61,5 +62,6 @@ build_project:
     paths:
       - node_modules
       - ./android
+    expire_in: 1 week
 
 
