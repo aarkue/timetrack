@@ -21,3 +21,11 @@ border-radius: 10px;
   position: relative;
   overflow: hidden;
 }
+
+.topRightBadge{
+  position: absolute;
+  left: 50px;
+  margin-bottom: 15px;
+  z-index: 2;
+  overflow:visible;
+}

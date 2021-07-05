@@ -1,11 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Plugins } from '@capacitor/core';
 import { AlertController, ModalController, PopoverController } from '@ionic/angular';
 import { NewActivityModalComponent } from './new-activity-modal/new-activity-modal.component';
 import { Activity } from './activity'
 import { TimeTrack } from './time-track'
 import { ActivityPopoverComponent } from './activity-popover/activity-popover.component';
-
+import {v4 as uuidv4} from 'uuid';
 const { Storage } = Plugins;
 
 @Component({
@@ -15,26 +15,18 @@ const { Storage } = Plugins;
 })
 export class TimeTrackerComponent implements OnInit {
 
-  public activities : Activity[] = [];
+  public activities : Activity[] = [{label: "Study", icon:"library",color: "#454333",id: uuidv4(), tags: []},{label: "House Duties", icon:'home', color: "#484373", id: uuidv4(), tags: []}];
 
   public activeIndex : number = 2;
 
-  public timeTracked : TimeTrack[] = []
-  constructor(private modalController : ModalController, private popoverComponent : PopoverController, private alertController : AlertController) { }
+  public timeTracked : Map<number,TimeTrack[]> = new Map<number,TimeTrack[]>();
+
+  public groupedTimeTracked : {date: number, items: TimeTrack[]}[] = [];
+
+  constructor(private modalController : ModalController, private popoverComponent : PopoverController, private alertController : AlertController, private changeDetectorRef : ChangeDetectorRef) { }
 
   ngOnInit() {
-    this.getFromStorage('activities').then((res) => {
-      this.activities = JSON.parse(res.value);
-      if(!this.activities){
-        this.activities = [{label: "Study", icon:"library",color: "#454333"},{label: "Shopping",icon:'pricetag', color: "#214333"},{label: "Watch Lecture",icon:'play-circle', color: "#666333"},{label: "Read",icon:'book', color: "#932233"},{label: "House Duties", icon:'home', color: "#484373"}];
-      }
-    })
-    this.getFromStorage('timeTracked').then((res) => {
-      this.timeTracked = JSON.parse(res.value);
-      if(!this.timeTracked){
-        this.timeTracked = [];
-      }
-    })
+    this.refresh();
   }
 
   async refresh(){
@@ -44,10 +36,12 @@ export class TimeTrackerComponent implements OnInit {
       this.activities = parsedActivities;
     }
     let timeTracked = (await this.getFromStorage('timeTracked')).value;
-    let parsedTimeTracked = JSON.parse(timeTracked);
+    let parsedTimeTracked = new Map<number,TimeTrack[]>(JSON.parse(timeTracked));
     if(parsedTimeTracked){
+      console.log(parsedTimeTracked);
       this.timeTracked = parsedTimeTracked;
     }
+    this.updateGrouped();
   }
 
   async addNewActivity(){
@@ -58,7 +52,7 @@ export class TimeTrackerComponent implements OnInit {
     modal.onWillDismiss().then((res) => {
       if(res.data){
       this.activities.push(res.data.activity);
-      this.saveDataToStorage();
+      this.saveChanges();
     }
     })
     await modal.present()
@@ -72,7 +66,7 @@ export class TimeTrackerComponent implements OnInit {
     modal.onWillDismiss().then((res) => {
       if(res.data){
         activity =res.data.activity;
-        this.saveDataToStorage();
+        this.saveChanges();
     }
     })
     await modal.present()
@@ -87,17 +81,17 @@ export class TimeTrackerComponent implements OnInit {
   }
   saveDataToStorage(){
     this.saveToStorage('activities',JSON.stringify(this.activities));
-    this.saveToStorage('timeTracked',JSON.stringify(this.timeTracked));
+    this.saveToStorage('timeTracked',JSON.stringify(Array.from(this.timeTracked)));
   }
 
   onActivityButtonClick(activity: Activity){
     if(activity.startDate){
-      this.timeTracked.unshift({activity: activity, startDate: activity.startDate, endDate: Date.now()})
-      this.saveDataToStorage();
+      this.addTimeTracked({id: uuidv4(),activityID: activity.id, startDate: activity.startDate, endDate: Date.now()})
       activity.startDate = undefined;
+      this.saveChanges();
     }else{
       activity.startDate = Date.now();
-      this.saveDataToStorage();
+      this.saveChanges();
     }
   }
 
@@ -117,33 +111,72 @@ export class TimeTrackerComponent implements OnInit {
           this.editActivity(comb.activity);
         }
       }
-      this.saveDataToStorage();
+      this.saveChanges();
     });
 
     await popover.present();
   }
   
-  deleteTimeTrack(index: number){
-    this.timeTracked.splice(index,1);
-    this.saveDataToStorage();
+  deleteTimeTrack(id: string){
+    const keyAndID = this.getKeyAndIndexForID(id);
+    this.timeTracked.get(keyAndID.key).splice(keyAndID.index,1)
+    if(this.timeTracked.get(keyAndID.key).length < 1){
+      this.timeTracked.delete(keyAndID.key);
+    }
+    this.saveChanges();
   }
 
-  async editTimeTrack(index: number){
+  getTimeTrackByID(id: string){
+    const keyAndID = this.getKeyAndIndexForID(id);
+    return this.timeTracked.get(keyAndID.key)[keyAndID.index];
+  }
+
+  getKeyAndIndexForID(id: string) : {key: number, index: number} {
+    for (let key of this.timeTracked.keys()){
+      let items = this.timeTracked.get(key);
+      for(let i = 0; i < items.length; i++){
+        if(items[i].id === id){
+          return {key: key, index: i};
+        }
+      }
+    }
+    return {key: null, index: -1};
+  }
+
+  getActivityIndexByID(id: string) : number{
+    for(let i = 0; i < this.activities.length; i++){
+      if(this.activities[i].id === id){
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  getActivityByID(id: string) : Activity{
+    const index = this.getActivityIndexByID(id);
+    if(index < 0){
+      return {id: "0",label: "Deleted Activity", color:"#000", icon: "question-mark", tags: []}
+    }else{
+      return this.activities[index];
+    }
+  }
+  
+
+  async editTimeTrack(id: string){
     // 2021-07-02T19:53:13.026Z vs. 2021-07-02T19:52
-    let startDate = new Date(this.timeTracked[index].startDate).toISOString()//.substring(0,16)
-    let endDate = new Date(this.timeTracked[index].endDate).toISOString()//.substring(0,16)
+    const timeTrack = this.getTimeTrackByID(id);
     let alert = await this.alertController.create({
       header: "Label",
       inputs: [
         { 
           name: "label",
           type: "text",
-          value: this.timeTracked[index].activity.label,
+          value: timeTrack.activityID
         },
         { 
           name: "icon",
           type: "text",
-          value: this.timeTracked[index].activity.icon,
+          value:  timeTrack.activityID
         }
       ],
       buttons: [
@@ -151,20 +184,18 @@ export class TimeTrackerComponent implements OnInit {
           text: "Save",
           handler: (data) => {
             // console.log(Date.parse(data.startDate+":00.026Z"));
-            console.log(data);
-            this.timeTracked[index].activity.label = data.label;
-            this.timeTracked[index].activity.icon = data.icon;
-            this.saveDataToStorage();
+            // console.log(data);
+            // this.timeTracked[index].activity.label = data.label;
+            // this.timeTracked[index].activity.icon = data.icon;
+            this.saveChanges();
           }
         }
       ]
     });
     await alert.present();
-
-    this.timeTracked[index].endDate += 1000;
   }
 
-  getFormattedDuration(start: number, end: number){
+  getFormattedDuration(start: number, end: number = Date.now()){
     let difSec = (end-start)/1000;
     let m = (difSec-(difSec%60))/60;
     let h = (m-(m%60))/60;
@@ -185,5 +216,146 @@ export class TimeTrackerComponent implements OnInit {
   getNumberFromIsoDatetime(iso: string){
     // console.log(Date.parse(iso));
     return Date.parse(iso);
+  }
+
+  setStartDateByID(id : string,date: number){
+    const timeTrack = this.getTimeTrackByID(id);
+
+    this.deleteTimeTrack(id);
+    
+    timeTrack.startDate = date;
+    this.addTimeTracked(timeTrack);
+    this.saveChanges();
+  }
+
+  setEndDateByID(id : string,date: number){
+    const timeTrack = this.getTimeTrackByID(id);
+
+    this.deleteTimeTrack(id);
+
+    timeTrack.endDate = date;
+    this.addTimeTracked(timeTrack);
+    this.saveChanges();
+  }
+
+  trackTimeTracked(index: number, g : {date: number, items: TimeTrack[]}){
+    // console.log(g.date);
+    return g.date;
+  }
+
+  saveChanges(){
+    this.saveDataToStorage();
+    this.updateGrouped();
+  }
+
+  addTimeTracked(item: TimeTrack){
+    let startDateTime = new Date(item.startDate)
+    let startDate = new Date(startDateTime.toDateString()).getTime();
+    if(!this.timeTracked.has(startDate)){
+      this.timeTracked.set(startDate,[])
+      }
+      this.timeTracked.get(startDate).push(item);
+      this.timeTracked.get(startDate).sort(function(a,b,){
+        if(a.startDate < b.startDate){
+          return 1;
+        }else if (a.startDate > b.startDate){
+          return -1;
+        }else{
+          return 0;
+        }
+      })
+      // this.updateGrouped();
+  }
+
+  async updateGrouped() {
+    const items: {date: number, items: TimeTrack[]}[] = [];
+    // const byDates: Map<string,TimeTrack[]> = new Map<string,TimeTrack[]>();
+    // this.timeTracked.forEach(item => {
+    //   let dateString = new Date(item.startDate).toISOString().split('T')[0];
+    // if(!byDates.has(dateString)){
+    //   byDates.set(dateString,[])
+    //   }
+    //   byDates.get(dateString).push(item)
+    // });
+
+    for(let date of this.timeTracked.keys()){
+      if(this.timeTracked.has(date)){
+        items.push({
+          date: date,
+          items: this.timeTracked.get(date)
+        });
+      }
+    }
+    items.sort(function(a,b){
+      if(a.date < b.date){
+        return 1;
+      }else if(a.date > b.date){
+        return -1;
+      }else{
+        return 0;
+      }
+    });
+
+    this.groupedTimeTracked = items;
+  }
+
+
+
+  getTotalDurationForActivity(id: string){
+    let duration = 0;
+    this.timeTracked.forEach((val,key) => {
+      val.forEach(item => {
+        if(item.activityID === id){
+          duration += (item.endDate - item.startDate)/1000;
+        }
+      })
+    });
+
+    const startDate = this.getActivityByID(id).startDate;
+    if(startDate){
+      duration += (Date.now() - startDate)/1000;
+    }
+
+    return duration;
+  }
+
+
+  getDurationTodayForActivity(id: string){
+    const today = new Date(new Date().toDateString()).getTime();
+    let duration = 0;
+    if(this.timeTracked.has(today)){
+      this.timeTracked.get(today).forEach(item => {
+        if(item.activityID === id){
+          duration += (item.endDate - item.startDate)/1000;
+        }
+      })
+    }
+
+    const startDate = this.getActivityByID(id).startDate;
+    if(startDate){
+      duration += (Date.now() - startDate)/1000;
+    }
+    
+    return duration;
+  }
+
+
+  formatDuration(durationSec: number){
+    const durationMin = durationSec/60;
+    const durationH = durationMin/60;
+
+    if(durationH >= 1){
+      const durationHLeft = Math.round((durationH - Math.floor(durationH))*10);
+      return Math.round(durationH).toString()+"."+durationHLeft.toString()+'h'
+    }else if(durationMin >= 1){
+      return Math.floor(durationMin).toString()+'m'
+    }else{
+      return "";
+    }
+
+  }
+
+  getRunningActivities(){
+    return this.activities.filter((val) => val.startDate);
   }
 }

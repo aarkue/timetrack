@@ -3,6 +3,7 @@
     (click)="onClicked()"
     (contextmenu)="onHold($event)"
     >
+    <ion-badge class="topRightBadge">{{badgeText}}</ion-badge>
       <ion-icon [ngStyle]="{color: activity.color}" [name]="activity.icon" size="large"></ion-icon>
       <br>
     <ion-label class="activityLabel">{{activity.label}}</ion-label>

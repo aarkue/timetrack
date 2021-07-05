@@ -14,6 +14,9 @@ export class ActivityButtonComponent implements OnInit {
   @Input('activity')
   public activity : Activity;
 
+  @Input('badgeText')
+  public badgeText? : string;
+
 
   @Output('activityClick')
   private clickEmitter : EventEmitter<Activity> = new EventEmitter();

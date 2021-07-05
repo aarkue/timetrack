@@ -21,11 +21,20 @@
   <ion-label position="fixed">Color</ion-label>
   <ion-input type="color" [(ngModel)]="activity.color"></ion-input>
 </ion-item>
-<ion-item disabled=true>
+<ion-item lines="top">
+  <ion-label position="fixed">Tags</ion-label>
+  <ion-input #tagInput type="text" (keydown.ENTER)="addTag(tagInput.value.toString());tagInput.value = ''"></ion-input>
+  <ion-button [disabled]="!tagInput.value || tagInput.value.toString().length < 1" (click)="addTag(tagInput.value.toString());tagInput.value = ''">Add</ion-button>
+  </ion-item>
+<ion-item lines="none" >
+  <div class="tagsDiv">
+  <ion-chip color="primary" outline="true" *ngFor="let tag of activity.tags; let i = index">{{tag}}  <ion-icon name="close-circle" (click)="activity.tags.splice(i,1)"></ion-icon></ion-chip>
+</div>
+</ion-item>
+<!-- <ion-item disabled=true>
   <ion-label position="fixed">Icon</ion-label>
   <ion-input type="text" [(ngModel)]="activity.icon"></ion-input>
-  <ion-icon name="search" color="medium" slot="end" (click)="showIconPicker()"></ion-icon>
-</ion-item>
+</ion-item> -->
 </ion-list>
 <ion-item>Search for an Icon:</ion-item>
 <app-icon-selector (iconSelected)="setIcon($event)"></app-icon-selector>
@@ -35,5 +44,4 @@
     <ion-icon name="save"></ion-icon>
   </ion-fab-button>
 </ion-fab>
-
 </ion-content>

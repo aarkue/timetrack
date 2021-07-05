@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { IconSelectorComponent } from 'src/app/icon-selector/icon-selector.component';
 import { Activity } from '../activity';
+import {v4 as uuidv4} from 'uuid';
 @Component({
   selector: 'app-new-activity-modal',
   templateUrl: './new-activity-modal.component.html',
@@ -22,7 +23,7 @@ export class NewActivityModalComponent implements OnInit {
   ngOnInit() {
     if(!this.activity){
       this.newActivity = true;
-      this.activity = { icon : "leaf",label : "", color :"#1f9e4b"}
+      this.activity = { icon : "leaf",label : "", color :"#1f9e4b", id: uuidv4(), tags: []}
     }else{
       this.previousColor = this.activity.color;
       this.previousLabel = this.activity.label;
@@ -52,6 +53,12 @@ export class NewActivityModalComponent implements OnInit {
 
   setIcon(event : any){
     this.activity.icon = event;
+  }
+
+  addTag(tag: string){
+    if(tag && tag.length > 0){
+      this.activity.tags.push(tag);
+    }
   }
   
 }
