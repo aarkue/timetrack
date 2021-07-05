@@ -341,18 +341,17 @@ export class TimeTrackerComponent implements OnInit {
 
 
   formatDuration(durationSec: number){
-    const durationMin = durationSec/60;
-    const durationH = durationMin/60;
-
-    if(durationH >= 1){
-      const durationHLeft = Math.round((durationH - Math.floor(durationH))*10);
-      return Math.round(durationH).toString()+"."+durationHLeft.toString()+'h'
-    }else if(durationMin >= 1){
-      return Math.floor(durationMin).toString()+'m'
+    let m = (durationSec-(durationSec%60))/60;
+    let h = (m-(m%60))/60;
+  
+    if(h >= 1){
+      const hFrac = Math.floor(((m%60)/60)*10);
+      return h.toString()+"."+ hFrac.toString()+'h';
+    }else if(m >= 1){
+      return m.toString()+'m'
     }else{
       return "";
     }
-
   }
 
   getRunningActivities(){
