@@ -130,17 +130,59 @@ export class PomodoroComponent implements OnInit, OnDestroy {
       if (!this.isPaused) {
         this.timePassed = this.timePassedBefore + this.calcTimePassed();
         if (this.timePassed >= this.currDuration && !this.isOvertime) {
-          this.isOvertime = true;
-          this.timeUp();
+          if(!this.isOvertime){
+            this.isOvertime = true;
+            this.timeUp();
+          }
+          
+          
         }
       }
     }, 100);
 
-    this.saveinterval = setInterval(() => {
+    this.saveinterval = setInterval( async () => {
+      if(!this.isPaused){
+      console.log("Interval calling");
+      await this.checkForTimeAway(this.startDate);
       this.setTimePassedBefore(this.timePassed);
       this.startDate = Date.now();
+    }
     }, 1000);
   }
+
+  async checkForTimeAway(startDate: number){
+  let dif = (Date.now() - startDate)/1000;
+  if(!this.isPaused && dif >= 60){
+    this.isPaused = true;
+    const alert = await this.alertController.create({
+      header: 'Welcome back',
+      message: "<p>The last timer update was <b>" + (dif - (dif%60))/60 + "min</b> ago.<br>Do you want to count that time?</p>",
+      buttons: [
+        {
+          text: 'No',
+          handler: () => {
+            // this.startDate = Date.now();
+            this.isPaused = false;
+            console.log(this.timePassedBefore,"timePassedBefore")
+            console.log(this.timePassed,"timePassed")
+          }
+        },
+        {
+          text: 'Yes',
+          role: 'cancel',
+          handler: () => {
+            // this.startDate = startDate;
+            this.isPaused = false;
+            this.setTimePassedBefore(this.timePassedBefore + ((Date.now() - startDate) / 1000));
+          }
+        }
+      ]
+    });
+    await alert.present();
+    this.startDate = Date.now();
+  }
+}
+
 
   timeUp() {
     if (this.status === PomodoroStatus.Work) {
@@ -253,6 +295,7 @@ export class PomodoroComponent implements OnInit, OnDestroy {
   }
 
   setTimePassedBefore(time: number) {
+    console.log("setTimePassedBefore called",time);
     this.timePassedBefore = time;
     this.saveCurrentState();
   }
@@ -294,39 +337,6 @@ export class PomodoroComponent implements OnInit, OnDestroy {
       this.pomodoros = parsedPomodoros;
     }
 
-    let parsedstartDate = parseInt(startDate.value);
-    console.log(parsedstartDate);
-    if(!isNaN(parsedstartDate)){
-      this.startDate = parsedstartDate;
-      console.log("sec since last check in", (Date.now() - parsedstartDate)/1000)
-      let dif = Date.now() - parsedstartDate;
-      if(!this.isPaused && (Date.now() - parsedstartDate) > 60 * 1000){
-        this.isPaused = true;
-        const alert = await this.alertController.create({
-          header: 'Welcome back',
-          message: "<p>The last timer update was <b>" + (dif - (dif%(1000*60)))/(1000*60) + "min</b> ago.<br>Do you want to count that time?</p>",
-          buttons: [
-            {
-              text: 'No',
-              handler: () => {
-                this.startDate = Date.now();
-                this.isPaused = false;
-              }
-            },
-            {
-              text: 'Yes',
-              role: 'cancel',
-              handler: () => {
-                this.startDate = parsedstartDate;
-                this.isPaused = false;
-              }
-            }
-          ]
-        });
-        await alert.present();
-      }
-    }
-
     let parsedCurrDuration = parseInt(currDuration.value);
     if(!isNaN(parsedCurrDuration)){
       console.log(parsedCurrDuration);
@@ -340,14 +350,27 @@ export class PomodoroComponent implements OnInit, OnDestroy {
 
     let parsedTimePassedBefore = parseFloat(timePassedBefore.value);
     if(!isNaN(parsedTimePassedBefore)){
-      this.timePassedBefore = parsedTimePassedBefore;
+      console.log("parsedTimePassedBefore",parsedTimePassedBefore)
+      this.setTimePassedBefore(parsedTimePassedBefore);
+      this.timePassed = parsedTimePassedBefore;
     }
+
+    let parsedstartDate = parseInt(startDate.value);
+    console.log(parsedstartDate);
+    if(!isNaN(parsedstartDate)){
+      this.startDate = parsedstartDate;
+      console.log("sec since last check in", (Date.now() - parsedstartDate)/1000)
+      let dif = Date.now() - parsedstartDate;
+      await this.checkForTimeAway(parsedstartDate);
+    }
+
 
     if(timerHistory.value && timerHistory.value.length > 0){
       this.timerHistory = JSON.parse(timerHistory.value);
     }else{
       this.timerHistory = [{startDate: null, duration: this.currDuration, type: this.status, endDate: null}];
     }
+    
   }
 
   async deleteHistory(){
