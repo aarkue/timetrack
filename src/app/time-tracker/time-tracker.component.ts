@@ -6,6 +6,7 @@ import { Activity } from './activity'
 import { TimeTrack } from './time-track'
 import { ActivityPopoverComponent } from './activity-popover/activity-popover.component';
 import {v4 as uuidv4} from 'uuid';
+import { StatisticsComponent } from './statistics/statistics.component';
 const { Storage } = Plugins;
 
 @Component({
@@ -356,5 +357,13 @@ export class TimeTrackerComponent implements OnInit {
 
   getRunningActivities(){
     return this.activities.filter((val) => val.startDate);
+  }
+
+  async showStatistics(){
+    const modal = await this.modalController.create({
+      component: StatisticsComponent,
+      componentProps : {'activities': this.activities, 'timeTracked': this.timeTracked},
+    });
+    await modal.present()
   }
 }

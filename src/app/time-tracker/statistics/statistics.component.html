@@ -1,0 +1,22 @@
+
+<ion-header translucent>
+  <ion-toolbar>
+    <ion-title>Statistics</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismissModal()">Cancel</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+<ngx-charts-bar-vertical
+  [results]="data"
+  [customColors]="customColors"
+  [legend]="true"
+  [showXAxisLabel]="true"
+  [showYAxisLabel]="true"
+  [xAxisLabel]="'activities'"
+  [yAxisLabel]="'duration'"
+  [xAxis]="true"
+  [yAxis]="true">
+</ngx-charts-bar-vertical>
+</ion-content>

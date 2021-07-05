@@ -8,12 +8,14 @@ import { IonicModule } from '@ionic/angular';
 import { ActivityButtonComponent } from './activity-button/activity-button.component'
 import { ActivityPopoverComponent } from './activity-popover/activity-popover.component';
 import { GroupDatePipe } from './group-date.pipe'
+import { StatisticsModule } from './statistics/statistics.module';
 @NgModule({
   declarations: [TimeTrackerComponent,IconSelectorComponent,NewActivityModalComponent, ActivityButtonComponent, ActivityPopoverComponent, GroupDatePipe],
   imports: [
     CommonModule,
     IonicModule,
-    FormsModule
+    FormsModule,
+    StatisticsModule
   ],
   exports: [TimeTrackerComponent]
 })
