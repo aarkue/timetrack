@@ -1,22 +1,19 @@
 {
-  "appId": "eu.smartime.app",
-  "appName": "smartime",
-  "bundledWebRuntime": false,
-  "npmClient": "npm",
-  "webDir": "www",
-  "plugins": {
-    "SplashScreen": {
-      "launchShowDuration": 0
-    },
-    "LocalNotifications": {
-      "smallIcon": "assets/favicon.png",
-      "iconColor": "#49991F",
-      "sound": "assets/notification.mp3"
-    }
-  },
-  "cordova": {},
-  "linuxAndroidStudioPath": "/usr/bin/android-studio",
-  "server": {
-    "url": "http://192.168.178.39:8100"
-  }
+	"appId": "eu.smartime.app",
+	"appName": "smartime",
+	"bundledWebRuntime": false,
+	"npmClient": "npm",
+	"webDir": "www",
+	"plugins": {
+		"SplashScreen": {
+			"launchShowDuration": 0
+		},
+		"LocalNotifications": {
+			"smallIcon": "assets/favicon.png",
+			"iconColor": "#49991F",
+			"sound": "assets/notification.mp3"
+		}
+	},
+	"cordova": {},
+	"linuxAndroidStudioPath": "/usr/bin/android-studio"
 }
