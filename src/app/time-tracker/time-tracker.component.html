@@ -1,3 +1,10 @@
+<ion-item>
+  <h3>Time Tracker</h3>
+  <ion-button slot="end" expand="block" fill="outline" size="medium" (click)="showStatistics();">
+  Statistics
+  <ion-icon name="stats-chart" slot="end"></ion-icon>
+  </ion-button>
+</ion-item>
 <ion-grid>
   <ion-row>
     <ion-col size-sm="3" size-md="3" size-lg="3" size-xl="3" *ngFor="let el of activities;let i=index">
@@ -18,6 +25,7 @@
     </ion-col>
   </ion-row>
 </ion-grid>
+
 <ion-list>
     <ion-item>
     <ion-label color="medium">Label</ion-label>
@@ -81,4 +89,3 @@
   </ion-item-sliding> -->
 </ion-list>
 <br>
-<ion-button (click)="showStatistics()">Show Statistics</ion-button>

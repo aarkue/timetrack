@@ -7,16 +7,83 @@
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
+
 <ion-content>
-<ngx-charts-bar-vertical
-  [results]="data"
-  [customColors]="customColors"
-  [legend]="true"
-  [showXAxisLabel]="true"
-  [showYAxisLabel]="true"
-  [xAxisLabel]="'activities'"
-  [yAxisLabel]="'duration'"
-  [xAxis]="true"
-  [yAxis]="true">
-</ngx-charts-bar-vertical>
+  <ion-segment [(ngModel)]="timeOptions" (ngModelChange)="updateDataset()" value="all">
+    <ion-segment-button value="all">
+      <ion-label>All</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="today">
+      <ion-label>Today</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="custom">
+      <ion-label>Custom</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+  <div class="customDatePickers" *ngIf="this.timeOptions === 'custom'">
+      <ion-row>
+        <ion-col col-2>
+          <ion-item>
+            <ion-label>Start</ion-label>
+            <ion-datetime picker-format="DD.MM.YYYY | HH:mm" display-format="DD.MM" [(ngModel)]="customDateStart" (ngModelChange)="updateDataset()"></ion-datetime>
+          </ion-item>
+        </ion-col>
+        <ion-col col-2>
+          <ion-item>
+          <ion-label>End</ion-label>
+          <ion-datetime picker-format="DD.MM.YYYY | HH:mm" display-format="DD.MM" [(ngModel)]="customDateEnd" (ngModelChange)="updateDataset()"></ion-datetime>
+        </ion-item>
+        </ion-col>
+      </ion-row>
+  </div>
+  <ion-item>
+    <div class="tagsDiv">
+      <ion-chip *ngFor="let tag of tagsActivated;" color="success" (click)="toggleActivated(tag)">{{tag}}</ion-chip>
+      <ion-chip *ngFor="let tag of tagsDeactived;" color="danger" (click)="toggleActivated(tag)">{{tag}}</ion-chip>
+    </div>
+  </ion-item>
+<div class="centerCards">
+  <ion-card class="chartCard">
+    <ion-card-header>
+      <ion-card-title>Bar Chart</ion-card-title>
+    </ion-card-header>
+    <ion-card-content  class="chartCardContent">
+      <div class="chartWrapper">
+        <ngx-charts-bar-vertical 
+        [results]="data"
+        [customColors]="customColors"
+        [legend]="true"
+        [showXAxisLabel]="true"
+        [showYAxisLabel]="true"
+        [yAxisLabel]="'duration (min)'"
+        [xAxis]="true"
+        [yAxis]="true"
+        [trimXAxisTicks]="true"
+        [maxXAxisTickLength]="10"
+        [legendPosition]="BELOW" 
+        >
+      </ngx-charts-bar-vertical>
+    </div>
+  </ion-card-content>
+  </ion-card>
+
+
+  <ion-card class="chartCard">
+    <ion-card-header>
+      <ion-card-title>Pie Chart</ion-card-title>
+    </ion-card-header>
+    <ion-card-content class="chartCardContent">
+      <div class="chartWrapper">
+        <ngx-charts-pie-chart
+          [results]="data"
+          [customColors]="customColors"
+          [legend]="true"
+          [legendPosition]="BELOW"
+          [labels]="false">
+        </ngx-charts-pie-chart>
+      </div>
+  </ion-card-content>
+  </ion-card>
+
+</div>
 </ion-content>

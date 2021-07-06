@@ -1,0 +1,28 @@
+.chartWrapper {
+  height: 250px;
+
+}
+.chartCardContent{
+  height: 325px;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.chartCard{
+  padding: 5px;
+  // width: 80%;
+  // height: 50vh;
+  margin: 20px auto;
+  max-width: 900px;
+}
+
+.centerCards{
+  padding-top: 15px; 
+}
+
+.tagsDiv{
+  overflow-x: auto;
+  white-space: nowrap;
+  padding-bottom: 5px;
+}
+

@@ -363,6 +363,7 @@ export class TimeTrackerComponent implements OnInit {
     const modal = await this.modalController.create({
       component: StatisticsComponent,
       componentProps : {'activities': this.activities, 'timeTracked': this.timeTracked},
+      cssClass: "fullscreenModal"
     });
     await modal.present()
   }
