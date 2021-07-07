@@ -36,12 +36,18 @@
         </ion-col>
       </ion-row>
   </div>
+  <div class="filter">
   <ion-item>
-    <div class="tagsDiv">
+    <ion-label>Filter by tags</ion-label>
+    <ion-toggle [(ngModel)]="filterTags" (ngModelChange)="updateDataset()"></ion-toggle>
+  </ion-item>
+  <ion-item *ngIf="filterTags" class="filterTags">
+    <div>
       <ion-chip *ngFor="let tag of tagsActivated;" color="success" (click)="toggleActivated(tag)">{{tag}}</ion-chip>
-      <ion-chip *ngFor="let tag of tagsDeactived;" color="danger" (click)="toggleActivated(tag)">{{tag}}</ion-chip>
+      <ion-chip *ngFor="let tag of tagsDeactived;" color="warning" (click)="toggleActivated(tag)">{{tag}}</ion-chip>
     </div>
   </ion-item>
+</div>
 <div class="centerCards">
   <ion-card class="chartCard">
     <ion-card-header>
