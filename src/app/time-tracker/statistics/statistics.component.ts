@@ -14,6 +14,8 @@ export class StatisticsComponent implements OnInit {
 
   public data = []
 
+  public heatMapData = []
+
   public readonly BELOW = LegendPosition.Below;
   public timeOptions : string = "today";
   @Input('activities')
@@ -31,6 +33,14 @@ export class StatisticsComponent implements OnInit {
   public tagsDeactived : Set<string> = new Set<string>();
 
   public filterTags : boolean = false;  
+
+  private readonly rightActivity : (act: Activity) => ((a: TimeTrack, key: number) => boolean)
+  = (act: Activity) => (a: TimeTrack, key: number) => a.activityID === act.id;
+  private readonly rightActivityRunning : (act: Activity) => ((a: Activity) => boolean)
+= (act: Activity) => (a: Activity) => a.id === act.id;
+
+ private readonly days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
   constructor(private modalController : ModalController) { }
 
   ngOnInit() {
@@ -60,6 +70,7 @@ export class StatisticsComponent implements OnInit {
     })
 
     this.updateDataset();
+
   }
 
 
@@ -168,16 +179,10 @@ export class StatisticsComponent implements OnInit {
   updateDataset(){
     this.data = [];
     this.customColors = [];
-
-    const rightActivity : (act: Activity) => ((a: TimeTrack, key: number) => boolean)
-                        = (act: Activity) => (a: TimeTrack, key: number) => a.activityID === act.id;
-    const rightActivityRunning : (act: Activity) => ((a: Activity) => boolean)
-    = (act: Activity) => (a: Activity) => a.id === act.id;
-
     if(this.timeOptions === "all"){
       this.activities.forEach((act) => {
         if(this.checkActivityTags(act)){
-        const dur = this.getDurationForActivityFiltered([rightActivity(act)],[rightActivityRunning(act)])
+        const dur = this.getDurationForActivityFiltered([this.rightActivity(act)],[this.rightActivityRunning(act)])
         const min = (dur/60);
         if(min > 0){
           this.data.push({"name": act.label, "value": min});
@@ -191,7 +196,7 @@ export class StatisticsComponent implements OnInit {
       console.log(this.data);
       this.activities.forEach((act) => {
         if(this.checkActivityTags(act)){
-        const dur = this.getDurationForActivityFiltered([rightActivity(act),(a: TimeTrack, key: number) =>  key === today],[rightActivityRunning(act)]);
+        const dur = this.getDurationForActivityFiltered([this.rightActivity(act),(a: TimeTrack, key: number) =>  key === today],[this.rightActivityRunning(act)]);
         const min = (dur/60);
         console.log(act.label,dur,min,this.data);
         if(min > 0){
@@ -208,7 +213,7 @@ export class StatisticsComponent implements OnInit {
       const now = Date.now();
       this.activities.forEach((act) => {
         if(this.checkActivityTags(act)){
-        const dur = this.getDurationForActivityFiltered([rightActivity(act),(a: TimeTrack, key: number) => {return (a.startDate >= mini && a.endDate <= maxi)}],[rightActivityRunning(act),(a: Activity) => {return (a.startDate >= mini && now <= maxi)}]);
+        const dur = this.getDurationForActivityFiltered([this.rightActivity(act),(a: TimeTrack, key: number) => {return (a.startDate >= mini && a.endDate <= maxi)}],[this.rightActivityRunning(act),(a: Activity) => {return (a.startDate >= mini && now <= maxi)}]);
         const min = (dur/60);
         if(min > 0){
           this.data.push({"name": act.label, "value": min});
@@ -218,7 +223,7 @@ export class StatisticsComponent implements OnInit {
       });
     
     }
-    console.log(this.timeOptions)
+    this.updateHeatMapDataset();
   }
 
   checkActivityTags(act: Activity) : boolean{
@@ -235,5 +240,35 @@ export class StatisticsComponent implements OnInit {
   }
   }
 
+
+  updateHeatMapDataset(){
+    this.heatMapData = [];
+    let weekData = [];
+    let day: Date = new Date(new Date().toDateString());
+    for(let i = 0; i < 7 * 4; i++){
+      let thisDay = day.setDate(day.getDate()-1);
+      let totalDayDur = 0;
+      console.log(this.data);
+      this.activities.forEach((act) => {
+        if(this.checkActivityTags(act)){
+        const dur = this.getDurationForActivityFiltered([this.rightActivity(act),(a: TimeTrack, key: number) =>  key === thisDay],[this.rightActivityRunning(act)]);
+        const min = (dur/60);
+        console.log(act.label,dur,min,this.data);
+        if(min > 0){
+          totalDayDur += min;
+        }
+      }
+      })
+      let dateString = this.days[new Date(thisDay).getDay()];
+      weekData.push({name: dateString, value:totalDayDur})
+      if((i+1)%7 === 0){
+        this.heatMapData.push({name: "week" + Math.floor((i+1)/7),series: weekData});
+        weekData = [];
+      }
+    }
+    this.heatMapData.reverse();
+    console.log(this.heatMapData)
+
+  }
 
 }

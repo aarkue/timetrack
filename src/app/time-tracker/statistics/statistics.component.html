@@ -91,5 +91,29 @@
   </ion-card-content>
   </ion-card>
 
+  <ion-card class="heatMapCard">
+    <ion-card-header>
+      <ion-card-title>Heat Map</ion-card-title>
+    </ion-card-header>
+    <ion-card-content  class="chartCardContent">
+      <div class="chartWrapper">
+        <ngx-charts-heat-map 
+        [results]="heatMapData"
+        [customColors]="customColors"
+        [legend]="true"
+        [showXAxisLabel]="true"
+        [showYAxisLabel]="true"
+        [yAxisLabel]="'duration (min)'"
+        [xAxis]="true"
+        [yAxis]="true"
+        [trimXAxisTicks]="true"
+        [maxXAxisTickLength]="10"
+        [legendPosition]="BELOW" 
+        >
+      </ngx-charts-heat-map>
+    </div>
+  </ion-card-content>
+  </ion-card>
+
 </div>
 </ion-content>
