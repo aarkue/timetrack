@@ -6,12 +6,12 @@
   "webDir": "www",
   "plugins": {
     "SplashScreen": {
-      "launchShowDuration": 0
+      "launchShowDuration": 5000
     },
     "LocalNotifications": {
-      "smallIcon": "assets/favicon.png",
-      "iconColor": "#49991F",
-      "sound": "assets/notification.mp3"
+      "smallIcon": "ic_launcher",
+      "iconColor": "#11db39",
+      "sound": "notification.wav"
     }
   },
   "cordova": {},

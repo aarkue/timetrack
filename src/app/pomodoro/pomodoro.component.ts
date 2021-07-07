@@ -240,8 +240,17 @@ export class PomodoroComponent implements OnInit, OnDestroy {
       // } catch (e){
       //   console.log("Notifications constructor is not supported! "+e);
       // }
-    }      
-  
+    } 
+    if(this.platform.is('android')){
+      await LocalNotifications.createChannel({
+        sound: "notification.wav",
+        vibration: true,
+        id: "importa",
+        name: "Important",
+        importance: 5
+      })
+    }
+
     
     let result = await LocalNotifications.schedule({
       notifications: [
@@ -253,6 +262,7 @@ export class PomodoroComponent implements OnInit, OnDestroy {
           attachments: null,
           actionTypeId: "",
           extra: null,
+          channelId: "importa"
         }
       ]
     });
@@ -261,10 +271,10 @@ export class PomodoroComponent implements OnInit, OnDestroy {
     if(this.platform.is("hybrid")){
       Haptics.vibrate();
     }
+  
     if(this.sound){
       this.sound.play();
     }
-    
     // this.snackbar.open(title, 'Ok', {
     //   duration: 3000,
     //   panelClass: 'success',
@@ -569,4 +579,35 @@ export class PomodoroComponent implements OnInit, OnDestroy {
       })
     return await modalRef.present();
   }
+
+  async sendPersNotification(){
+    await LocalNotifications.createChannel({
+      sound: "notification.wav",
+      vibration: false,
+      id: "imp",
+      name: "Other",
+      importance: 5
+    })
+    const notif = {
+      id: 2,
+      title: "Pomodoro in progress",
+      body: "",
+      sound: null,
+      channelId: "unimportant"
+    };
+
+    setInterval(async () => {
+      notif.body = this.getMinLeft() + " min left"
+      let res = await LocalNotifications.schedule({
+        notifications: [notif]
+      })
+    },60 * 1000)
+    
+  }
+
+  getProgessDec(){
+    return (this.timePassed / this.currDuration);
+  }
+
+
 }
