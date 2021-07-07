@@ -60,6 +60,8 @@ export class PomodoroComponent implements OnInit, OnDestroy {
 
   isOvertime: boolean = false;
 
+  private isInitialized: boolean = false;
+
   @ViewChild('pomodoroHistoryDiv')
   private pomodoroHistoryDiv: ElementRef<HTMLDivElement>;
 
@@ -84,35 +86,44 @@ export class PomodoroComponent implements OnInit, OnDestroy {
       this.calcTimePassed();
       this.startClock();
       this.saveCurrentState();
+      this.isInitialized = true;
     });
 
-    LocalNotifications.registerActionTypes({
-      types: [{
-          id: "almost-up",
-          actions: [{
-            id: "pause",
-            title: "Pause"
-          },
-          {
-            id: "skip",
-            title: "Skip"
-          }]
-        }]
-    });
-    LocalNotifications.addListener("localNotificationActionPerformed",(act) => {
-      console.log(act);
-      if(act.actionId === 'pause'){
-        this.calcTimePassed();
-        this.setTimePassedBefore(this.timePassed);
-        this.startDate = null;
-        this.cancelNotificationInAdvance();
-        this.setIsPaused(true);
-        this.saveCurrentState();
-      }else if(act.actionId === 'skip'){
-        this.nextTimer();
-      }
-    })
+
+    if(this.platform.is('hybrid')){
+          LocalNotifications.registerActionTypes({
+            types: [{
+                id: "almost-up",
+                actions: [{
+                  id: "pause",
+                  title: "Pause"
+                },
+                {
+                  id: "skip",
+                  title: "Skip"
+                }]
+              }]
+          });
+        LocalNotifications.addListener("localNotificationActionPerformed",(act) => {
+          if(this.isInitialized){
+          console.log(act);
+          if(act.actionId === 'pause'){
+            this.calcTimePassed();
+            this.setTimePassedBefore(this.timePassed);
+            this.startDate = null;
+            this.cancelNotificationInAdvance();
+            this.setIsPaused(true);
+            this.saveCurrentState();
+          }else if(act.actionId === 'skip'){
+            this.nextTimer();
+          }
+        }
+      });
+    }
   }
+
+
+  
 
   async refresh() {
     this.loadOptions().then(async () => {
@@ -152,7 +163,16 @@ export class PomodoroComponent implements OnInit, OnDestroy {
         if (this.timerHistory.length >= 2) {
           this.timerHistory[this.timerHistory.length - 2].endDate = Date.now();
         }
+        if(this.timerHistory.length >= 1){
         this.timerHistory[this.timerHistory.length - 1].startDate = Date.now();
+        }else{
+          this.timerHistory.push({
+            startDate: Date.now(),
+            duration: this.currDuration,
+            type: this.status,
+            endDate: null,
+          });
+        }
       }
       this.scheduleNotificationInAdvance();
       this.calcTimePassed();
