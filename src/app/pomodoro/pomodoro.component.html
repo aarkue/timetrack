@@ -28,9 +28,9 @@
       {{ this.isPaused ? "Resume" : (this.isOvertime ? 'Finish' : 'Pause') }}
     </ion-button>
     <ion-progress-bar *ngIf="showProgressBar"
-    [value]="this.isOvertime ? '0.9' : (this.timePassed / this.currDuration)"
+    [value]="this.isOvertime ? getProgessDec()%1 : getProgessDec()"
     [ngClass]="this.status?.toString() === 'Break' ? 'onBreak' : 'working'" 
-    [buffer]="this.isOvertime ? '0.1' : '1'"
+    [buffer]="this.isOvertime ? 0 : '1'"
     ></ion-progress-bar>
 
   </ion-card-content>
@@ -56,7 +56,7 @@
   </ion-item>
   <div class="pomodoroHistory" #pomodoroHistoryDiv [ngClass]="{'historyExpanded': this.historyExpanded}">
     <app-timer-history-chip *ngFor="let el of timerHistory;"
-      [timerData]="el" [progress]="el.endDate ? 1 : (this.timePassed / this.currDuration)"
+      [timerData]="el" [progress]="el.endDate ? 1 : getProgessDec()"
       [showProgress]="this.showProgressBar">
     </app-timer-history-chip>
   </div>
