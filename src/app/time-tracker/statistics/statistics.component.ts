@@ -77,7 +77,7 @@ export class StatisticsComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(){
     setTimeout(() => {
       this.updateDataset();
-    },100)
+    },300)
   }
 
   dismissModal(){
@@ -230,7 +230,9 @@ export class StatisticsComponent implements OnInit, AfterViewInit {
       });
     
     }
-    this.updateHeatMapDataset();
+    setTimeout(() => {
+      this.updateHeatMapDataset();
+    },200)
   }
 
   checkActivityTags(act: Activity) : boolean{

@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { Capacitor, SplashScreen } from '@capacitor/core';
 
 @Component({
   selector: 'app-root',
@@ -8,8 +7,6 @@ import { Capacitor, SplashScreen } from '@capacitor/core';
 })
 export class AppComponent {
   constructor() {
-    if (Capacitor.isNative){
-      SplashScreen.hide();
-    }
+
   }
 }
