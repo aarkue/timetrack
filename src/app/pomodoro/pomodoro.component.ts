@@ -658,29 +658,7 @@ export class PomodoroComponent implements OnInit, OnDestroy {
     return await modalRef.present();
   }
 
-  async sendPersNotification() {
-    await LocalNotifications.createChannel({
-      sound: 'notification.wav',
-      vibration: false,
-      id: 'imp',
-      name: 'Other',
-      importance: 5,
-    });
-    const notif = {
-      id: 2,
-      title: 'Pomodoro in progress',
-      body: '',
-      sound: null,
-      channelId: 'unimportant',
-    };
 
-    setInterval(async () => {
-      notif.body = this.getMinLeft() + ' min left';
-      let res = await LocalNotifications.schedule({
-        notifications: [notif],
-      });
-    }, 60 * 1000);
-  }
 
   getProgessDec() {
     return this.getTimePassed() / this.currDuration;
