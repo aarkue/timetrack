@@ -61,7 +61,7 @@
         [legend]="true"
         [showXAxisLabel]="true"
         [showYAxisLabel]="true"
-        [yAxisLabel]="'duration (min)'"
+        [yAxisLabel]="'duration (h)'"
         [xAxis]="true"
         [yAxis]="true"
         [trimXAxisTicks]="true"
@@ -91,24 +91,27 @@
   </ion-card-content>
   </ion-card>
 
-  <ion-card class="heatMapCard">
+  <ion-card class="chartCard">
     <ion-card-header>
       <ion-card-title>Heat Map</ion-card-title>
+      <ion-card-subtitle *ngIf="timeOptions !== 'custom'">Showing the last {{getNumDaysToShow()}} days</ion-card-subtitle>
+      <ion-card-subtitle *ngIf="timeOptions === 'custom'">Showing custom interval</ion-card-subtitle>
     </ion-card-header>
     <ion-card-content  class="chartCardContent">
       <div class="chartWrapper">
         <ngx-charts-heat-map 
         [results]="heatMapData"
         [customColors]="customColors"
-        [legend]="true"
+        scheme="solar"
+        [legend]="false"
         [showXAxisLabel]="true"
-        [showYAxisLabel]="true"
-        [yAxisLabel]="'duration (min)'"
+        [showXAxisLabel]="false"
         [xAxis]="true"
         [yAxis]="true"
         [trimXAxisTicks]="true"
         [maxXAxisTickLength]="10"
-        [legendPosition]="BELOW" 
+        [xAxisTickFormatting]="formatHeatmapXAxis"
+        [tooltipText]="calendarTooltipText"
         >
       </ngx-charts-heat-map>
     </div>

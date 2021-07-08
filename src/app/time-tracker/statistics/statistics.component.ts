@@ -1,5 +1,5 @@
 import { Time } from '@angular/common';
-import { Component, Input, OnInit } from '@angular/core';
+import { AfterViewInit, Component, Input, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { LegendPosition } from '@swimlane/ngx-charts';
 import { Activity } from '../activity';
@@ -10,13 +10,15 @@ import { TimeTrack } from '../time-track';
   templateUrl: './statistics.component.html',
   styleUrls: ['./statistics.component.scss'],
 })
-export class StatisticsComponent implements OnInit {
+export class StatisticsComponent implements OnInit, AfterViewInit {
 
   public data = []
 
   public heatMapData = []
 
   public readonly BELOW = LegendPosition.Below;
+
+
   public timeOptions : string = "today";
   @Input('activities')
   private activities: Activity[];
@@ -39,8 +41,7 @@ export class StatisticsComponent implements OnInit {
   private readonly rightActivityRunning : (act: Activity) => ((a: Activity) => boolean)
 = (act: Activity) => (a: Activity) => a.id === act.id;
 
- private readonly days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-
+  private readonly days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   constructor(private modalController : ModalController) { }
 
   ngOnInit() {
@@ -69,10 +70,15 @@ export class StatisticsComponent implements OnInit {
       })
     })
 
-    this.updateDataset();
 
   }
 
+
+  ngAfterViewInit(){
+    setTimeout(() => {
+      this.updateDataset();
+    },100)
+  }
 
   dismissModal(){
     this.modalController.dismiss();
@@ -176,7 +182,7 @@ export class StatisticsComponent implements OnInit {
     this.updateDataset();
   }
 
-  updateDataset(){
+  async updateDataset(){
     this.data = [];
     this.customColors = [];
     if(this.timeOptions === "all"){
@@ -184,8 +190,9 @@ export class StatisticsComponent implements OnInit {
         if(this.checkActivityTags(act)){
         const dur = this.getDurationForActivityFiltered([this.rightActivity(act)],[this.rightActivityRunning(act)])
         const min = (dur/60);
-        if(min > 0){
-          this.data.push({"name": act.label, "value": min});
+        const h = (min/60);
+        if(h > 0){
+          this.data.push({"name": act.label, "value": h});
           this.customColors.push({"name": act.label, "value": act.color});
         }
       }
@@ -193,14 +200,13 @@ export class StatisticsComponent implements OnInit {
     }else if(this.timeOptions === "today"){
       const today = new Date(new Date().toDateString()).getTime();
       this.data = [];
-      console.log(this.data);
       this.activities.forEach((act) => {
         if(this.checkActivityTags(act)){
         const dur = this.getDurationForActivityFiltered([this.rightActivity(act),(a: TimeTrack, key: number) =>  key === today],[this.rightActivityRunning(act)]);
         const min = (dur/60);
-        console.log(act.label,dur,min,this.data);
-        if(min > 0){
-          this.data.push({"name": act.label, "value": min});
+        const h = (min/60);
+        if(h > 0){
+          this.data.push({"name": act.label, "value": h});
           this.customColors.push({"name": act.label, "value": act.color});
         }
       }
@@ -215,8 +221,9 @@ export class StatisticsComponent implements OnInit {
         if(this.checkActivityTags(act)){
         const dur = this.getDurationForActivityFiltered([this.rightActivity(act),(a: TimeTrack, key: number) => {return (a.startDate >= mini && a.endDate <= maxi)}],[this.rightActivityRunning(act),(a: Activity) => {return (a.startDate >= mini && now <= maxi)}]);
         const min = (dur/60);
-        if(min > 0){
-          this.data.push({"name": act.label, "value": min});
+        const h = (min/60);
+        if(h > 0){
+          this.data.push({"name": act.label, "value": h});
           this.customColors.push({"name": act.label, "value": act.color});
         }
       }
@@ -229,46 +236,100 @@ export class StatisticsComponent implements OnInit {
   checkActivityTags(act: Activity) : boolean{
     if(this.filterTags){
     const res = act.tags.filter((tag) => {
-      console.log(this.tagsActivated.has(tag));
       return this.tagsActivated.has(tag);
     });
-    console.log(act.tags);
-
     return res.length > 0;
   }else{
     return true;
   }
   }
 
+  getDaysInMonth(month: number, year: number){
+    // Day 0: Last day of last month
+    return new Date(year,month-1,0).getDate();
+  }
 
-  updateHeatMapDataset(){
+  async updateHeatMapDataset(){
     this.heatMapData = [];
     let weekData = [];
+    const today = new Date(new Date().toDateString()).getTime();
     let day: Date = new Date(new Date().toDateString());
-    for(let i = 0; i < 7 * 4; i++){
-      let thisDay = day.setDate(day.getDate()-1);
+
+    const n = this.getNumDaysToShow();
+
+    if(this.timeOptions === "custom"){
+      const woTimeDate = new Date(new Date(this.customDateEnd).toDateString());
+      day = woTimeDate;
+    }
+
+
+
+    day.setDate(day.getDate()-n);
+    let startOfWeekDate = day.getTime();
+    for(let i = 0; i < n; i++){
+      let thisDay = day.setDate(day.getDate()+1);
+      let dayString = this.days[new Date(thisDay).getDay()];
+      let dateString = new Date(thisDay).toDateString();
+      if(thisDay <= today){
       let totalDayDur = 0;
-      console.log(this.data);
       this.activities.forEach((act) => {
         if(this.checkActivityTags(act)){
-        const dur = this.getDurationForActivityFiltered([this.rightActivity(act),(a: TimeTrack, key: number) =>  key === thisDay],[this.rightActivityRunning(act)]);
+        const dur = this.getDurationForActivityFiltered(
+          [this.rightActivity(act),(a: TimeTrack, key: number) =>  key === thisDay],
+          [this.rightActivityRunning(act), (a => new Date(new Date(act.startDate).toDateString()).getDate() === thisDay )
+          ]);
         const min = (dur/60);
-        console.log(act.label,dur,min,this.data);
-        if(min > 0){
-          totalDayDur += min;
+        const h = (min/60);
+        if(h > 0){
+          totalDayDur += h;
         }
       }
       })
-      let dateString = this.days[new Date(thisDay).getDay()];
-      weekData.push({name: dateString, value:totalDayDur})
-      if((i+1)%7 === 0){
-        this.heatMapData.push({name: "week" + Math.floor((i+1)/7),series: weekData});
+      if(dayString=== this.days[0]){
+        weekData.unshift({name: dayString, value:totalDayDur, date: dateString})
+        this.heatMapData.push({name: startOfWeekDate,series: weekData});
         weekData = [];
+      }else if(dayString === this.days[1]){
+        startOfWeekDate = thisDay;
+        weekData.unshift({name: dayString, value:totalDayDur, date: dateString})
+      }else{
+        weekData.unshift({name: dayString, value:totalDayDur, date: dateString})
       }
     }
-    this.heatMapData.reverse();
-    console.log(this.heatMapData)
+    }
+    this.heatMapData.push({name: startOfWeekDate, series: weekData});
 
+  }
+
+  formatHeatmapXAxis(data: any){
+    const monthsShort = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul","Aug", "Sep", "Oct", "Nov", "Dec"];
+    const date = new Date(data);
+    if(date.getDate() <= 7 ){
+      return monthsShort[date.getMonth()];
+    }else{
+      return monthsShort[date.getMonth()];
+    }
+  }
+
+  calendarTooltipText(v: any): string {
+    return `
+      <span class="tooltip-label">${v.label} • ${v.cell.date}</span>
+      <span class="tooltip-val">${Math.round(v.data*10)/10}</span>
+    `;
+  }
+
+  getNumDaysToShow() : number{
+    if(this.timeOptions === "custom"){
+      let day: Date = new Date(new Date(this.customDateStart).toDateString());
+      let end: Date = new Date(new Date(this.customDateEnd).toDateString());
+      let diffInMS = end.getTime()-day.getTime();
+      let diffInDaysEst = diffInMS / (1000 * 60 * 60 * 24);
+      return Math.max(diffInDaysEst,1);
+    }else if(this.timeOptions === "all"){
+      return 100;
+    }else{
+      return 30;
+    }
   }
 
 }
