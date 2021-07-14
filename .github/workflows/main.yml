@@ -54,15 +54,15 @@ jobs:
             KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
             chmod +x ./android/gradlew
-            cd android
+            cd ./android
             # Secrets
-            echo "$KEYSTORE" | base64 -d > app/key.jks
-            echo "RELEASE_STORE_FILE=key.jks" >> gradle.properties
-            echo "RELEASE_STORE_PASSWORD=$KEYSTORE_PASSWORD" >> gradle.properties
-            echo "RELEASE_KEY_ALIAS=$ALIAS" >> gradle.properties
-            echo "RELEASE_KEY_PASSWORD=$KEY_PASSWORD" >> gradle.properties
+            echo "$KEYSTORE" | base64 -d > ./android/app/key.jks
+            echo "RELEASE_STORE_FILE=key.jks" >> ./android/gradle.properties
+            echo "RELEASE_STORE_PASSWORD=$KEYSTORE_PASSWORD" >> ./android/gradle.properties
+            echo "RELEASE_KEY_ALIAS=$ALIAS" >> ./android/gradle.properties
+            echo "RELEASE_KEY_PASSWORD=$KEY_PASSWORD" >> ./android/gradle.properties
       - name: Build android
-        run: ./gradlew build
+        run: ./android/gradlew build
         
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v2.2.4
