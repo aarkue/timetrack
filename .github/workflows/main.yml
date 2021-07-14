@@ -60,7 +60,7 @@ jobs:
       - name: Build android
         run: cd ./android/ && ./gradlew build
         
-      - name: Upload a Build Artifact
+      - name: Upload Artifacts
         uses: actions/upload-artifact@v2.2.4
         with:
           # Artifact name
