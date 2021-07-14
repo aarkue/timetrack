@@ -44,7 +44,8 @@ jobs:
         uses: actions/setup-java@v2.1.0
         with:
           # The Java version to set up. Takes a whole or semver Java version. See examples of supported syntax in README file
-          java-version: 8
+          java-version: '8'
+          distribution: 'adopt'
           
       - name: prepare android
         env:
