@@ -1,0 +1,72 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  build_project:
+    runs-on: ubuntu:latest
+    container: node:latest-alpine
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Instal ionic cli
+        run: npm install -g @ionic/cli
+        
+      - name: Install packages
+        run: npm install
+        
+      - name: Ionic build
+        run: ionic build --prod
+        
+      - name: Upload to siter.eu
+        run: npx @getmeli/cli upload     --url https://siter.eu     --site $SITER_SITE  --branch main   --token $SITER_TOKEN  www/
+      
+      - name: Prepare android build
+        run: ionic cap copy android
+       
+      - name: Setup Java JDK
+        uses: actions/setup-java@v2.1.0
+        with:
+          # The Java version to set up. Takes a whole or semver Java version. See examples of supported syntax in README file
+          java-version: 8
+          
+      - name: prepare android
+        run: |
+            apt-get --quiet update --yes
+            apt-get --quiet install --yes wget tar unzip lib32stdc++6 lib32z1
+            wget --quiet --output-document=android-sdk.zip https://dl.google.com/android/repository/sdk-tools-linux-${ANDROID_SDK_TOOLS}.zip
+            unzip -d android-sdk-linux android-sdk.zip
+            echo y | android-sdk-linux/tools/bin/sdkmanager "platforms;android-${ANDROID_COMPILE_SDK}" >/dev/null
+            echo y | android-sdk-linux/tools/bin/sdkmanager "platform-tools" >/dev/null
+            echo y | android-sdk-linux/tools/bin/sdkmanager "build-tools;${ANDROID_BUILD_TOOLS}" >/dev/null
+            export ANDROID_HOME=$PWD/android-sdk-linux
+            export PATH=$PATH:$PWD/android-sdk-linux/platform-tools/
+            chmod +x ./android/gradlew
+            export GRADLE_USER_HOME=`pwd`/android/.gradle
+            # temporarily disable checking for EPIPE error and use yes to accept all licenses
+            set +o pipefail
+            yes | android-sdk-linux/tools/bin/sdkmanager --licenses
+            set -o pipefail
+            cd android
+            # Secrets
+            echo "$KEYSTORE" | base64 -d > app/key.jks
+            echo "RELEASE_STORE_FILE=key.jks" >> gradle.properties
+            echo "RELEASE_STORE_PASSWORD=$KEYSTORE_PASSWORD" >> gradle.properties
+            echo "RELEASE_KEY_ALIAS=$ALIAS" >> gradle.properties
+            echo "RELEASE_KEY_PASSWORD=$KEY_PASSWORD" >> gradle.properties
+      - name: Build android
+        run: ./gradlew build
+        
