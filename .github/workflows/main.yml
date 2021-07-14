@@ -54,7 +54,6 @@ jobs:
             KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
             chmod +x ./android/gradlew
-            cd ./android
             # Secrets
             echo "$KEYSTORE" | base64 -d > ./android/app/key.jks
             echo "RELEASE_STORE_FILE=key.jks" >> ./android/gradle.properties
