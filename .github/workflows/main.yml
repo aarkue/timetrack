@@ -64,7 +64,7 @@ jobs:
         uses: actions/upload-artifact@v2.2.4
         with:
           # Artifact name
-          name: timetrack# optional, default is artifact
+          name: timetrack-apk # optional, default is artifact
           # A file, directory or wildcard pattern that describes what to upload
           path: ./android/app/build/outputs/apk/release/app-release.apk
           retention-days: 3
