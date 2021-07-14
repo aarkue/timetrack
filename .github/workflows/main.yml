@@ -61,7 +61,7 @@ jobs:
             echo "RELEASE_KEY_ALIAS=$ALIAS" >> ./android/gradle.properties
             echo "RELEASE_KEY_PASSWORD=$KEY_PASSWORD" >> ./android/gradle.properties
       - name: Build android
-        run: ./android/gradlew build
+        run: cd ./android/ && ./gradlew build
         
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v2.2.4
