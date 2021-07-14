@@ -32,6 +32,9 @@ jobs:
         run: ionic build --prod
         
       - name: Upload to siter.eu
+        env:
+          SITER_SITE: ${{ secrets.SITER_SITE }}
+          SITER_TOKEN: ${{ secrets.SITER_TOKEN }}
         run: npx @getmeli/cli upload --branch main --url https://siter.eu --site $SITER_SITE --token $SITER_TOKEN  www/
       
       - name: Prepare android build
@@ -44,6 +47,10 @@ jobs:
           java-version: 8
           
       - name: prepare android
+        env:
+            KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+            ALIAS: ${{ secrets.ALIAS }}
+            KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
             apt-get --quiet update --yes
             apt-get --quiet install --yes wget tar unzip lib32stdc++6 lib32z1
