@@ -17,7 +17,6 @@ on:
 jobs:
   build_project:
     runs-on: ubuntu-latest
-    container: node:latest
 
     steps:
       - uses: actions/checkout@v2
@@ -39,17 +38,6 @@ jobs:
       
       - name: Prepare android build
         run: ionic cap copy android
-       
-      - name: Setup Java JDK
-        uses: actions/setup-java@v2.1.0
-        with:
-          # The Java version to set up. Takes a whole or semver Java version. See examples of supported syntax in README file
-          java-version: '8'
-          distribution: 'adopt'
-      - name: Setup Android SDK Tools
-        # You may pin to the exact commit or the version.
-        # uses: android-actions/setup-android@72fdd2e74f58fb338a2743720c0847b8becf1589
-        uses: android-actions/setup-android@v2.0.2
       - name: prepare android
         env:
             KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
