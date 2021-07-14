@@ -17,7 +17,7 @@ on:
 jobs:
   build_project:
     runs-on: ubuntu-latest
-    container: node:latest-alpine
+    container: node:latest
 
     steps:
       - uses: actions/checkout@v2
