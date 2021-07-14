@@ -3,7 +3,6 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { FilesystemDirectory, FilesystemEncoding, FileWriteOptions, FileWriteResult, Plugins } from '@capacitor/core';
 import { IonInput, Platform, ToastController } from '@ionic/angular';
 import { AccountService } from '../services/account.service';
-import { GamificationService } from '../services/gamification.service';
 const { Storage, Directory, Encoding, Filesystem, Share } = Plugins;
 @Component({
   selector: 'app-tab3',
@@ -32,7 +31,6 @@ export class Tab3Page {
   constructor(public accountService : AccountService,
               public toastController: ToastController, 
               public formBuilder: FormBuilder,
-              public gamificationService: GamificationService,
               platform : Platform) {
 
     this.platform = platform;

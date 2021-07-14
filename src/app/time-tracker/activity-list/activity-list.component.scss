@@ -1,0 +1,17 @@
+.activityButton{
+  text-align: center;
+  // background-color:	var(--ion-color-primary);
+  // border: 1mm black solid;
+  width: 100px;
+  background-color: #00000000;
+}
+
+.ripple-parent {
+  position: relative;
+  overflow: hidden;
+}
+
+.detailLabel{
+  max-width: 70px;
+  text-align: center;
+}

@@ -1,6 +1,6 @@
 {
-  "appId": "eu.smartime.app",
-  "appName": "smartime",
+  "appId": "eu.siter.timetrack",
+  "appName": "timetrack",
   "bundledWebRuntime": false,
   "npmClient": "npm",
   "webDir": "www",

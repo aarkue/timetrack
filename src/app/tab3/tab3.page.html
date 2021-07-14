@@ -21,8 +21,6 @@
     <ion-card-content>
       <h2>Sweat: {{accountService.getMoney()}}</h2> 
       <h2>Experience: {{accountService.getExperience()}}</h2>
-      <h2 class="level">Level: {{gamificationService.getCurrentLevel()}}</h2>
-      <ion-progress-bar [value]="gamificationService.getLevelProgressPercent()/100"></ion-progress-bar>
     </ion-card-content>
     <ion-button color="warning" label="Logout" size="block" *ngIf="accountService.isLoggedIn()" (click)="logOut()">
       <ion-label>Logout</ion-label>
@@ -48,26 +46,6 @@
 
   <ion-item-divider>
     </ion-item-divider>
-
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>Leaderboard</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <ion-list>
-        <ion-list-header lines="inset">
-          <ion-label>Username</ion-label>
-          <ion-label>Experience</ion-label>
-          <ion-label>Sweat</ion-label>
-        </ion-list-header>
-       <ion-item *ngFor="let entry of gamificationService.getLeaderboard()">
-        <ion-label>{{entry.username}}</ion-label>
-        <ion-label>{{entry.experience}}</ion-label>
-        <ion-label>{{entry.sweat}}</ion-label>
-        </ion-item>
-      </ion-list>
-    </ion-card-content>
-  </ion-card>
 
   <ion-card>
     <ion-card-header>

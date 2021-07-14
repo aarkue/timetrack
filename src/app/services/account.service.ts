@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Acc } from '../models/acc';
 import { APIResult } from '../models/api-result';
-import { TodoService } from './todo.service';
 import { WebRequestService } from './web-request.service';
 
 
@@ -16,7 +15,7 @@ const { Storage } = Plugins;
 export class AccountService {
   private acc: Acc | undefined;
 
-  constructor(private webReqServ: WebRequestService, private todoService : TodoService) {
+  constructor(private webReqServ: WebRequestService) {
     Storage.get({key: "acc"}).then((res) => {
       this.acc = JSON.parse(res.value);
       console.log(res);
@@ -150,7 +149,6 @@ export class AccountService {
         if (res && 'success' in res && res.success === true) {
           this.acc = res.result;
           await Storage.set({key: "acc", value: JSON.stringify(res.result)});
-          this.todoService.fetchData()
           resolve();
         }else{//not authenticated
           resolve();

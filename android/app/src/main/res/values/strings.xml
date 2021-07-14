@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">smartime</string>
-    <string name="title_activity_main">smartime</string>
-    <string name="package_name">eu.smartime.app</string>
-    <string name="custom_url_scheme">eu.smartime.app</string>
+    <string name="app_name">timetrack</string>
+    <string name="title_activity_main">timetrack</string>
+    <string name="package_name">eu.siter.timetrack</string>
+    <string name="custom_url_scheme">eu.siter.timetrack</string>
 </resources>

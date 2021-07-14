@@ -7,7 +7,6 @@ import { Tab2Page } from './tab2.page';
 import { ExploreContainerComponentModule } from '../explore-container/explore-container.module';
 
 import { Tab2PageRoutingModule } from './tab2-routing.module';
-import { PomodoroModule } from '../pomodoro/pomodoro.module';
 import { TimeTrackerModule } from '../time-tracker/time-tracker.module';
 @NgModule({
   imports: [
@@ -16,7 +15,6 @@ import { TimeTrackerModule } from '../time-tracker/time-tracker.module';
     FormsModule,
     ExploreContainerComponentModule,
     Tab2PageRoutingModule,
-    PomodoroModule,
     TimeTrackerModule
   ],
   declarations: [Tab2Page]

@@ -1,0 +1,40 @@
+<h3>Recent</h3>
+<ion-list>
+  <ion-item>
+  <ion-label color="medium">Label</ion-label>
+  <ion-icon name="clipboard-outline" slot="start" ></ion-icon>
+  <ion-label class="detailLabel" color="medium">Duration</ion-label>
+  <ion-label class="detailLabel" color="medium">Start</ion-label>
+  <ion-label class="detailLabel" color="medium">End</ion-label>
+</ion-item>
+<ion-item *ngFor="let act of this.timeTrackerService.getRunningActivities()">
+  <ion-label color="primary">{{act.label}}</ion-label>
+  <ion-icon [name]="act.icon" slot="start" [ngStyle]="{'color': act.color}"></ion-icon>
+  <ion-label class="detailLabel">{{this.timeTrackerService.getFormattedDuration(act.startDate)}}</ion-label>
+  <ion-datetime [ngModel]="this.timeTrackerService.getLocalIsoDatetime(act.startDate)" (ngModelChange)="act.startDate = this.timeTrackerService.getNumberFromIsoDatetime($event); timeTrackerService.saveChanges();" display-format="HH:mm" picker-format="DD.MM.YYYY | HH:mm">
+  </ion-datetime>
+  <ion-datetime disabled [ngModel]="this.timeTrackerService.getLocalIsoDatetime(act.startDate)"  display-format="HH:mm" picker-format="DD.MM.YYYY | HH:mm">
+  </ion-datetime>
+</ion-item>
+<ion-item-sliding *ngFor="let t of this.timeTrackerService.groupedTimeTracked[0]?.items" >
+  <ion-item>
+    <ion-label>{{this.timeTrackerService.getActivityByID(t.activityID).label}}</ion-label>
+    <ion-icon [name]="this.timeTrackerService.getActivityByID(t.activityID).icon" slot="start" [ngStyle]="{'color': this.timeTrackerService.getActivityByID(t.activityID).color}"></ion-icon>
+    <ion-label class="detailLabel">{{timeTrackerService.getFormattedDuration(t.startDate,t.endDate)}}</ion-label>
+    <ion-datetime [ngModel]="this.timeTrackerService.getLocalIsoDatetime(t.startDate)" (ngModelChange)="this.timeTrackerService.setStartDateByID(t.id,this.timeTrackerService.getNumberFromIsoDatetime($event))" display-format="HH:mm" picker-format="DD.MM.YYYY | HH:mm">
+    </ion-datetime>
+    <ion-datetime [ngModel]="this.timeTrackerService.getLocalIsoDatetime(t.endDate)" (ngModelChange)="this.timeTrackerService.setEndDateByID(t.id,this.timeTrackerService.getNumberFromIsoDatetime($event))" display-format="HH:mm" picker-format="DD.MM.YYYY | HH:mm">
+    </ion-datetime>
+  </ion-item>
+  <ion-item-options side="start">
+    <ion-item-option color="danger" (click)="timeTrackerService.deleteTimeTrack(t.id)">
+      <ion-icon slot="icon-only" name="trash"></ion-icon>
+    </ion-item-option>
+    <ion-item-option (click)="editTimeTrack(t.id)">
+      <ion-icon slot="icon-only" name="pencil"></ion-icon>
+    </ion-item-option>
+  </ion-item-options>
+</ion-item-sliding>
+<ion-button expand="block" fill="outline" size="medium" color="secondary" routerLink="/timetrack">
+  View full History
+  </ion-button>

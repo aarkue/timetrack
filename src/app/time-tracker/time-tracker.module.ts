@@ -9,14 +9,19 @@ import { ActivityButtonComponent } from './activity-button/activity-button.compo
 import { ActivityPopoverComponent } from './activity-popover/activity-popover.component';
 import { GroupDatePipe } from './group-date.pipe'
 import { StatisticsModule } from './statistics/statistics.module';
+import { TimeTrackerService } from './time-tracker.service';
+import { ActivityListComponent } from './activity-list/activity-list.component';
+import { RecentTimeTrackComponent } from './recent-time-track/recent-time-track.component';
+import { RouterModule } from '@angular/router';
 @NgModule({
-  declarations: [TimeTrackerComponent,IconSelectorComponent,NewActivityModalComponent, ActivityButtonComponent, ActivityPopoverComponent, GroupDatePipe],
+  declarations: [TimeTrackerComponent,IconSelectorComponent,NewActivityModalComponent, ActivityButtonComponent, ActivityPopoverComponent, GroupDatePipe, ActivityListComponent, RecentTimeTrackComponent],
   imports: [
     CommonModule,
     IonicModule,
     FormsModule,
-    StatisticsModule
+    StatisticsModule,
+    RouterModule
   ],
-  exports: [TimeTrackerComponent]
+  exports: [TimeTrackerComponent, ActivityListComponent, RecentTimeTrackComponent],
 })
 export class TimeTrackerModule { }

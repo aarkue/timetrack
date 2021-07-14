@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { AccountService } from '../services/account.service';
-import { GamificationService } from '../services/gamification.service';
+import { TimeTrackerService } from '../time-tracker/time-tracker.service';
 
 @Component({
   selector: 'app-tabs',
@@ -9,6 +9,8 @@ import { GamificationService } from '../services/gamification.service';
 })
 export class TabsPage {
 
-  constructor(public accountService : AccountService, public gamificationService: GamificationService) {}
+  constructor(private timeTrackerService : TimeTrackerService) {
+    this.timeTrackerService.refresh();
+  }
 
 }

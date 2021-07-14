@@ -1,19 +1,19 @@
 {
-	"appId": "eu.smartime.app",
-	"appName": "smartime",
-	"bundledWebRuntime": false,
-	"npmClient": "npm",
-	"webDir": "www",
-	"plugins": {
-		"SplashScreen": {
-			"launchShowDuration": 1000
-		},
-		"LocalNotifications": {
-			"smallIcon": "ic_launcher",
-			"iconColor": "#11db39",
-			"sound": "notification.wav"
-		}
-	},
-	"cordova": {},
-	"linuxAndroidStudioPath": "/usr/bin/android-studio"
+  "appId": "eu.siter.timetrack",
+  "appName": "timetrack",
+  "bundledWebRuntime": false,
+  "npmClient": "npm",
+  "webDir": "www",
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 1000
+    },
+    "LocalNotifications": {
+      "smallIcon": "ic_launcher",
+      "iconColor": "#11db39",
+      "sound": "notification.wav"
+    }
+  },
+  "cordova": {},
+  "linuxAndroidStudioPath": "/usr/bin/android-studio"
 }
