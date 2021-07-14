@@ -48,6 +48,7 @@ jobs:
             KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
             ALIAS: ${{ secrets.ALIAS }}
             KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+            KEYSTORE: ${{ secrets.KEYSTORE }}
         run: |
             chmod +x ./android/gradlew
             # Secrets
