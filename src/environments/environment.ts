@@ -3,7 +3,10 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  API_ENDPOINT: 'https://api.siter.eu/v1',
+  API_PROJECT: '60f0137240812',
+  BASE_URL: 'http://localhost:4200'
 };
 
 /*

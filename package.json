@@ -27,6 +27,7 @@
     "@ionic/pwa-elements": "^3.0.2",
     "@swimlane/ngx-charts": "^18.0.1",
     "@types/uuid": "^8.3.1",
+    "appwrite": "^3.2.0",
     "howler": "^2.2.1",
     "rxjs": "~6.6.0",
     "tslib": "^2.0.0",

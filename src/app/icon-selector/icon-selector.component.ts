@@ -24,10 +24,8 @@ export class IconSelectorComponent implements OnInit {
   iconSelected :  EventEmitter<string> = new EventEmitter<string>();
 
   loadData(event){
-    console.log("LOAD MORE DATA?")
     if(this.searchText == ""){
     if(this.shownIcons.length < this.allIcons.length){
-      console.log("LOAD MORE DATA!")
       this.shownIcons = this.shownIcons.concat(this.allIcons.slice(this.shownIcons.length-1,this.shownIcons.length-1+10))
       this.shownIconsFiltered = this.shownIcons;
     }

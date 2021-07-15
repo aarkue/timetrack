@@ -1,172 +1,107 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { Acc } from '../models/acc';
-import { APIResult } from '../models/api-result';
-import { WebRequestService } from './web-request.service';
-
+import { environment } from '../../environments/environment'
 
 import { Plugins } from '@capacitor/core';
+import { Appwrite } from 'appwrite';
 
 const { Storage } = Plugins;
+
 
 @Injectable({
   providedIn: 'root',
 })
+
+
 export class AccountService {
-  private acc: Acc | undefined;
+  private acc: any | undefined;
 
-  constructor(private webReqServ: WebRequestService) {
-    Storage.get({key: "acc"}).then((res) => {
-      this.acc = JSON.parse(res.value);
-      console.log(res);
+  private appwrite : Appwrite;
+
+  constructor() {
+    this.setUpApi();
+  }
+
+  setUpApi(){
+    this.appwrite = new Appwrite();
+    this.appwrite.setEndpoint(environment.API_ENDPOINT);
+    this.appwrite.setProject(environment.API_PROJECT);
+  }
+
+  async login(email: string, password: string) {
+    const createSessionProm =  this.appwrite.account.createSession(email,password);
+    createSessionProm.then((res) => {
+      console.log("createSessionProm",res);
       this.updateAcc();
-    }).catch((reason) => {
-      this.updateAcc();
-    });
+    },
+    (err) => {
+      console.log("Error during createSessionProm", err);
+    })
   }
-
-  private postRegister(
-    username: string,
-    email: string,
-    password: string
-  ): Observable<Object> {
-    return this.webReqServ.post('register', { username, email, password });
-  }
-
-  private getAccount() {
-    return this.webReqServ.get('account');
-  }
-
-  private postLogin(username: String, password: String) {
-    return this.webReqServ.post('login', { username, password });
-  }
-  private postLoginJWT(username: String, password: String) {
-    return this.webReqServ.post('jwt/login', { username, password });
-  }
-
-  private getLogout() {
-    return this.webReqServ.get('logout');
-  }
-
-  private getCurrtask() {
-    return this.webReqServ.get('account/currtask');
-  }
-
-  private patchCurrtask(currTask: String) {
-    return this.webReqServ.patch('account/currtask', { currTask });
-  }
-
-  private postChange(username: String, email: String){
-    return this.webReqServ.patch('change-profile', { username, email });
-  }
-
-  //nach schema der todo-service methoden
-  public setCurrTask(todoid: String) {
-    return new Promise<APIResult<Acc>>((resolve) => {
-      this.patchCurrtask(todoid).subscribe((res: any) => {
-        resolve(res);
-      });
-    });
-  }
-
-  async login(username: string, pw: string): Promise<boolean> {
-    return new Promise<boolean>((resolve) => {
-      this.postLogin(username, pw)
-        .toPromise()
-        .then((res: any) => {
-          if (res && 'success' in res && res.success === true) {
-            this.acc = res.result;
-            resolve(true);
-          } else {
-            resolve(false);
-          }
-        })
-        .catch((e) => {
-          resolve(false);
-        });
-    });
+  async loginWithGoogle() {
+    const oathSession =  this.appwrite.account.createOAuth2Session("google",environment.BASE_URL+"/settings?oauth=1",environment.BASE_URL+"/settings?oauth=-1")
+    console.log("Created new oathSession", oathSession);
   }
 
 
-  async loginJWT(username: string, pw: string): Promise<boolean> {
-    return new Promise<boolean>((resolve) => {
-      this.postLoginJWT(username, pw)
-        .toPromise()
-        .then(async (res: any) => {
-          if (res && 'success' in res && res.success === true) {
-            await Storage.set({key: "jwt", value: res.result.token});
-            await this.updateAcc();
-            resolve(true);
-          } else {
-            resolve(false);
-          }
-        })
-        .catch((e) => {
-          resolve(false);
-        });
-    });
-  }
-  
 
-  async logout(): Promise<boolean> {
-    return new Promise<boolean>((resolve) => {
-      this.getLogout().subscribe(async (res: any) => {
-        if (res && 'success' in res && res.success === true) {
-          await Storage.set({key: "jwt", value: ""});
-          await Storage.set({key: "acc", value: JSON.stringify(null)});
-          this.acc = null;
-          resolve(true);
-        } else {
-          await Storage.set({key: "jwt", value: ""});
-          await Storage.set({key: "acc", value: JSON.stringify(null)});
-          this.acc = null;
-          resolve(false);
-        }
-      });
-    });
+  async logout() {
+    const session : {sessions: {'$id': string}[]} = await this.appwrite.account.getSession('current');
+
+    console.log("Logging out: ", session);
+
+    session.sessions.forEach( async (s) => {
+      const delRes = await this.appwrite.account.deleteSession(s.$id);
+      console.log("Session delete result:", delRes,s.$id);
+    } )
+
+    this.acc = null;
+    return true;
   }
 
-  async register(
-    username: string,
-    email: string,
-    pw: string
-  ): Promise<boolean> {
-    return new Promise<boolean>((resolve) => {
-      this.postRegister(username, email, pw).subscribe((res: any) => {
-        resolve(res && 'success' in res && res.success === true);
-      });
-    });
+  async register( email: string, password: string) {
+    const createPromise = this.appwrite.account.create(email,password,email.split('@')[0]);
+    createPromise.then( async (val) => {
+      console.log("Account register: ",val);
+      await this.login(email,password)
+    },
+    (err) => {
+      console.log("Error creating account",err)}
+      )
+    
+  }
+
+  startEmailVerification(){
+    this.appwrite.account.createVerification(environment.BASE_URL+"/register?verification=1").then((res) => {
+      console.log("Email confirmation created",res);
+    },
+    (err) => {
+      console.log("Error during email confirmation creation",err);
+    })
+  }
+
+  verifyEmail(userid: string, secret: string){
+    this.appwrite.account.updateVerification(userid, secret).then((res) => {
+      console.log("Email confirmation finished",res);
+    },
+    (err) => {
+      console.log("Error during email confirmation",err);
+    })
   }
 
   isLoggedIn(): boolean {
     return this.acc != null;
   }
 
-  async updateAcc(): Promise<void> {
-    return new Promise<void>(async (resolve) => {
-      await this.webReqServ.updateJWT();
-      this.getAccount().subscribe( async (res: any) => {
-        if (res && 'success' in res && res.success === true) {
-          this.acc = res.result;
-          await Storage.set({key: "acc", value: JSON.stringify(res.result)});
-          resolve();
-        }else{//not authenticated
-          resolve();
-        }
-      });
-    });
-  }
-
-  getAcc(): Acc | undefined {
-    return this.acc;
-  }
-
-  getMoney(): number {
-    if(this.acc){
-      return this.acc.sweat
-    }else{
-      return 0;
+  async updateAcc() {
+    try {
+      this.acc = await this.appwrite.account.get();
+    } catch (error) {
+      this.acc = null;
     }
+  }
+
+  getAcc(): any | undefined {
+    return this.acc;
   }
 
   getUsername(): string {
@@ -185,22 +120,4 @@ export class AccountService {
     }
   }
 
-  async changeProfile(
-    username: string,
-    email: string
-  ): Promise<boolean> {
-    return new Promise<boolean>((resolve) => {
-      this.postChange(username, email).subscribe((res: any) => {
-        resolve(res && 'success' in res && res.success === true);
-      });
-    });
-  }
-
-  getExperience(): number {
-    if(this.acc){
-      return this.acc.experience;
-    }else{
-      return 0;
-    }
-  }
 }

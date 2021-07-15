@@ -1,7 +1,7 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>
-      Account
+      Settings
     </ion-title>
   </ion-toolbar>
 </ion-header>
@@ -9,43 +9,60 @@
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">Account</ion-title>
+      <ion-title size="large">Settings</ion-title>
     </ion-toolbar>
   </ion-header>
 
-  <ion-card  *ngIf="accountService.isLoggedIn()">
+  <ion-card  *ngIf="accountService.isLoggedIn()" class="centeredCard">
     <ion-card-header>
       <ion-card-subtitle>{{accountService.getAcc().email}}</ion-card-subtitle>
-      <ion-card-title>{{accountService.getAcc().username}}</ion-card-title>
+      <ion-card-title>{{accountService.getAcc().name}}</ion-card-title>
     </ion-card-header>
     <ion-card-content>
-      <h2>Sweat: {{accountService.getMoney()}}</h2> 
-      <h2>Experience: {{accountService.getExperience()}}</h2>
+      <ion-item *ngIf="accountService.getAcc().emailVerification">
+        <ion-label >Email verified!</ion-label>
+        <ion-icon slot="end" name="checkmark-circle-outline"></ion-icon>
+      </ion-item>
+      
+      <div *ngIf="!accountService.getAcc().emailVerification">
+        <ion-item>
+          <ion-label>Email not verified. </ion-label>
+          <ion-icon slot="end" name="alert-circle-outline"></ion-icon>
+          <ion-button slot="end" color="tertiary" mode="ios"  size="small" routerLink="/register" >Verify...</ion-button>
+        </ion-item>
+      </div> 
     </ion-card-content>
-    <ion-button color="warning" label="Logout" size="block" *ngIf="accountService.isLoggedIn()" (click)="logOut()">
+    <ion-button color="warning" label="Logout" *ngIf="accountService.isLoggedIn()" (click)="logOut()">
       <ion-label>Logout</ion-label>
       <ion-icon name="log-out-outline"></ion-icon>
     </ion-button>
   </ion-card>
 
 
-  <form [formGroup]="loginForm" (ngSubmit)="logIn()" *ngIf="!accountService.isLoggedIn()">
-    <ion-item>
-      <ion-label>Username</ion-label>
-      <ion-input type="text" formControlName="username" required></ion-input>
-    </ion-item>
-    <ion-item>
-      <ion-label>Password</ion-label>
-      <ion-input type="password" formControlName="password" required></ion-input>
-    </ion-item>
-    <input type="submit" style="display: none" />
-    <ion-button type="submit" color="primary" expand="block" [disabled]="!loginForm.valid">Login</ion-button>
-    <!-- <ion-button color="primary" expand="block" (click)="logIn()">Login</ion-button> -->
-  </form>
-  
 
-  <ion-item-divider>
-    </ion-item-divider>
+  <ion-card  *ngIf="!accountService.isLoggedIn()" class="centeredCard">
+    <ion-card-header>
+      <ion-card-title>Login or Register</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <form [formGroup]="loginForm" (ngSubmit)="logIn()" *ngIf="!accountService.isLoggedIn()" >
+        <ion-item>
+          <ion-label>Username</ion-label>
+          <ion-input type="text" formControlName="username" required></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label>Password</ion-label>
+          <ion-input type="password" formControlName="password" required></ion-input>
+        </ion-item>
+        <input type="submit" style="display: none" />
+        <ion-button  mode="ios" type="submit" color="primary" [disabled]="!loginForm.valid">Login</ion-button>
+        <!-- <ion-button color="primary" expand="block" (click)="logIn()">Login</ion-button> -->
+      </form>
+      <ion-button color="secondary"  mode="ios" size="small" (click)="googleLogin()" *ngIf="!accountService.isLoggedIn()" >Login with Google</ion-button>
+      <ion-button color="tertiary" mode="ios"  size="small" routerLink="/register" *ngIf="!accountService.isLoggedIn()" >Register...</ion-button>
+    </ion-card-content>
+  </ion-card>
+
 
   <ion-card>
     <ion-card-header>

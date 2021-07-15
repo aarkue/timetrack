@@ -1,0 +1,51 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      Register
+    </ion-title>
+    <ion-buttons slot="end" routerLink="/settings">
+      <ion-button>Cancel</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <form [formGroup]="registerForm" (ngSubmit)="register()"  *ngIf="!waitForEmailVerification()">
+    <ion-item>
+      <ion-label position="stacked">Email</ion-label>
+      <ion-input type="email" formControlName="email" required></ion-input>
+    </ion-item>
+    <ion-label class="validationIndicator" position="start" *ngIf="registerForm.get('email').touched && registerForm.get('email').errors" color="danger">Email is invalid</ion-label> 
+
+    <ion-item>
+      <ion-label position="stacked">Password</ion-label>
+      <ion-input type="password" clearOnEdit="false" formControlName="password" required></ion-input>
+    </ion-item>
+    <ion-label class="validationIndicator" position="start" *ngIf="registerForm.get('password').touched && registerForm.get('password').errors" color="danger">Password length must be between {{this.MIN_PW_LENGTH}} - {{this.MAX_PW_LENGTH}}</ion-label> 
+
+    <ion-item>
+      <ion-label position="stacked">Repeat Password</ion-label>
+      <ion-input type="password" clearOnEdit="false" formControlName="repeatPassword" required></ion-input>
+    </ion-item>
+    <ion-label class="validationIndicator" position="start" color="danger" *ngIf="registerForm.get('repeatPassword').touched && registerForm.get('password').value != registerForm.get('repeatPassword').value">Passwords do not match</ion-label> 
+
+    <input type="submit" style="display: none" />
+    <ion-button type="submit" color="primary" expand="block" [disabled]="!registerForm.valid || registerForm.get('password').value != registerForm.get('repeatPassword').value">Register</ion-button>
+  </form>
+
+
+  <ion-button color="primary" expand="block" *ngIf="waitForEmailVerification()" (click)="startVerification()">Start Email Verification</ion-button>
+  <br>
+
+  <div *ngIf="isVerifying">
+    <ion-item>
+      <ion-label position="stacked">Userid</ion-label>
+      <ion-input [(ngModel)]="verifyUserid" type="text" required></ion-input>
+    </ion-item>
+  <ion-item>
+    <ion-label position="stacked">Secret</ion-label>
+    <ion-input [(ngModel)]="verifySecret" type="text" required></ion-input>
+  </ion-item>
+  <ion-button color="primary" expand="block" *ngIf="verifySecret && verifyUserid" (click)="verifyEmail()">Verify Email</ion-button>
+</div>
+
+</ion-content>

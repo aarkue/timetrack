@@ -1,15 +1,19 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FilesystemDirectory, FilesystemEncoding, FileWriteOptions, FileWriteResult, Plugins } from '@capacitor/core';
 import { IonInput, Platform, ToastController } from '@ionic/angular';
+import { Appwrite } from 'appwrite';
 import { AccountService } from '../services/account.service';
 const { Storage, Directory, Encoding, Filesystem, Share } = Plugins;
+
 @Component({
   selector: 'app-tab3',
   templateUrl: 'tab3.page.html',
   styleUrls: ['tab3.page.scss']
 })
-export class Tab3Page {
+
+export class Tab3Page implements OnInit{
   loginForm: FormGroup;
 
   private readonly localKeys : string[] = 
@@ -31,7 +35,9 @@ export class Tab3Page {
   constructor(public accountService : AccountService,
               public toastController: ToastController, 
               public formBuilder: FormBuilder,
-              platform : Platform) {
+              platform : Platform,
+              private route: ActivatedRoute,
+              private router: Router) {
 
     this.platform = platform;
     this.loginForm = formBuilder.group({
@@ -41,33 +47,46 @@ export class Tab3Page {
 
     
   }
+  async ngOnInit() {
+    let queryParamMap = this.route.snapshot.queryParamMap;
+    if(queryParamMap.has('oauth')){
+      if(queryParamMap.get('oauth') == '-1'){
+        const toastNot = await  this.toastController.create({
+          header: "OAUTH Login failed",
+          message: "Could not login. Please try again later.",
+          position: "middle",
+          color: "danger",
+          duration: 4000,
+          buttons: [{text: " Ok", icon: "checkmark-outline", role: "cancel", handler: () => {}}],
+        });
+      toastNot.present();
+      }else   if(queryParamMap.get('oauth') == '1'){
+        const toastNot = await  this.toastController.create({
+          header: "OAUTH Login successful",
+          position: "middle",
+          color: "success",
+          duration: 2500,
+          buttons: [{text: " Ok", icon: "checkmark-outline", role: "cancel", handler: () => {}}],
+        });
+        toastNot.present();
+      }
+
+      this.router.navigate([],{queryParams: {'oauth': null}, queryParamsHandling: 'merge'});
+    }
+    await this.accountService.updateAcc();
+    console.log(this.accountService.getAcc())
+  }
 
   public async logIn(){
     this.loginForm.disable();
-    const logInRes = await this.accountService.loginJWT(this.loginForm.value["username"],this.loginForm.value["password"]);
-    if(logInRes){
-      this.loginForm.reset();
-      const toastNot = await  this.toastController.create({
-        header: "Login successful",
-        position: "middle",
-        color: "success",
-        duration: 1500,
-        buttons: [{text: " Ok", icon: "checkmark-outline", role: "cancel", handler: () => {}}],
-      });
-    toastNot.present();
-    }else{
-    const toastNot = await  this.toastController.create({
-        header: "Login failed",
-        message: "Could not login. Please check username and password or try again later.",
-        position: "middle",
-        color: "danger",
-        duration: 3000,
-        buttons: [{text: " Ok", icon: "checkmark-outline", role: "cancel", handler: () => {}}],
-      });
-    toastNot.present();
-    }
+    await this.accountService.login(this.loginForm.value["username"],this.loginForm.value["password"]);
     this.loginForm.enable();
   }
+
+  public async googleLogin(){
+    await this.accountService.loginWithGoogle(); 
+  }
+
 
 
   public async logOut(){
@@ -210,5 +229,10 @@ export class Tab3Page {
       buttons: [{text: " Ok", icon: "checkmark-outline", role: "cancel", handler: () => {}}],
     });
     await toastNot.present();
+  }
+
+  async appWriteTest(){
+
+    
   }
 }
