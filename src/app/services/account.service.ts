@@ -3,6 +3,7 @@ import { environment } from '../../environments/environment'
 
 import { Plugins } from '@capacitor/core';
 import { Appwrite } from 'appwrite';
+import { UserNotifierService } from '../notifier/user-notifier.service';
 
 const { Storage } = Plugins;
 
@@ -13,11 +14,11 @@ const { Storage } = Plugins;
 
 
 export class AccountService {
-  private acc: any | undefined;
+  private account : any | undefined;
 
   private appwrite : Appwrite;
 
-  constructor() {
+  constructor(private userNotifier : UserNotifierService) {
     this.setUpApi();
   }
 
@@ -27,16 +28,15 @@ export class AccountService {
     this.appwrite.setProject(environment.API_PROJECT);
   }
 
-  async login(email: string, password: string) {
-    const createSessionProm =  this.appwrite.account.createSession(email,password);
-    createSessionProm.then((res) => {
-      console.log("createSessionProm",res);
+  async login(email: string, password: string) : Promise<boolean> {
+    const prom =  this.appwrite.account.createSession(email,password);
+    const res = await this.userNotifier.notifyForPromise(prom,"Login");
+    if(res.success){
       this.updateAcc();
-    },
-    (err) => {
-      console.log("Error during createSessionProm", err);
-    })
+    }
+    return res.success;
   }
+
   async loginWithGoogle() {
     const oathSession =  this.appwrite.account.createOAuth2Session("google",environment.BASE_URL+"/settings?oauth=1",environment.BASE_URL+"/settings?oauth=-1")
     console.log("Created new oathSession", oathSession);
@@ -44,79 +44,76 @@ export class AccountService {
 
 
 
-  async logout() {
-    const session : {sessions: {'$id': string}[]} = await this.appwrite.account.getSession('current');
-
-    console.log("Logging out: ", session);
-
-    session.sessions.forEach( async (s) => {
-      const delRes = await this.appwrite.account.deleteSession(s.$id);
-      console.log("Session delete result:", delRes,s.$id);
-    } )
-
-    this.acc = null;
-    return true;
-  }
-
-  async register( email: string, password: string) {
-    const createPromise = this.appwrite.account.create(email,password,email.split('@')[0]);
-    createPromise.then( async (val) => {
-      console.log("Account register: ",val);
-      await this.login(email,password)
-    },
-    (err) => {
-      console.log("Error creating account",err)}
-      )
+  async logout(): Promise<boolean> {
+    let logOutSuccess = true;
+    const sessionProm = this.appwrite.account.getSession('current');
+    const sessionRes = await this.userNotifier.notifyForPromise(sessionProm,"Logout");
+    if(sessionRes.success){
+      const sessionsRes : {sessions: {'$id': string}[]} = sessionRes.result;
+      sessionsRes.sessions.forEach( async (s) => {
+        const delSessionProm = this.appwrite.account.deleteSession(s.$id);
+        const delSessionRes = await this.userNotifier.notifyForPromise(delSessionProm,"Logout");
+        if(!delSessionRes.success){
+          logOutSuccess = false;
+        }
+      })
+    }else{
+      logOutSuccess = false;
+    }
     
+    this.account = undefined;
+    return logOutSuccess;
   }
 
-  startEmailVerification(){
-    this.appwrite.account.createVerification(environment.BASE_URL+"/register?verification=1").then((res) => {
-      console.log("Email confirmation created",res);
-    },
-    (err) => {
-      console.log("Error during email confirmation creation",err);
-    })
+  async register( email: string, password: string): Promise<boolean> {
+    const createProm = this.appwrite.account.create(email,password,email.split('@')[0]);
+    const createRes = await this.userNotifier.notifyForPromise(createProm,"Registration");
+    if(createRes.success){
+      await this.login(email,password);
+      this.updateAcc();
+    }
+    return createRes.success;
   }
 
-  verifyEmail(userid: string, secret: string){
-    this.appwrite.account.updateVerification(userid, secret).then((res) => {
-      console.log("Email confirmation finished",res);
-    },
-    (err) => {
-      console.log("Error during email confirmation",err);
-    })
+  async startEmailVerification() : Promise<boolean>{
+    const prom =  this.appwrite.account.createVerification(environment.BASE_URL+"/register?verification=1")
+    const res = await this.userNotifier.notifyForPromise(prom,"Starting email verification");
+    return res.success;
+  }
+
+  async verifyEmail(userid: string, secret: string) : Promise<boolean>{
+    const veriProm = this.appwrite.account.updateVerification(userid,secret);
+    const veriRes = await this.userNotifier.notifyForPromise(veriProm,"Email confirmation");
+    return veriRes.success;
   }
 
   isLoggedIn(): boolean {
-    return this.acc != null;
+    return this.account!= undefined;
   }
 
   async updateAcc() {
-    try {
-      this.acc = await this.appwrite.account.get();
-    } catch (error) {
-      this.acc = null;
-    }
+    this.appwrite.account.get()
+    .then((acc) => this.account = acc)
+    .catch((error) => this.account = undefined)
   }
 
   getAcc(): any | undefined {
-    return this.acc;
+    return this.account;
   }
 
   getUsername(): string {
-    if(this.acc){
-      return this.acc.username;
+    if(this.account){
+      return this.account.username;
     } else {
-      return 'Please login';
+      return 'Not logged in.';
     }
   }
 
   getEmail(): string {
-    if(this.acc){
-      return this.acc.email;
+    if(this.account){
+      return this.account.email;
     } else {
-      return 'Please login';
+      return 'Not logged in.';
     }
   }
 

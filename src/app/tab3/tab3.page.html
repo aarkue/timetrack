@@ -47,18 +47,21 @@
     <ion-card-content>
       <form [formGroup]="loginForm" (ngSubmit)="logIn()" *ngIf="!accountService.isLoggedIn()" >
         <ion-item>
-          <ion-label>Username</ion-label>
-          <ion-input type="text" formControlName="username" required></ion-input>
+          <ion-label position="stacked">Email</ion-label>
+          <ion-input type="text" formControlName="email" required></ion-input>
         </ion-item>
         <ion-item>
-          <ion-label>Password</ion-label>
+          <ion-label position="stacked">Password</ion-label>
           <ion-input type="password" formControlName="password" required></ion-input>
         </ion-item>
         <input type="submit" style="display: none" />
         <ion-button  mode="ios" type="submit" color="primary" [disabled]="!loginForm.valid">Login</ion-button>
         <!-- <ion-button color="primary" expand="block" (click)="logIn()">Login</ion-button> -->
       </form>
-      <ion-button color="secondary"  mode="ios" size="small" (click)="googleLogin()" *ngIf="!accountService.isLoggedIn()" >Login with Google</ion-button>
+      <ion-button color="secondary"  mode="ios" size="small" (click)="googleLogin()" *ngIf="!accountService.isLoggedIn()" >
+        Login with Google
+        <ion-icon slot="end" name="logo-google"></ion-icon>
+      </ion-button>
       <ion-button color="tertiary" mode="ios"  size="small" routerLink="/register" *ngIf="!accountService.isLoggedIn()" >Register...</ion-button>
     </ion-card-content>
   </ion-card>

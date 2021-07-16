@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FilesystemDirectory, FilesystemEncoding, FileWriteOptions, FileWriteResult, Plugins } from '@capacitor/core';
 import { IonInput, Platform, ToastController } from '@ionic/angular';
 import { Appwrite } from 'appwrite';
+import { environment } from 'src/environments/environment';
 import { AccountService } from '../services/account.service';
 const { Storage, Directory, Encoding, Filesystem, Share } = Plugins;
 
@@ -41,8 +42,8 @@ export class Tab3Page implements OnInit{
 
     this.platform = platform;
     this.loginForm = formBuilder.group({
-      username : ['', [Validators.required]],
-      password : ['', [Validators.required]],
+      email : ['', [Validators.required,Validators.email]],
+      password : ['', [Validators.required, Validators.minLength(environment.MIN_PW_LENGTH),Validators.maxLength(environment.MAX_PW_LENGTH)]],
     })
 
     
@@ -79,7 +80,7 @@ export class Tab3Page implements OnInit{
 
   public async logIn(){
     this.loginForm.disable();
-    await this.accountService.login(this.loginForm.value["username"],this.loginForm.value["password"]);
+    await this.accountService.login(this.loginForm.value["email"],this.loginForm.value["password"]);
     this.loginForm.enable();
   }
 
@@ -90,26 +91,7 @@ export class Tab3Page implements OnInit{
 
 
   public async logOut(){
-    const logOutRes = await this.accountService.logout();
-    if(logOutRes){
-      const toastNot = await  this.toastController.create({
-        header: "Logout successful",
-        position: "middle",
-        color: "success",
-        duration: 1500,
-        buttons: [{text: " Ok", icon: "checkmark-outline", role: "cancel", handler: () => {}}],
-      });
-    toastNot.present();
-    }else{
-    const toastNot = await  this.toastController.create({
-        header: "Logout failed",
-        position: "middle",
-        color: "danger",
-        duration: 3000,
-        buttons: [{text: " Ok", icon: "checkmark-outline", role: "cancel", handler: () => {}}],
-      });
-    toastNot.present();
-    }
+    this.accountService.logout();
   }
 
 

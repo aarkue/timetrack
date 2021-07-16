@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { environment } from 'src/environments/environment';
 import { AccountService } from '../services/account.service';
 
 @Component({
@@ -11,18 +12,17 @@ import { AccountService } from '../services/account.service';
 export class RegisterComponent implements OnInit {
 
   public registerForm : FormGroup;
-  
-  public readonly MIN_PW_LENGTH : number = 6;
-  public readonly MAX_PW_LENGTH : number = 32;
 
   public isVerifying : boolean = false;
 
   public verifySecret: string = '';
   public verifyUserid: string = '';
-  constructor(private formBuilder : FormBuilder, private accountService : AccountService, private route: ActivatedRoute, private router: Router) { 
+
+  public startEmailVerificationDisabled = false;
+  constructor(private formBuilder : FormBuilder, public accountService : AccountService, private route: ActivatedRoute, private router: Router) { 
     this.registerForm = formBuilder.group({
       email : ['', [Validators.email]],
-      password : ['', [Validators.required,Validators.minLength(this.MIN_PW_LENGTH),Validators.maxLength(this.MAX_PW_LENGTH)]],
+      password : ['', [Validators.required,Validators.minLength(environment.MIN_PW_LENGTH),Validators.maxLength(environment.MAX_PW_LENGTH)]],
       repeatPassword : ['', [Validators.required]],
     })
   }
@@ -38,30 +38,47 @@ export class RegisterComponent implements OnInit {
         console.log("verify email", this.verifyUserid ,  this.verifySecret )
       }
 
-      this.router.navigate([],{queryParams: {'oauth': null}, queryParamsHandling: 'merge'});
+      this.router.navigate([],{queryParams: {'secret': null, userId: null, verification: null}, queryParamsHandling: 'merge'});
     }
     await this.accountService.updateAcc();
     console.log(this.accountService.getAcc())
   }
 
-  register(){
+  async register(){
     if(this.registerForm.valid && this.registerForm.get('password').value === this.registerForm.get('repeatPassword').value){
-      this.accountService.register(this.registerForm.get('email').value, this.registerForm.get('password').value);
+      const success =  this.accountService.register(this.registerForm.get('email').value, this.registerForm.get('password').value);
+      if(success){
+        this.registerForm.get('password').setValue("");
+        this.registerForm.get('repeatPassword').setValue("");
+      }
     }
   }
 
-  waitForEmailVerification(){
-    return (this.accountService.getAcc() != null && !this.accountService.getAcc().emailVerification) && !this.isVerifying;
+  canStartValidation(){
+    return (this.accountService.isLoggedIn() && !this.accountService.getAcc().emailVerification) && !this.isVerifying;
+  }
+
+  canValidateEmail(){
+    return (!this.accountService.getAcc()?.emailVerification);
   }
 
 
-  startVerification(){
-    this.accountService.startEmailVerification();
+  async startVerification(){
+  const success = await  this.accountService.startEmailVerification();
+  if(success){
+    this.startEmailVerificationDisabled = true;
+    setTimeout(() => this.startEmailVerificationDisabled = true,30000);
+  }
   }
 
-  verifyEmail(){
-    this.accountService.verifyEmail(this.verifyUserid,this.verifySecret);
+  async verifyEmail(){
+    const success = await this.accountService.verifyEmail(this.verifyUserid,this.verifySecret);
+    if(success){
+      this.router.navigate(['settings']);
+    }
   }
+
+
 
 
 
