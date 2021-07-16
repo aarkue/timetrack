@@ -25,7 +25,7 @@
       <ion-label position="stacked">Password</ion-label>
       <ion-input type="password" clearOnEdit="false" formControlName="password" required></ion-input>
     </ion-item>
-    <ion-label class="validationIndicator" position="start" *ngIf="registerForm.get('password').touched && registerForm.get('password').errors" color="danger">Password length must be between {{this.MIN_PW_LENGTH}} - {{this.MAX_PW_LENGTH}}</ion-label> 
+    <ion-label class="validationIndicator" position="start" *ngIf="registerForm.get('password').touched && registerForm.get('password').errors" color="danger">Password length must be between {{getPWMinLength()}} - {{getPWMaxLength()}}</ion-label> 
 
     <ion-item>
       <ion-label position="stacked">Repeat Password</ion-label>

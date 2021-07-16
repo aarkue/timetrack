@@ -78,6 +78,14 @@ export class RegisterComponent implements OnInit {
     }
   }
 
+  getPWMinLength(){
+    return environment.MIN_PW_LENGTH;
+  }
+
+  getPWMaxLength(){
+    return environment.MAX_PW_LENGTH;
+  }
+
 
 
 
