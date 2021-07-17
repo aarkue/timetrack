@@ -45,24 +45,10 @@ export class AccountService {
 
 
   async logout(): Promise<boolean> {
-    let logOutSuccess = true;
-    const sessionProm = this.appwrite.account.getSession('current');
-    const sessionRes = await this.userNotifier.notifyForPromise(sessionProm,"Logout");
-    if(sessionRes.success){
-      const sessionsRes : {sessions: {'$id': string}[]} = sessionRes.result;
-      sessionsRes.sessions.forEach( async (s) => {
-        const delSessionProm = this.appwrite.account.deleteSession(s.$id);
-        const delSessionRes = await this.userNotifier.notifyForPromise(delSessionProm,"Logout");
-        if(!delSessionRes.success){
-          logOutSuccess = false;
-        }
-      })
-    }else{
-      logOutSuccess = false;
-    }
-    
+    const delSessionProm = this.appwrite.account.deleteSession('current');
+    const delSessionRes = await this.userNotifier.notifyForPromise(delSessionProm,"Logout");
     this.account = undefined;
-    return logOutSuccess;
+    return delSessionRes.success;
   }
 
   async register( email: string, password: string): Promise<boolean> {
@@ -85,6 +71,19 @@ export class AccountService {
     const veriProm = this.appwrite.account.updateVerification(userid,secret);
     const veriRes = await this.userNotifier.notifyForPromise(veriProm,"Email confirmation");
     return veriRes.success;
+  }
+
+  async startPasswordRecovery(email : string) : Promise<boolean>{
+    const prom = this.appwrite.account.createRecovery(email,environment.BASE_URL+"/password-recovery");
+    const res = await this.userNotifier.notifyForPromise(prom,"Starting password recovery","Please check your emails.");
+    return res.success;
+  }
+
+  async completePasswordRecovery(userid : string, secret: string, password: string, passwordRepeat: string) : Promise<boolean>{
+    const prom = this.appwrite.account.updateRecovery(userid, secret, password, passwordRepeat);
+    const res = await this.userNotifier.notifyForPromise(prom,"Password recovery");
+    this.updateAcc();
+    return res.success;
   }
 
   isLoggedIn(): boolean {
