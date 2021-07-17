@@ -59,7 +59,7 @@ export class RegisterComponent implements OnInit {
   }
 
   canValidateEmail(){
-    return (!this.accountService.getAcc()?.emailVerification);
+    return (!this.accountService.getAcc()?.emailVerification) && this.isVerifying;
   }
 
 

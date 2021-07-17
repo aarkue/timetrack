@@ -11,7 +11,11 @@
 <ion-content>
   <ion-card [disabled]="accountService.isLoggedIn()">
     <ion-card-header>
-    <ion-card-title>Register</ion-card-title>
+    <ion-card-title>
+      <ion-item lines="none">
+        <ion-icon name="person-add-outline" slot="end"></ion-icon><h2>Register</h2>
+      </ion-item>
+    </ion-card-title>
   </ion-card-header>
     <ion-card-content>
   <form [formGroup]="registerForm" (ngSubmit)="register()" >
@@ -41,9 +45,16 @@
 
 <ion-card [disabled]="!canStartValidation()">
   <ion-card-header>
-  <ion-card-title>Start your Email verification</ion-card-title>
+    <ion-card-subtitle>Already registered? Verify your Email address.</ion-card-subtitle>
+  <ion-card-title>
+    <ion-item lines="none">
+      <ion-icon name="mail-unread-outline" slot="end"></ion-icon>
+    <h2>Start your Email verification</h2>
+  </ion-item>
+</ion-card-title>
 </ion-card-header>
   <ion-card-content>
+    <p>To make sure your email address is correct, we will send you verification mail with a link to verify your email address.</p>
     <ion-button color="primary" expand="block" (click)="startVerification()" [disabled]="startEmailVerificationDisabled">Start Email Verification</ion-button>
     <ion-label *ngIf="startEmailVerificationDisabled">Please wait a moment before requesting another Email.</ion-label>
   </ion-card-content>
@@ -52,8 +63,15 @@
 
 <ion-card [disabled]="!canValidateEmail()">
   <ion-card-header>
-  <ion-card-title>Finish your Email verification</ion-card-title>
-</ion-card-header>
+    <ion-card-subtitle>Already got our verification mail?</ion-card-subtitle>
+  <ion-card-title>
+    <ion-item lines="none">
+      <ion-icon slot="end" name="checkmark-circle-outline"></ion-icon>
+    <h2>Finish your Email verification</h2>
+  </ion-item>
+  </ion-card-title>
+  <ion-card-subtitle>Click on the link included and the following details will be automatically filled in:</ion-card-subtitle>
+  </ion-card-header>
   <div>
     <ion-item>
       <ion-label position="stacked">Userid</ion-label>
@@ -63,7 +81,7 @@
     <ion-label position="stacked">Secret</ion-label>
     <ion-input [(ngModel)]="verifySecret" type="text" required></ion-input>
   </ion-item>
-  <ion-button color="primary" expand="block" *ngIf="verifySecret && verifyUserid" (click)="verifyEmail()">Verify Email</ion-button>
+  <ion-button color="primary" expand="block" (click)="verifyEmail()">Verify Email</ion-button>
 </div>
 </ion-card>
 
