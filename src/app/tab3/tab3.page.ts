@@ -2,7 +2,7 @@ import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FilesystemDirectory, FilesystemEncoding, FileWriteOptions, FileWriteResult, Plugins } from '@capacitor/core';
-import { IonInput, Platform, ToastController } from '@ionic/angular';
+import { AlertController, IonInput, Platform, ToastController } from '@ionic/angular';
 import { Appwrite } from 'appwrite';
 import { environment } from 'src/environments/environment';
 import { AccountService } from '../services/account.service';
@@ -38,7 +38,8 @@ export class Tab3Page implements OnInit{
               public formBuilder: FormBuilder,
               platform : Platform,
               private route: ActivatedRoute,
-              private router: Router) {
+              private router: Router,
+              private alertController: AlertController) {
 
     this.platform = platform;
     this.loginForm = formBuilder.group({
@@ -92,6 +93,29 @@ export class Tab3Page implements OnInit{
 
   public async logOut(){
     this.accountService.logout();
+  }
+
+  public async resetPassword(){
+    const alert = await this.alertController.create({
+      header: 'Reset your password',
+      message: 'Enter your email and we will send you a link to reset your password.',
+      inputs: [{type: 'email', name: 'email', label: 'Your account email address', placeholder: 'your@email.address'}],
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          handler: () => {},
+        },
+        {
+          text: 'Confirm',
+          handler: (data) => {
+            console.log(data.email);
+            this.accountService.startPasswordRecovery(data.email);
+          },
+        },
+      ],
+    });
+    await alert.present();
   }
 
 

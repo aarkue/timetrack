@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { PasswordRecoveryComponent } from '../account/password-recovery/password-recovery.component';
 import { RegisterComponent } from '../register/register.component';
 import { TabsPage } from './tabs.page';
 
@@ -23,6 +24,10 @@ const routes: Routes = [
       { 
         path: 'register',
         component: RegisterComponent
+      },
+      { 
+        path: 'password-recovery',
+        component: PasswordRecoveryComponent
       },
       {
         path: '',

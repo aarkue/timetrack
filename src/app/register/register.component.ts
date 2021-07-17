@@ -21,7 +21,7 @@ export class RegisterComponent implements OnInit {
   public startEmailVerificationDisabled = false;
   constructor(private formBuilder : FormBuilder, public accountService : AccountService, private route: ActivatedRoute, private router: Router) { 
     this.registerForm = formBuilder.group({
-      email : ['', [Validators.email]],
+      email : ['', [Validators.required,Validators.email]],
       password : ['', [Validators.required,Validators.minLength(environment.MIN_PW_LENGTH),Validators.maxLength(environment.MAX_PW_LENGTH)]],
       repeatPassword : ['', [Validators.required]],
     })

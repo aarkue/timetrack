@@ -25,10 +25,10 @@ export class UserNotifierService {
   }
 
 
-  async notifyForPromise(promise : Promise<unknown>, name: string) : Promise<{success: boolean, result : any}>{
+  async notifyForPromise(promise : Promise<unknown>, name: string, additionalSuccessText = '') : Promise<{success: boolean, result : any}>{
     return new Promise((resolve) => {
       promise.then((res) => {
-        this.notify(name + " was successfull.","","success", true);
+        this.notify(name + " was successfull.",additionalSuccessText,"success", true);
         resolve({success: true,result:res});
       },
       (err) => {
