@@ -23,7 +23,7 @@ export class NewActivityModalComponent implements OnInit {
   ngOnInit() {
     if(!this.activity){
       this.newActivity = true;
-      this.activity = { icon : "leaf",label : "", color :"#1f9e4b", id: uuidv4(), tags: []}
+      this.activity = { icon : "leaf",label : "", color :"#1f9e4b", localID: uuidv4(), tags: []}
     }else{
       this.previousColor = this.activity.color;
       this.previousLabel = this.activity.label;
@@ -56,6 +56,9 @@ export class NewActivityModalComponent implements OnInit {
   }
 
   addTag(tag: string){
+    if(!this.activity.tags){
+      this.activity.tags = [];
+    }
     if(tag && tag.length > 0){
       this.activity.tags.push(tag);
     }

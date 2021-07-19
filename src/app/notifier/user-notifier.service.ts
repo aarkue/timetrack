@@ -32,10 +32,33 @@ export class UserNotifierService {
         resolve({success: true,result:res});
       },
       (err) => {
+        console.log(name + " failed ",err)
         this.notify(name + " failed.",err.message ,"danger");
         resolve({success: false, result:err});
       })
     })
+  }
+
+  async notifyOnPromiseReject(promise : Promise<unknown>, name: string) : Promise<{success: boolean, result : any}>{
+    return new Promise((resolve) => {
+      promise.then((res) => {
+        console.log("Silent Success:", name + " was successfull.", res);
+        resolve({success: true,result:res});
+      },
+      (err) => {
+        console.log(name + " failed ",err)
+        this.notify(name + " failed.",err.message ,"danger");
+        resolve({success: false, result:err});
+      })
+    })
+  }
+
+  notifyForPromiseFlag(promise : Promise<unknown>, name: string, notifyForSuccess : boolean) : Promise<{success: boolean, result : any}>{
+    if(notifyForSuccess){
+      return this.notifyForPromise(promise,name,"");
+    }else{
+      return this.notifyOnPromiseReject(promise,name);
+    }
 
   }
 }

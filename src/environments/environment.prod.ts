@@ -4,5 +4,6 @@ export const environment = {
   API_PROJECT: '60f0137240812',
   BASE_URL: 'https://timetrack.siter.eu',
   MIN_PW_LENGTH: 6,
-  MAX_PW_LENGTH: 32
+  MAX_PW_LENGTH: 32,
+  collectionMap: {'activities': '60f2e6415958d'}
 };

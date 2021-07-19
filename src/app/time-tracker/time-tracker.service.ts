@@ -3,24 +3,28 @@ import { Activity } from './activity';
 import { TimeTrack } from './time-track';
 import {v4 as uuidv4} from 'uuid';
 import { Plugins } from '@capacitor/core';
+import { DataService } from '../data/data.service';
+import { ThrowStmt } from '@angular/compiler';
 const { Storage } = Plugins;
 @Injectable({
   providedIn: 'root'
 })
 export class TimeTrackerService {
 
-  public activities : Activity[] = [{label: "Study", icon:"library",color: "#454333",id: uuidv4(), tags: []},{label: "House Duties", icon:'home', color: "#484373", id: uuidv4(), tags: []}];
+  public activities : Map<string,Activity> = new Map<string, Activity>(); 
   
   public timeTracked : Map<number,TimeTrack[]> = new Map<number,TimeTrack[]>();
 
   public groupedTimeTracked : {date: number, items: TimeTrack[]}[] = [];
   
-  constructor() { }
+  constructor(private dataService : DataService) { }
 
 
   async refresh(){
-    let activities = (await this.getFromStorage('activities')).value;
-    let parsedActivities = JSON.parse(activities);
+    let parsedActivities = await this.dataService.fetchCollection('activities');
+    console.log(parsedActivities);
+    // let activities = (await this.getFromStorage('activities')).value;
+    // let parsedActivities = JSON.parse(activities);
     if(parsedActivities){
       this.activities = parsedActivities;
     }
@@ -31,6 +35,7 @@ export class TimeTrackerService {
       this.timeTracked = parsedTimeTracked;
     }
     this.updateGrouped();
+    
   }
 
   saveChanges(){
@@ -74,7 +79,7 @@ export class TimeTrackerService {
 
 
   saveDataToStorage(){
-    this.saveToStorage('activities',JSON.stringify(this.activities));
+    // this.saveToStorage('activities',JSON.stringify(this.activities));
     this.saveToStorage('timeTracked',JSON.stringify(Array.from(this.timeTracked)));
   }
 
@@ -105,21 +110,11 @@ export class TimeTrackerService {
     return {key: null, index: -1};
   }
 
-  getActivityIndexByID(id: string) : number{
-    for(let i = 0; i < this.activities.length; i++){
-      if(this.activities[i].id === id){
-        return i;
-      }
-    }
-    return -1;
-  }
-
   getActivityByID(id: string) : Activity{
-    const index = this.getActivityIndexByID(id);
-    if(index < 0){
-      return {id: "0",label: "Deleted Activity", color:"#000", icon: "question-mark", tags: []}
+    if(this.activities.has(id)){
+      return this.activities.get(id);
     }else{
-      return this.activities[index];
+      return {localID: "0",label: "Deleted Activity", color:"#000", icon: "help-outline", tags: []}
     }
   }
   
@@ -230,7 +225,7 @@ export class TimeTrackerService {
   }
 
   getRunningActivities(){
-    return this.activities.filter((val) => val.startDate);
+    return Array.from(this.activities.values()).filter((val) => val.startDate);
   }
 
   getFormattedDuration(start: number, end: number = Date.now()){

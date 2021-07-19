@@ -1,7 +1,7 @@
 <ion-grid>
   <ion-row>
-    <ion-col size-sm="3" size-md="3" size-lg="3" size-xl="3" *ngFor="let el of this.timeTrackerService.activities;let i=index">
-    <app-activity-button [activity]="el"  [badgeText]="this.timeTrackerService.formatDuration(this.timeTrackerService.getDurationTodayForActivity(el.id))"
+    <ion-col size-sm="3" size-md="3" size-lg="3" size-xl="3" *ngFor="let el of this.timeTrackerService.activities | keyvalue;let i=index">
+    <app-activity-button [activity]="el.value"  [badgeText]="this.timeTrackerService.formatDuration(this.timeTrackerService.getDurationTodayForActivity(el.key))"
       (activityClick)="onActivityButtonClick($event)" (activityHold)="onActivityButtonHold($event)"
       >
     </app-activity-button>

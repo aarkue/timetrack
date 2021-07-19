@@ -5,6 +5,7 @@ import { FilesystemDirectory, FilesystemEncoding, FileWriteOptions, FileWriteRes
 import { AlertController, IonInput, Platform, ToastController } from '@ionic/angular';
 import { Appwrite } from 'appwrite';
 import { environment } from 'src/environments/environment';
+import { DataService } from '../data/data.service';
 import { AccountService } from '../services/account.service';
 const { Storage, Directory, Encoding, Filesystem, Share } = Plugins;
 
@@ -39,7 +40,8 @@ export class Tab3Page implements OnInit{
               platform : Platform,
               private route: ActivatedRoute,
               private router: Router,
-              private alertController: AlertController) {
+              private alertController: AlertController,
+              public dataService: DataService) {
 
     this.platform = platform;
     this.loginForm = formBuilder.group({
@@ -128,7 +130,20 @@ export class Tab3Page implements OnInit{
         let res = JSON.parse(evt.target.result+"");
         for(const key in res){
           if(this.localKeys.indexOf(key) > -1){
-            await Storage.set({key: key, value: res[key]})
+            if(key === "activities"){
+              const activities = JSON.parse(res[key]) as any[];
+              console.log(activities);
+              for (let i = 0; i < activities.length; i++) {
+                const act = activities[i];
+                if(act['id']){
+                  act['localID'] = act['id'];
+                  act['id'] = undefined;
+                }
+                await this.dataService.createDocument('activities',act);
+              }
+            }else{
+              await Storage.set({key: key, value: res[key]})
+            }
           }
         }
 
@@ -203,7 +218,7 @@ export class Tab3Page implements OnInit{
     let url = URL.createObjectURL(toExport);
     if (!this.platform.is('hybrid')) {
       this.exportDownload.nativeElement.href = url;
-      this.exportDownload.nativeElement.download = "smartime.json"
+      this.exportDownload.nativeElement.download = "timetrack-"+new Date().toISOString()+".json"
       this.exportDownload.nativeElement.click();
     }else{
       let blobText = await toExport.text();
@@ -217,7 +232,7 @@ export class Tab3Page implements OnInit{
       console.log("Permission", perRes);
       const res : FileWriteResult = await Filesystem.writeFile({
         data: blobText,
-        path:"smartime.json",
+        path: "timetrack-"+new Date().toISOString()+".json",
         encoding: FilesystemEncoding.UTF8,
         directory: FilesystemDirectory.External
     });

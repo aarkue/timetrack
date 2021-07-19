@@ -5,10 +5,11 @@
 export const environment = {
   production: false,
   API_ENDPOINT: 'https://api.siter.eu/v1',
-  API_PROJECT: '60f0137240812',
+  API_PROJECT: '60f56d59e282c',
   BASE_URL: 'http://localhost:4200',
   MIN_PW_LENGTH: 6,
-  MAX_PW_LENGTH: 32
+  MAX_PW_LENGTH: 32,
+  collectionMap: {'activities': '60f56d83ebeae'}
 };
 
 /*

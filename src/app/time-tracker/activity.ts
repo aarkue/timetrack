@@ -1,5 +1,5 @@
 export interface Activity{
-  id: string,
+  localID: string,
   label: string;
   icon: string;
   color: string;

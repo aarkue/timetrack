@@ -37,9 +37,9 @@ export class StatisticsComponent implements OnInit, AfterViewInit {
   public filterTags : boolean = false;  
 
   private readonly rightActivity : (act: Activity) => ((a: TimeTrack, key: number) => boolean)
-  = (act: Activity) => (a: TimeTrack, key: number) => a.activityID === act.id;
+  = (act: Activity) => (a: TimeTrack, key: number) => a.activityID === act.localID;
   private readonly rightActivityRunning : (act: Activity) => ((a: Activity) => boolean)
-= (act: Activity) => (a: Activity) => a.id === act.id;
+= (act: Activity) => (a: Activity) => a.localID === act.localID;
 
   private readonly days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   constructor(private modalController : ModalController) { }
@@ -155,7 +155,7 @@ export class StatisticsComponent implements OnInit, AfterViewInit {
 
   getActivityIndexByID(id: string) : number{
     for(let i = 0; i < this.activities.length; i++){
-      if(this.activities[i].id === id){
+      if(this.activities[i].localID === id){
         return i;
       }
     }
@@ -165,7 +165,7 @@ export class StatisticsComponent implements OnInit, AfterViewInit {
   getActivityByID(id: string) : Activity{
     const index = this.getActivityIndexByID(id);
     if(index < 0){
-      return {id: "0",label: "Deleted Activity", color:"#000", icon: "question-mark", tags: []}
+      return {localID: "0",label: "Deleted Activity", color:"#000", icon: "question-mark", tags: []}
     }else{
       return this.activities[index];
     }

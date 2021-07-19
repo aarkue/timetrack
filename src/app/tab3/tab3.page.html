@@ -18,8 +18,8 @@
       <ion-card-subtitle>{{accountService.getAcc().email}}</ion-card-subtitle>
       <ion-card-title>{{accountService.getAcc().name}}</ion-card-title>
     </ion-card-header>
-    <ion-card-content>
-      <ion-item *ngIf="accountService.getAcc().emailVerification">
+    <ion-card-content class="centerContent">
+      <ion-item *ngIf="accountService.getAcc().emailVerification" lines="none" class="smallItem">
         <ion-label >Email verified!</ion-label>
         <ion-icon slot="end" name="checkmark-circle-outline"></ion-icon>
       </ion-item>
@@ -67,7 +67,43 @@
       </ion-button>
     </ion-card-content>
   </ion-card>
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Failed Requests</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-list>
+        <ion-item-sliding *ngFor="let req of dataService.failedRequests">
+        <ion-item>
+          <ion-icon slot="start" [name]="req.type === 'create' ? 'document-outline' : 'pencil-outline'"></ion-icon>
+          <ion-label>
+            <h2>{{req.collectionName}}</h2>
+            <h3>{{req.dataLocalID}}</h3>
+            <p>{{dataService.stringify(req.data)}}</p>
+          </ion-label>
+          <ion-icon name="refresh-circle-outline" (click)="dataService.retryRequest(req)"></ion-icon>
+        </ion-item>
+        <ion-item-options side="start">
+          <ion-item-option color="danger" (click)="dataService.removeFailedRequest(req.ID)">
+            <ion-icon slot="icon-only" name="trash"></ion-icon>
+          </ion-item-option>
+        </ion-item-options>
+      </ion-item-sliding>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
 
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Sync settings</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-item>
+        <ion-label>Offline mode</ion-label>
+        <ion-toggle [(ngModel)]="dataService.offlineMode" (ngModelChange)="dataService.saveOfflineModeSetting()"></ion-toggle>
+      </ion-item>
+    </ion-card-content>
+  </ion-card>
 
   <ion-card>
     <ion-card-header>

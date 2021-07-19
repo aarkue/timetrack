@@ -19,6 +19,7 @@ export class TimeTrackerComponent implements OnInit {
   constructor(private modalController : ModalController, private alertController : AlertController, public timeTrackerService : TimeTrackerService) { }
 
   ngOnInit() {
+    this.refresh();
   }
 
   async refresh(){
