@@ -5,5 +5,5 @@ export const environment = {
   BASE_URL: 'https://timetrack.siter.eu',
   MIN_PW_LENGTH: 6,
   MAX_PW_LENGTH: 32,
-  collectionMap: {'activities': '60f2e6415958d'}
+  collectionMap: {'activities': '60f2e6415958d', 'timetracked': '60f0138f3c39c'}
 };
