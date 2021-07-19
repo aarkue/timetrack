@@ -18,13 +18,15 @@ export class ActivityListComponent implements OnInit {
 
   ngOnInit() {}
 
-  onActivityButtonClick(activity: Activity){
+  async onActivityButtonClick(activity: Activity){
     if(activity.startDate){
       this.timeTrackerService.addTimeTracked({localID: uuidv4(),activityID: activity.localID, startDate: activity.startDate, endDate: Date.now()})
-      activity.startDate = undefined;
+      activity.startDate = null;
+      await this.dataService.updateDocument("activities",activity)
       this.timeTrackerService.saveChanges();
     }else{
       activity.startDate = Date.now();
+      await this.dataService.updateDocument("activities",activity)
       this.timeTrackerService.saveChanges();
     }
   }
