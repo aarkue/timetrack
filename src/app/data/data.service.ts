@@ -199,8 +199,9 @@ export class DataService {
           const res = await this.userNotifierService.notifyOnPromiseReject(prom,"(Online) Fetching "+collectionName);
           documents.concat(res.result.documents);
           offset++;
+          console.log(offset,documents.length,totalAmount);
           // Shouldn't change, but lets play safe:
-          totalAmount = res.result.sum; 
+          // totalAmount = res.result.sum; 
         }
         let collection = await this.getCollectionFromStorage(collectionName);
         // collection.clear();
