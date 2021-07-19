@@ -198,7 +198,7 @@ export class DataService {
           const prom =  this.appwrite.database.listDocuments(environment.collectionMap[collectionName],[],100,offset);
           const res = await this.userNotifierService.notifyOnPromiseReject(prom,"(Online) Fetching "+collectionName);
           documents.concat(res.result.documents);
-
+          offset++;
           // Shouldn't change, but lets play safe:
           totalAmount = res.result.sum; 
         }
