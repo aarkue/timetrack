@@ -67,11 +67,15 @@ export class DataService {
       }
     }
 
-      let collection = await this.getCollectionFromStorage(collectionName);
-      collection.set(data['localID'],data);
-      const success = await this.saveCollectionToStorage(collectionName,collection);
-      return {success: success, localID: data['localID']};
+      return await this.createDocumentOffline(collectionName,data);
     }
+
+  async createDocumentOffline(collectionName: string, data: {localID: string}){
+    let collection = await this.getCollectionFromStorage(collectionName);
+    collection.set(data['localID'],data);
+    const success = await this.saveCollectionToStorage(collectionName,collection);
+    return {success: success, localID: data['localID']};
+  }
 
   async updateDocument(collectionName: string, data : {ID?: string, localID: string}){
     console.log("Update Document",collectionName,data);
@@ -95,6 +99,10 @@ export class DataService {
       let ID = null;
       if(apiRes.success){
         ID = apiRes.result.$id;
+        data['$id'] = ID;
+        const collection = await this.getCollectionFromStorage(collectionName);
+        collection.set(localID,data);
+        await this.saveCollectionToStorage(collectionName,collection);
       }else{
         this.failedRequests.push({ID: uuidv4(), time: Date.now(),type: 'create', dataLocalID: localID, data: data, collectionName: collectionName});
         this.saveFailedRequests();
@@ -185,30 +193,40 @@ export class DataService {
           this.failedRequests = this.failedRequests.filter((req)=> req.ID !== ID);
           this.saveFailedRequests();
         }
+        clearFailedRequests(){
+          this.failedRequests = [];
+          this.saveFailedRequests();
+        }
 
   async fetchOnlineCollection(collectionName: string){
     if(!this.offlineMode){
       const prom =  this.appwrite.database.listDocuments(environment.collectionMap[collectionName],[],100);
       const res = await this.userNotifierService.notifyOnPromiseReject(prom,"(Online) Fetching "+collectionName);
       if(res.success){
-        let documents = [].concat(res.result.documents);
-        let totalAmount = res.result.sum;
-        let offset = 1;
-        while(documents.length < totalAmount){
-          const prom =  this.appwrite.database.listDocuments(environment.collectionMap[collectionName],[],100,offset);
+        let documents = [];
+        let offset = 0;
+        let prom = this.appwrite.database.listDocuments(environment.collectionMap[collectionName],[],0,0);
+        const list = await this.userNotifierService.notifyOnPromiseReject(prom,"(Online) Fetching "+collectionName);
+        if(list.success){
+        let totalAmount = list.result.sum;
+        do {
+          let prom = this.appwrite.database.listDocuments(environment.collectionMap[collectionName],[],100,offset);
           const res = await this.userNotifierService.notifyOnPromiseReject(prom,"(Online) Fetching "+collectionName);
-          documents.concat(res.result.documents);
-          offset++;
-          console.log(offset,documents.length,totalAmount);
-          // Shouldn't change, but lets play safe:
-          // totalAmount = res.result.sum; 
-        }
+          if(!res.success){ break; }
+
+          documents = documents.concat(res.result.documents);
+          offset += res.result.documents.length;
+        } while (documents.length < totalAmount);
+
+      }
+
         let collection = await this.getCollectionFromStorage(collectionName);
         // collection.clear();
         documents.forEach((doc) => {
           collection.set(doc.localID,doc);
         })
         this.saveCollectionToStorage(collectionName,collection);
+        
         return collection;
       }
     }
@@ -237,6 +255,58 @@ export class DataService {
       const res = await this.userNotifierService.notifyOnPromiseReject(prom,collectionName + " Deletion");
       if(!res.success){
         this.failedRequests.push({time: Date.now(), ID: uuidv4(), type: "delete", collectionName: collectionName, dataLocalID: data.localID, data: data});
+      }
+    }
+  }
+
+  async sendAllOfflineToServer(){
+    for(let collectionName in environment.collectionMap){
+      const map = await this.getCollectionFromStorage(collectionName);
+      for(let val of map.values()){
+        if(!val.$id && val.localID){
+          await this.createDocumentOnline(collectionName,val,val.localID);
+        }
+      }
+    }
+    this.userNotifierService.notify("Upload successfull!","","success");
+  }
+
+  async deleteAllFromServer(collectionName: string){
+    if(!this.offlineMode){
+      const prom =  this.appwrite.database.listDocuments(environment.collectionMap[collectionName],[],100);
+      const res = await this.userNotifierService.notifyOnPromiseReject(prom,"(Online) Fetching "+collectionName);
+      if(res.success){
+        let documents = [];
+        let offset = 0;
+        let prom = this.appwrite.database.listDocuments(environment.collectionMap[collectionName],[],0,0);
+        const list = await this.userNotifierService.notifyOnPromiseReject(prom,"(Online) Fetching "+collectionName);
+        if(list.success){
+        let totalAmount = list.result.sum;
+        do {
+          let prom = this.appwrite.database.listDocuments(environment.collectionMap[collectionName],[],100,offset);
+          const res = await this.userNotifierService.notifyOnPromiseReject(prom,"(Online) Fetching "+collectionName);
+          if(!res.success){ break; }
+
+          documents = documents.concat(res.result.documents);
+          offset += res.result.documents.length;
+        } while (documents.length < totalAmount);
+
+      }
+
+        let collection = await this.getCollectionFromStorage(collectionName);
+        // collection.clear();
+        
+        for (let i = 0; i < documents.length; i++) {
+          const doc = documents[i];
+          const el = collection.get(doc.localID)
+          const prom = this.appwrite.database.deleteDocument(environment.collectionMap[collectionName],doc.$id);
+          const res = await this.userNotifierService.notifyOnPromiseReject(prom,"(Online) Deleting "+collectionName);
+          el.$id = undefined;
+          
+        }
+        this.saveCollectionToStorage(collectionName,collection);
+        
+        this.userNotifierService.notify("Deleted server copy","","success");
       }
     }
   }

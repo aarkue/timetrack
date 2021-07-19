@@ -6,6 +6,7 @@ import { AlertController, IonInput, Platform, ToastController } from '@ionic/ang
 import { Appwrite } from 'appwrite';
 import { environment } from 'src/environments/environment';
 import { DataService } from '../data/data.service';
+import { UserNotifierService } from '../notifier/user-notifier.service';
 import { AccountService } from '../services/account.service';
 import { TimeTrack } from '../time-tracker/time-track';
 const { Storage, Directory, Encoding, Filesystem, Share } = Plugins;
@@ -42,7 +43,8 @@ export class Tab3Page implements OnInit{
               private route: ActivatedRoute,
               private router: Router,
               private alertController: AlertController,
-              public dataService: DataService) {
+              public dataService: DataService,
+              private userNotifierService : UserNotifierService) {
 
     this.platform = platform;
     this.loginForm = formBuilder.group({
@@ -140,69 +142,41 @@ export class Tab3Page implements OnInit{
                   act['localID'] = act['id'];
                   act['id'] = undefined;
                 }
-                await this.dataService.createDocument('activities',act);
+                await this.dataService.createDocumentOffline('activities',act);
               }
-            } if(key === "timeTracked"){
+            } else if(key === "timeTracked"){
                   // let timeTracked = (await this.getFromStorage('timeTracked')).value;
                 const parsedTimeTracked = new Map<number,TimeTrack[]>(JSON.parse(res[key]));
                 if(parsedTimeTracked){
                   console.log(parsedTimeTracked);
-                  parsedTimeTracked.forEach((val,key) => {
-                    val.forEach(async (timeTracked) => {
-                      if(timeTracked['id']){
-                        timeTracked['localID'] = timeTracked['id'];
-                        timeTracked['id'] = undefined;
+                  for (let k of parsedTimeTracked.keys()) {
+                    const array = parsedTimeTracked.get(k)
+                    for (let i = 0; i < array.length; i++) {
+                      const e = array[i];
+                      if(e['id']){
+                        e['localID'] = e['id'];
+                        e['id'] = undefined;
                       }
-                      await this.dataService.createDocument('timetracked',timeTracked);
-                    })
-                    
-                  })
+                      await this.dataService.createDocumentOffline('timetracked',e);
+                    }
+                  }
                 }
             }else{
               await Storage.set({key: key, value: res[key]})
             }
           }
-        }
-
-        const toastNot = await  this.toastController.create({
-          header: "Import successful! Refresh app to see changes.",
-          position: "middle",
-          color: "success",
-          duration: 1500,
-          buttons: [{text: " Ok", icon: "checkmark-outline", role: "cancel", handler: () => {}}],
-        });
-        toastNot.present();
+          }
+          this.userNotifierService.notify("Import successful!","If you want to sync to the server, you need to click the 'Send to server' botton in 'Sync settings'","success");
         this.fileInput.nativeElement.value = ""
 
       }
       reader.onerror = async (evt) => {
-        const toastNot = await  this.toastController.create({
-          header: "Import failed",
-          position: "middle",
-          color: "danger",
-          duration: 3000,
-          buttons: [{text: " Ok", icon: "checkmark-outline", role: "cancel", handler: () => {}}],
-        });
-
-        const toastFail = await  this.toastController.create({
-          header: "Import failed! Could not read file.",
-          position: "middle",
-          color: "danger",
-          buttons: [{text: " Ok", icon: "checkmark-outline", role: "cancel", handler: () => {}}],
-        });
-        toastFail.present();
+        this.userNotifierService.notify("Import failed!"," Could not read file.","danger");
       }
 
       reader.readAsText(file);
     }else{
-      
-      const toastFail = await  this.toastController.create({
-        header: "Import failed! Please select a file.",
-        position: "middle",
-        color: "warning",
-        buttons: [{text: " Ok", icon: "checkmark-outline", role: "cancel", handler: () => {}}],
-      });
-      toastFail.present();
+      this.userNotifierService.notify("Import failed!"," Please select a file.","danger");
     }
   // }else{
   //   let perRes = await Filesystem.requestPermissions();

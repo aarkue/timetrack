@@ -69,7 +69,10 @@
   </ion-card>
   <ion-card>
     <ion-card-header>
-      <ion-card-title>Failed Requests</ion-card-title>
+      <ion-card-title>
+        Failed Requests
+      </ion-card-title>
+      <ion-button color="danger" size="small" mode="ios" (click)="dataService.clearFailedRequests()"><ion-icon slot="end" name="trash"></ion-icon> Delete All</ion-button>
     </ion-card-header>
     <ion-card-content>
       <ion-list>
@@ -101,6 +104,18 @@
       <ion-item>
         <ion-label>Offline mode</ion-label>
         <ion-toggle [(ngModel)]="dataService.offlineMode" (ngModelChange)="dataService.saveOfflineModeSetting()"></ion-toggle>
+      </ion-item>
+      <ion-item>
+        <ion-label>Send all offline-only data to server</ion-label>
+        <ion-button color="tertiary" mode="ios" size="small" (click)="dataService.sendAllOfflineToServer()" [disabled]="this.dataService.offlineMode">Send to server</ion-button>
+      </ion-item>
+      <ion-item>
+        <ion-label>Delete server copy of timetracked. Your local copy is uneffected.</ion-label>
+        <ion-button color="danger" mode="ios" size="small" (click)="dataService.deleteAllFromServer('timetracked')" [disabled]="this.dataService.offlineMode">Delete timetracked on server</ion-button>
+      </ion-item>
+      <ion-item>
+        <ion-label>Delete server copy of activities. Your local copy is uneffected.</ion-label>
+        <ion-button color="danger" mode="ios" size="small" (click)="dataService.deleteAllFromServer('activities')" [disabled]="this.dataService.offlineMode">Delete activities on server</ion-button>
       </ion-item>
     </ion-card-content>
   </ion-card>

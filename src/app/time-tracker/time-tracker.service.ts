@@ -241,7 +241,7 @@ export class TimeTrackerService {
   }
 
   getRunningActivities(){
-    return Array.from(this.activities.values()).filter((val) => val.startDate);
+    return Array.from(this.activities.values()).filter((val) => val && val.startDate);
   }
 
   getFormattedDuration(start: number, end: number = Date.now()){
