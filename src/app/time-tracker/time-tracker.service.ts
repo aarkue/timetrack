@@ -148,14 +148,15 @@ export class TimeTrackerService {
     // this.saveChanges();
   }
 
-  setEndDateByID(id : string,date: number){
+  async setEndDateByID(id : string,date: number){
     const timeTrack = this.getTimeTrackByID(id);
 
-    this.deleteTimeTrack(id);
-
     timeTrack.endDate = date;
-    this.addTimeTracked(timeTrack);
-    this.saveChanges();
+
+    await this.dataService.updateDocument("timetracked",this.getTimeTrackByID(id));
+    
+    this.deleteTimeTrackLocally(id);
+    this.addTimeTrackedLocally(timeTrack);
   }
 
 
