@@ -20,7 +20,7 @@ export class ActivityListComponent implements OnInit {
 
   onActivityButtonClick(activity: Activity){
     if(activity.startDate){
-      this.timeTrackerService.addTimeTracked({id: uuidv4(),activityID: activity.localID, startDate: activity.startDate, endDate: Date.now()})
+      this.timeTrackerService.addTimeTracked({localID: uuidv4(),activityID: activity.localID, startDate: activity.startDate, endDate: Date.now()})
       activity.startDate = undefined;
       this.timeTrackerService.saveChanges();
     }else{

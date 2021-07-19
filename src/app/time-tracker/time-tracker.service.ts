@@ -22,18 +22,22 @@ export class TimeTrackerService {
 
   async refresh(){
     let parsedActivities = await this.dataService.fetchCollection('activities');
-    console.log(parsedActivities);
     // let activities = (await this.getFromStorage('activities')).value;
     // let parsedActivities = JSON.parse(activities);
     if(parsedActivities){
       this.activities = parsedActivities;
     }
-    let timeTracked = (await this.getFromStorage('timeTracked')).value;
-    let parsedTimeTracked = new Map<number,TimeTrack[]>(JSON.parse(timeTracked));
-    if(parsedTimeTracked){
-      console.log(parsedTimeTracked);
-      this.timeTracked = parsedTimeTracked;
+    let rawTimeTracks = await this.dataService.fetchCollection('timetracked');
+    this.timeTracked.clear();
+    for(const timeTrack of rawTimeTracks.values()){
+      this.addTimeTrackedLocally(timeTrack);
     }
+    // let timeTracked = (await this.getFromStorage('timeTracked')).value;
+    // let parsedTimeTracked = new Map<number,TimeTrack[]>(JSON.parse(timeTracked));
+    // if(parsedTimeTracked){
+    //   console.log(parsedTimeTracked);
+    //   this.timeTracked = parsedTimeTracked;
+    // }
     this.updateGrouped();
     
   }
@@ -80,17 +84,21 @@ export class TimeTrackerService {
 
   saveDataToStorage(){
     // this.saveToStorage('activities',JSON.stringify(this.activities));
-    this.saveToStorage('timeTracked',JSON.stringify(Array.from(this.timeTracked)));
+    // this.saveToStorage('timeTracked',JSON.stringify(Array.from(this.timeTracked)));
   }
 
 
-  deleteTimeTrack(id: string){
+  deleteTimeTrackLocally(id: string){
     const keyAndID = this.getKeyAndIndexForID(id);
     this.timeTracked.get(keyAndID.key).splice(keyAndID.index,1)
     if(this.timeTracked.get(keyAndID.key).length < 1){
       this.timeTracked.delete(keyAndID.key);
     }
-    this.saveChanges();
+  }
+
+  deleteTimeTrack(id: string){
+    this.dataService.deleteDocument('timetracked',this.getTimeTrackByID(id));
+    this.deleteTimeTrackLocally(id);
   }
 
   getTimeTrackByID(id: string){
@@ -102,7 +110,7 @@ export class TimeTrackerService {
     for (let key of this.timeTracked.keys()){
       let items = this.timeTracked.get(key);
       for(let i = 0; i < items.length; i++){
-        if(items[i].id === id){
+        if(items[i].localID === id){
           return {key: key, index: i};
         }
       }
@@ -129,14 +137,15 @@ export class TimeTrackerService {
     return Date.parse(iso);
   }
 
-  setStartDateByID(id : string,date: number){
+  async setStartDateByID(id : string,date: number){
     const timeTrack = this.getTimeTrackByID(id);
-
-    this.deleteTimeTrack(id);
-    
     timeTrack.startDate = date;
-    this.addTimeTracked(timeTrack);
-    this.saveChanges();
+
+    await this.dataService.updateDocument("timetracked",this.getTimeTrackByID(id));
+    
+    this.deleteTimeTrackLocally(id);
+    this.addTimeTrackedLocally(timeTrack);
+    // this.saveChanges();
   }
 
   setEndDateByID(id : string,date: number){
@@ -150,8 +159,15 @@ export class TimeTrackerService {
   }
 
 
+  async addTimeTracked(item: TimeTrack){
+      this.addTimeTrackedLocally(item);
+      const res = await this.dataService.createDocument("timetracked",item);
+      // if(res.success){
+      //   this.refresh();
+      // }
+  }
 
-  addTimeTracked(item: TimeTrack){
+  addTimeTrackedLocally(item: TimeTrack){
     let startDateTime = new Date(item.startDate)
     let startDate = new Date(startDateTime.toDateString()).getTime();
     if(!this.timeTracked.has(startDate)){

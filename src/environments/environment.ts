@@ -9,7 +9,7 @@ export const environment = {
   BASE_URL: 'http://localhost:4200',
   MIN_PW_LENGTH: 6,
   MAX_PW_LENGTH: 32,
-  collectionMap: {'activities': '60f56d83ebeae'}
+  collectionMap: {'activities': '60f56d83ebeae', 'timetracked': '60f5aa93afe18'}
 };
 
 /*

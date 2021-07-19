@@ -29,16 +29,16 @@
         <ion-label [color]=" i === 0 ? '' : 'medium'">{{this.timeTrackerService.getActivityByID(t.activityID).label}}</ion-label>
         <ion-icon [name]="this.timeTrackerService.getActivityByID(t.activityID).icon" slot="start" [ngStyle]="{'color': this.timeTrackerService.getActivityByID(t.activityID).color}"></ion-icon>
         <ion-label class="detailLabel">{{timeTrackerService.getFormattedDuration(t.startDate,t.endDate)}}</ion-label>
-        <ion-datetime [ngModel]="this.timeTrackerService.getLocalIsoDatetime(t.startDate)" (ngModelChange)="this.timeTrackerService.setStartDateByID(t.id,this.timeTrackerService.getNumberFromIsoDatetime($event))" display-format="HH:mm" picker-format="DD.MM.YYYY | HH:mm">
+        <ion-datetime [ngModel]="this.timeTrackerService.getLocalIsoDatetime(t.startDate)" (ngModelChange)="this.timeTrackerService.setStartDateByID(t.localID,this.timeTrackerService.getNumberFromIsoDatetime($event))" display-format="HH:mm" picker-format="DD.MM.YYYY | HH:mm">
         </ion-datetime>
-        <ion-datetime [ngModel]="this.timeTrackerService.getLocalIsoDatetime(t.endDate)" (ngModelChange)="this.timeTrackerService.setEndDateByID(t.id,this.timeTrackerService.getNumberFromIsoDatetime($event))" display-format="HH:mm" picker-format="DD.MM.YYYY | HH:mm">
+        <ion-datetime [ngModel]="this.timeTrackerService.getLocalIsoDatetime(t.endDate)" (ngModelChange)="this.timeTrackerService.setEndDateByID(t.localID,this.timeTrackerService.getNumberFromIsoDatetime($event))" display-format="HH:mm" picker-format="DD.MM.YYYY | HH:mm">
         </ion-datetime>
       </ion-item>
       <ion-item-options side="start">
-        <ion-item-option color="danger" (click)="timeTrackerService.deleteTimeTrack(t.id)">
+        <ion-item-option color="danger" (click)="timeTrackerService.deleteTimeTrack(t.localID)">
           <ion-icon slot="icon-only" name="trash"></ion-icon>
         </ion-item-option>
-        <ion-item-option (click)="editTimeTrack(t.id)">
+        <ion-item-option (click)="editTimeTrack(t.localID)" disabled="true">
           <ion-icon slot="icon-only" name="pencil"></ion-icon>
         </ion-item-option>
       </ion-item-options>

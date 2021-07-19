@@ -1,5 +1,5 @@
 export interface TimeTrack{
-  id: string;
+  localID: string;
   startDate: number;
   endDate: number;
   activityID: string;

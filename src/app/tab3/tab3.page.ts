@@ -7,6 +7,7 @@ import { Appwrite } from 'appwrite';
 import { environment } from 'src/environments/environment';
 import { DataService } from '../data/data.service';
 import { AccountService } from '../services/account.service';
+import { TimeTrack } from '../time-tracker/time-track';
 const { Storage, Directory, Encoding, Filesystem, Share } = Plugins;
 
 @Component({
@@ -141,6 +142,22 @@ export class Tab3Page implements OnInit{
                 }
                 await this.dataService.createDocument('activities',act);
               }
+            } if(key === "timeTracked"){
+                  // let timeTracked = (await this.getFromStorage('timeTracked')).value;
+                const parsedTimeTracked = new Map<number,TimeTrack[]>(JSON.parse(res[key]));
+                if(parsedTimeTracked){
+                  console.log(parsedTimeTracked);
+                  parsedTimeTracked.forEach((val,key) => {
+                    val.forEach(async (timeTracked) => {
+                      if(timeTracked['id']){
+                        timeTracked['localID'] = timeTracked['id'];
+                        timeTracked['id'] = undefined;
+                      }
+                      await this.dataService.createDocument('timetracked',timeTracked);
+                    })
+                    
+                  })
+                }
             }else{
               await Storage.set({key: key, value: res[key]})
             }

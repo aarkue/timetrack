@@ -52,7 +52,7 @@ export class TimeTrackerComponent implements OnInit {
             // console.log(data);
             // this.timeTracked[index].activity.label = data.label;
             // this.timeTracked[index].activity.icon = data.icon;
-            this.timeTrackerService.saveChanges();
+            // this.timeTrackerService.saveChanges();
           }
         }
       ]

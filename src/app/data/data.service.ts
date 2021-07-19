@@ -163,7 +163,6 @@ export class DataService {
       }
 
       async saveCollectionToStorage(collectionName: string, collection : Map<string,any>){
-        console.log("Saving",collection);
         const prom =  this.saveToStorage(collectionName,JSON.stringify(Array.from(collection)));
         const res = await this.userNotifierService.notifyOnPromiseReject(prom,"Saving " + collectionName + " to local storage");
         return res.success;
@@ -203,7 +202,6 @@ export class DataService {
           // Shouldn't change, but lets play safe:
           totalAmount = res.result.sum; 
         }
-        console.log('Complete list of documents',documents);
         let collection = await this.getCollectionFromStorage(collectionName);
         // collection.clear();
         documents.forEach((doc) => {
@@ -217,13 +215,13 @@ export class DataService {
 
   async fetchCollection(collectionName: string){
     if(!this.offlineMode){
-      return await this.fetchOnlineCollection(collectionName);
-    }else{
-      return await this.getCollectionFromStorage(collectionName);
+      await this.fetchOnlineCollection(collectionName);
     }
+      return await this.getCollectionFromStorage(collectionName);
   }
 
   async deleteDocument(collectionName : string, data : {$id?: string, localID: string}){
+    console.log("Delete Document",collectionName,data);
     if(!this.offlineMode && data.$id){
       this.deleteDocumentOnline(collectionName,data.$id,data);
     }
