@@ -1,15 +1,13 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActionSheetController } from '@ionic/angular';
-import { Picture } from '../models/picture';
-import { PomodoroComponent } from '../pomodoro/pomodoro.component';
-import { TimeTrackerComponent } from '../time-tracker/time-tracker.component';
+import { TimeTrackerComponent } from '../time-tracker.component';
 
 @Component({
-  selector: 'app-tab2',
-  templateUrl: 'tab2.page.html',
-  styleUrls: ['tab2.page.scss']
+  selector: 'app-time-track-page',
+  templateUrl: './time-track-page.component.html',
+  styleUrls: ['./time-track-page.component.scss'],
 })
-export class Tab2Page implements OnInit {
+export class TimeTrackPageComponent implements OnInit {
 
   @ViewChild('timeTracker')
   private timeTracker : TimeTrackerComponent;
@@ -29,5 +27,4 @@ export class Tab2Page implements OnInit {
   showTrackerStatistics(){
     this.timeTracker.showStatistics();
   }
-
 }

@@ -1,16 +1,14 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActionSheetController } from '@ionic/angular';
-import { Picture } from '../models/picture';
-import { PomodoroComponent } from '../pomodoro/pomodoro.component';
-import { TimeTrackerComponent } from '../time-tracker/time-tracker.component';
-import { TimeTrackerService } from '../time-tracker/time-tracker.service';
+import { TimeTrackerService } from 'src/app/time-tracker/time-tracker.service';
+import { PomodoroComponent } from '../pomodoro.component';
 
 @Component({
-  selector: 'app-tab1',
-  templateUrl: 'tab1.page.html',
-  styleUrls: ['tab1.page.scss']
+  selector: 'app-pomodoro-page',
+  templateUrl: './pomodoro-page.component.html',
+  styleUrls: ['./pomodoro-page.component.scss'],
 })
-export class Tab1Page implements OnInit {
+export class PomodoroPageComponent implements OnInit {
 
   @ViewChild('pomodoro')
   private pomdoro : PomodoroComponent;
@@ -28,5 +26,4 @@ export class Tab1Page implements OnInit {
     await this.timeTrackerService.refresh();
     event.target.complete();
   }
-
 }

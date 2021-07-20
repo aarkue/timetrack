@@ -1,7 +1,9 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { PasswordRecoveryComponent } from '../account/password-recovery/password-recovery.component';
+import { PomodoroPageComponent } from '../pomodoro/pomodoro-page/pomodoro-page.component';
 import { RegisterComponent } from '../register/register.component';
+import { TimeTrackPageComponent } from '../time-tracker/time-track-page/time-track-page.component';
 import { TabsPage } from './tabs.page';
 
 const routes: Routes = [
@@ -11,11 +13,13 @@ const routes: Routes = [
     children: [
       {
         path: 'pomodoro',
-        loadChildren: () => import('../tab1/tab1.module').then(m => m.Tab1PageModule)
+        loadChildren: () => import('../pomodoro/pomodoro.module').then(m => m.PomodoroModule),
+        component: PomodoroPageComponent
       },
       {
         path: 'timetrack',
-        loadChildren: () => import('../tab2/tab2.module').then(m => m.Tab2PageModule)
+        loadChildren: () => import('../time-tracker/time-tracker.module').then(m => m.TimeTrackerModule),
+        component: TimeTrackPageComponent
       },
       {
         path: 'settings',

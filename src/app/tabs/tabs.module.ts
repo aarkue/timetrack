@@ -6,13 +6,17 @@ import { FormsModule } from '@angular/forms';
 import { TabsPageRoutingModule } from './tabs-routing.module';
 
 import { TabsPage } from './tabs.page';
+import { PomodoroModule } from '../pomodoro/pomodoro.module';
+import { TimeTrackerModule } from '../time-tracker/time-tracker.module';
 
 @NgModule({
   imports: [
     IonicModule,
     CommonModule,
     FormsModule,
-    TabsPageRoutingModule
+    TabsPageRoutingModule,
+    PomodoroModule,
+    TimeTrackerModule
   ],
   declarations: [TabsPage]
 })
