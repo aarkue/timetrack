@@ -1,6 +1,6 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { Plugins } from '@capacitor/core';
-import { AlertController, ModalController, PopoverController } from '@ionic/angular';
+import { AlertController, IonContent, ModalController, PopoverController } from '@ionic/angular';
 import { NewActivityModalComponent } from './new-activity-modal/new-activity-modal.component';
 
 import { TimeTrack } from './time-track'
@@ -18,7 +18,17 @@ import { Activity } from './activity';
 })
 export class TimeTrackerComponent implements OnInit {
 
+  @ViewChild('content')
+  private content: IonContent
+
+  private readonly INITIAL_LIMIT = 20;
+  public limit : number = this.INITIAL_LIMIT;
+
+  public topScroll : number = 0;
+
   constructor(private modalController : ModalController, private alertController : AlertController, public timeTrackerService : TimeTrackerService, public dataService : DataService) { }
+  
+  
 
   ngOnInit() {
   }
@@ -26,48 +36,6 @@ export class TimeTrackerComponent implements OnInit {
   async refresh(){
     this.timeTrackerService.refresh();
   }
-
-
-  async editTimeTrack(id: string){
-    // 2021-07-02T19:53:13.026Z vs. 2021-07-02T19:52
-    const timeTrack = this.timeTrackerService.getTimeTrackByID(id);
-    let alert = await this.alertController.create({
-      header: "Label",
-      inputs: [
-        { 
-          name: "label",
-          type: "text",
-          value: timeTrack.activityID
-        },
-        { 
-          name: "icon",
-          type: "text",
-          value:  timeTrack.activityID
-        }
-      ],
-      buttons: [
-        {
-          text: "Save",
-          handler: (data) => {
-            // console.log(Date.parse(data.startDate+":00.026Z"));
-            // console.log(data);
-            // this.timeTracked[index].activity.label = data.label;
-            // this.timeTracked[index].activity.icon = data.icon;
-            // this.timeTrackerService.saveChanges();
-          }
-        }
-      ]
-    });
-    await alert.present();
-  }
-
-
-  trackTimeTracked(index: number, g : {date: number, items: TimeTrack[]}){
-    // console.log(g.date);
-    return g.date;
-  }
-
-
 
   public async showStatistics(){
     const modal = await this.modalController.create({
@@ -81,4 +49,25 @@ export class TimeTrackerComponent implements OnInit {
   trackByActivitiy(act : Activity){
     return act.localID;
   }
+
+  loadMore(event: any){
+    event.target.complete()
+    this.limit += 15;
+    if(this.limit >= Number.MAX_SAFE_INTEGER){
+        event.target.disabled = true;
+      }
+  }
+
+  resetScroll(){
+    this.content.scrollToTop(200);
+    this.limit = this.INITIAL_LIMIT;
+  }
+
+  onScroll(event : any){
+    this.topScroll = event.detail.scrollTop;
+    if(this.topScroll < 100){
+      this.limit = this.INITIAL_LIMIT;
+    }
+  }
+  
 }

@@ -1,0 +1,36 @@
+<ion-list>
+  <ion-item>
+    <div class="timeTrackGrid">
+      <ion-icon color="medium" name="clipboard-outline" ></ion-icon>
+  <p class="mediumColor">Label</p>
+  <p class="mediumColor" color="medium">Duration</p>
+  <div class="timePickers">
+    <ion-item lines="none">
+  <ion-label class="detailLabel" color="medium">Start</ion-label>
+  <ion-label class="detailLabel" color="medium">End</ion-label>
+  </ion-item>
+  </div>
+  </div>
+</ion-item>
+<ion-item *ngFor="let act of this.timeTrackerService.getRunningActivities(); trackBy: dataService.trackByID">
+  <div class="timeTrackGrid">
+    <ion-icon [name]="act.icon" slot="start" [ngStyle]="{'color': act.color}"></ion-icon>
+    <p class="activeActivityInList">{{act.label}}</p>
+    <p class="detailLabel">{{this.timeTrackerService.getFormattedDuration(act.startDate)}}</p>
+  <div class="timePickers">
+    <ion-item lines="none">
+      <ion-datetime [ngModel]="this.timeTrackerService.getLocalIsoDatetime(act.startDate)" (ngModelChange)="act.startDate = this.timeTrackerService.getNumberFromIsoDatetime($event); timeTrackerService.saveChanges();" display-format="HH:mm" picker-format="DD.MM.YYYY | HH:mm">
+      </ion-datetime>
+      <ion-datetime disabled [ngModel]="this.timeTrackerService.getLocalIsoDatetime(act.startDate)"  display-format="HH:mm" picker-format="DD.MM.YYYY | HH:mm">
+      </ion-datetime>
+    </ion-item>
+</div>
+</div>
+</ion-item>
+<div *ngFor="let group of timeTrackerService.groupedTimeTracked; let i = index; trackBy: trackTimeTracked">
+  <app-grouped-item *ngIf="limit === undefined ||  sumUpGroupUpTo(i-1) < limit"
+  [group]="group"
+  [highlighted]="i === 0"
+  >  </app-grouped-item>
+</div>
+</ion-list>

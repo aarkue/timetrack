@@ -14,6 +14,8 @@ import { ActivityListComponent } from './activity-list/activity-list.component';
 import { RecentTimeTrackComponent } from './recent-time-track/recent-time-track.component';
 import { RouterModule } from '@angular/router';
 import { GroupedItemComponent } from './grouped-item/grouped-item.component';
+import { TimeTrackerItemComponent } from './time-tracker-item/time-tracker-item.component';
+import { TimeTrackerListComponent } from './time-tracker-list/time-tracker-list.component';
 @NgModule({
   declarations: [TimeTrackerComponent,
                 IconSelectorComponent,
@@ -23,7 +25,9 @@ import { GroupedItemComponent } from './grouped-item/grouped-item.component';
                 GroupDatePipe,
                 ActivityListComponent,
                 RecentTimeTrackComponent,
-                GroupedItemComponent],
+                GroupedItemComponent,
+                TimeTrackerItemComponent,
+                TimeTrackerListComponent],
   imports: [
     CommonModule,
     IonicModule,

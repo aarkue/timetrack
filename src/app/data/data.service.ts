@@ -17,6 +17,8 @@ export class DataService {
 
   public failedRequests : FailedRequest[] = [];
 
+  public busy: boolean = false;
+
   constructor(private userNotifierService : UserNotifierService) {
     this.appwrite = new Appwrite();
     this.appwrite.setEndpoint(environment.API_ENDPOINT);
@@ -256,6 +258,7 @@ export class DataService {
   }
 
   async sendAllOfflineToServer(){
+    this.busy = true;
     for(let collectionName in environment.collectionMap){
       const map = await this.getCollectionFromStorage(collectionName);
       for(let val of map.values()){
@@ -264,10 +267,18 @@ export class DataService {
         }
       }
     }
+    this.busy = false;
     this.userNotifierService.notify("Upload successfull!","","success");
   }
-
-  async deleteAllFromServer(collectionName: string){
+  async deleteAllFromServer(){
+    this.busy = true;
+    for( let collectionName in environment.collectionMap){
+      await this.deleteCollectionFromServer(collectionName);
+    }
+    this.busy = false;
+    this.userNotifierService.notify("Deleted server copy","","success");
+  }
+  async deleteCollectionFromServer(collectionName: string){
     if(!this.offlineMode){
       const prom =  this.appwrite.database.listDocuments(environment.collectionMap[collectionName],[],100);
       const res = await this.userNotifierService.notifyOnPromiseReject(prom,"(Online) Deleting "+collectionName);
@@ -301,8 +312,6 @@ export class DataService {
           
         }
         this.saveCollectionToStorage(collectionName,collection);
-        
-        this.userNotifierService.notify("Deleted server copy","","success");
       }
     }
   }

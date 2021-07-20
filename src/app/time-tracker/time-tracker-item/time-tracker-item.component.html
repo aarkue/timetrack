@@ -1,0 +1,25 @@
+<ion-item-sliding>
+  <ion-item>
+    <div class="timeTrackGrid">
+    <ion-icon [name]="this.timeTrackerService.getActivityByID(t.activityID).icon" [ngStyle]="{'color': this.timeTrackerService.getActivityByID(t.activityID).color}"></ion-icon>
+    <p >{{this.timeTrackerService.getActivityByID(t.activityID).label}}</p>
+    <p class="detailLabel">{{timeTrackerService.getFormattedDuration(t.startDate,t.endDate)}}</p>
+    <div class="timePickers">
+      <ion-item lines="none">
+        <ion-datetime [ngModel]="this.timeTrackerService.getLocalIsoDatetime(t.startDate)" (ngModelChange)="this.timeTrackerService.setStartDateByID(t.localID,this.timeTrackerService.getNumberFromIsoDatetime($event))" display-format="HH:mm" picker-format="DD.MM.YYYY | HH:mm">
+        </ion-datetime>
+        <ion-datetime [ngModel]="this.timeTrackerService.getLocalIsoDatetime(t.endDate)" (ngModelChange)="this.timeTrackerService.setEndDateByID(t.localID,this.timeTrackerService.getNumberFromIsoDatetime($event))" display-format="HH:mm" picker-format="DD.MM.YYYY | HH:mm">
+        </ion-datetime>
+      </ion-item>
+  </div>
+  </div>
+  </ion-item>
+  <ion-item-options side="start">
+    <ion-item-option color="danger" (click)="timeTrackerService.deleteTimeTrack(t.localID)">
+      <ion-icon slot="icon-only" name="trash"></ion-icon>
+    </ion-item-option>
+    <ion-item-option (click)="timeTrackerService.editTimeTrack(t.localID)" disabled="true">
+      <ion-icon slot="icon-only" name="pencil"></ion-icon>
+    </ion-item-option>
+  </ion-item-options>
+</ion-item-sliding>

@@ -50,3 +50,32 @@
         padding-bottom: 10px !important;
     }
 }
+
+.timeTrackGrid{
+    width: 100%;
+    display: grid;
+    grid-template-columns: 40px 1.5fr 1fr 1.5fr;
+}
+
+.timeTrackGrid ion-icon {
+    height: 100%;
+    font-size: 24px;
+}
+
+.timeTrackGrid .timePickers ion-label {
+    width: 100%;
+    text-align: center;
+}
+
+.timeTrackGrid .timePickers ion-datetime {
+    width: 100%;
+    text-align: center;
+}
+
+.activeActivityInList {
+    color: var(--ion-color-primary)
+}
+
+.mediumColor{
+    color: var(--ion-color-medium)
+}
