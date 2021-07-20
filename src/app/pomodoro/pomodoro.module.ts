@@ -10,6 +10,7 @@ import { TimerHistoryChipComponent } from './timer-history-chip/timer-history-ch
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { PomodoroPageComponent } from './pomodoro-page/pomodoro-page.component';
+import { TimeTrackerModule } from '../time-tracker/time-tracker.module';
 @NgModule({
   declarations: [
     PomodoroComponent,
@@ -19,7 +20,7 @@ import { PomodoroPageComponent } from './pomodoro-page/pomodoro-page.component';
     EditCurrentComponent,
     PomodoroPageComponent
   ],
-  imports: [CommonModule, IonicModule, FormsModule],
+  imports: [CommonModule, IonicModule, FormsModule, TimeTrackerModule],
   exports: [PomodoroPageComponent],
 })
 export class PomodoroModule {}
