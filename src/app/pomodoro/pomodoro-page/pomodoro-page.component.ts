@@ -23,9 +23,9 @@ export class PomodoroPageComponent implements OnInit {
 
 
   async doRefresh(event : any){
-    await this.pomdoro.refresh();
     await this.timeTrackerService.refresh();
-    await this.dataService.refresh();
+    await this.dataService.init();
+    await this.pomdoro.refresh();
     event.target.complete();
   }
 }

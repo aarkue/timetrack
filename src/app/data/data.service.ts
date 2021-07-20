@@ -34,7 +34,13 @@ export class DataService {
     const res = await this.getFromStorage('offlineMode');
       if(res.value === "false"){
         this.offlineMode = false;
-        await this.fetchPrefsFromServer();
+        const serverPrefs = await this.fetchPrefsFromServer();
+        if(!this.prefs['lastUpdated'] || (serverPrefs['lastUpdated'] && this.prefs['lastUpdated'] < serverPrefs['lastUpdated']) ){
+          this.prefs = serverPrefs;
+          this.savePrefsToStorage(this.prefs);
+        }else{
+          this.savePrefsToServer(this.prefs);
+        }
       }else{
         this.offlineMode = true;
     }
@@ -369,8 +375,9 @@ export class DataService {
     const prom =  this.appwrite.account.getPrefs();
     const res = await this.userNotifierService.notifyOnPromiseReject(prom,"(Online) Fetching preferences");
     if(res.success){
-      this.prefs = res.result;
-      await this.savePrefsToStorage(this.prefs);
+      return res.result;
+    }else{
+      return {};
     }
   }
 
@@ -390,6 +397,8 @@ export class DataService {
     for(const key in prefs){
       this.prefs[key] = prefs[key];
     }
+    this.prefs['lastUpdated'] = Date.now();
+    
     await this.savePrefsToStorage(this.prefs);
     if(!this.offlineMode){
       this.savePrefsToServer(this.prefs);
@@ -403,8 +412,5 @@ export class DataService {
     }
   }
 
-  async refresh(){
-    await this.fetchPrefsFromServer();
-  }
 
 }
