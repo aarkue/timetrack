@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Plugins } from '@capacitor/core';
 import { AlertController, IonContent, ModalController, PopoverController } from '@ionic/angular';
 import { NewActivityModalComponent } from './new-activity-modal/new-activity-modal.component';
@@ -10,27 +10,28 @@ import { StatisticsComponent } from './statistics/statistics.component';
 import { TimeTrackerService } from './time-tracker.service';
 import { DataService } from '../data/data.service';
 import { Activity } from './activity';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-time-tracker',
   templateUrl: './time-tracker.component.html',
   styleUrls: ['./time-tracker.component.scss'],
 })
-export class TimeTrackerComponent implements OnInit {
+export class TimeTrackerComponent implements OnInit, OnDestroy {
 
-  @ViewChild('content')
-  private content: IonContent
 
   private readonly INITIAL_LIMIT = 20;
   public limit : number = this.INITIAL_LIMIT;
 
-  public topScroll : number = 0;
-
   constructor(private modalController : ModalController, private alertController : AlertController, public timeTrackerService : TimeTrackerService, public dataService : DataService) { }
+  
+  ngOnDestroy(): void {
+  }
   
   
 
   ngOnInit() {
+
   }
 
   async refresh(){
@@ -52,22 +53,15 @@ export class TimeTrackerComponent implements OnInit {
 
   loadMore(event: any){
     event.target.complete()
-    this.limit += 15;
+    this.limit += 20;
     if(this.limit >= Number.MAX_SAFE_INTEGER){
         event.target.disabled = true;
       }
   }
 
-  resetScroll(){
-    this.content.scrollToTop(200);
+  resetLoaded(){
     this.limit = this.INITIAL_LIMIT;
   }
 
-  onScroll(event : any){
-    this.topScroll = event.detail.scrollTop;
-    if(this.topScroll < 100){
-      this.limit = this.INITIAL_LIMIT;
-    }
-  }
   
 }

@@ -20,6 +20,7 @@
       <ion-title size="large">Settings</ion-title>
     </ion-toolbar>
   </ion-header>
+  <div class="mainContent">
   <ion-card  *ngIf="accountService.isLoggedIn()" class="centeredCard">
     <ion-card-header>
       <ion-card-subtitle>{{accountService.getAcc().email}}</ion-card-subtitle>
@@ -187,5 +188,5 @@
       </ion-item>
     </ion-card-content>
   </ion-card>
-
+</div>
 </ion-content>

@@ -1,22 +1,18 @@
 
-<ion-content #content [scrollEvents]="true" (ionScroll)="onScroll($event)" >
-<app-activity-list></app-activity-list>
+<!-- <ion-content #content [scrollEvents]="true" (ionScroll)="onScroll($event)" > -->
+<div>
+  <app-activity-list></app-activity-list>
 <ion-button expand="block" fill="outline" size="medium" (click)="showStatistics()">
   Statistics
   <ion-icon name="stats-chart" slot="end"></ion-icon>
   </ion-button>
 
-  <ion-fab vertical="bottom" horizontal="end" slot="fixed" *ngIf="topScroll > 300">
-    <ion-fab-button (click)="resetScroll()">
-      <ion-icon name="arrow-up-circle"></ion-icon>
-    </ion-fab-button>
-  </ion-fab>
-
   <app-time-tracker-list [limit]="limit"></app-time-tracker-list>
-  <ion-infinite-scroll threshold="100px" (ionInfinite)="loadMore($event)">
+  <ion-infinite-scroll threshold="200px" (ionInfinite)="loadMore($event)">
     <ion-infinite-scroll-content
       loadingSpinner="bubbles"
       loadingText="Loading more data...">
     </ion-infinite-scroll-content>
   </ion-infinite-scroll>  
-</ion-content>
+<!-- </ion-content> -->
+</div>

@@ -6,12 +6,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Time Tracker</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content [fullscreen]="true" #content [scrollEvents]="true" (ionScroll)="onScroll($event)">
   <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
     <ion-refresher-content
       pullingIcon="bubbles"
@@ -20,7 +15,17 @@
       refreshingText="Refreshing...">
     </ion-refresher-content>
   </ion-refresher>
-
-
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Time Tracker</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <div class="mainContent">
   <app-time-tracker #timeTracker></app-time-tracker>
+  </div>
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed" *ngIf="topScroll > 300">
+    <ion-fab-button (click)="resetScroll()">
+      <ion-icon name="arrow-up-circle"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 </ion-content>
