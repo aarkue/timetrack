@@ -9,8 +9,7 @@ import { TimeTrackerService } from '../time-tracker/time-tracker.service';
 })
 export class TabsPage {
 
-  constructor(private timeTrackerService : TimeTrackerService) {
-    this.timeTrackerService.refresh();
+  constructor() {
   }
 
 }

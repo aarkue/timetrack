@@ -13,8 +13,17 @@ import { TimeTrackerService } from './time-tracker.service';
 import { ActivityListComponent } from './activity-list/activity-list.component';
 import { RecentTimeTrackComponent } from './recent-time-track/recent-time-track.component';
 import { RouterModule } from '@angular/router';
+import { GroupedItemComponent } from './grouped-item/grouped-item.component';
 @NgModule({
-  declarations: [TimeTrackerComponent,IconSelectorComponent,NewActivityModalComponent, ActivityButtonComponent, ActivityPopoverComponent, GroupDatePipe, ActivityListComponent, RecentTimeTrackComponent],
+  declarations: [TimeTrackerComponent,
+                IconSelectorComponent,
+                NewActivityModalComponent,
+                ActivityButtonComponent,
+                ActivityPopoverComponent,
+                GroupDatePipe,
+                ActivityListComponent,
+                RecentTimeTrackComponent,
+                GroupedItemComponent],
   imports: [
     CommonModule,
     IonicModule,

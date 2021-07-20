@@ -8,6 +8,7 @@ import { TimeTrack } from './time-track'
 
 import { StatisticsComponent } from './statistics/statistics.component';
 import { TimeTrackerService } from './time-tracker.service';
+import { DataService } from '../data/data.service';
 
 @Component({
   selector: 'app-time-tracker',
@@ -16,10 +17,9 @@ import { TimeTrackerService } from './time-tracker.service';
 })
 export class TimeTrackerComponent implements OnInit {
 
-  constructor(private modalController : ModalController, private alertController : AlertController, public timeTrackerService : TimeTrackerService) { }
+  constructor(private modalController : ModalController, private alertController : AlertController, public timeTrackerService : TimeTrackerService, public dataService : DataService) { }
 
   ngOnInit() {
-    this.refresh();
   }
 
   async refresh(){

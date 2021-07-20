@@ -254,6 +254,9 @@ export class TimeTrackerService {
     }else{
       return `${m%60}m`;
     }
+  }
 
+  editTimeTrack(id: string){
+    
   }
 }

@@ -14,7 +14,7 @@ import { DataService } from 'src/app/data/data.service';
 })
 export class ActivityListComponent implements OnInit {
 
-  constructor(private modalController : ModalController, public timeTrackerService: TimeTrackerService, private popoverComponent : PopoverController, private dataService : DataService) { }
+  constructor(private modalController : ModalController, public timeTrackerService: TimeTrackerService, private popoverComponent : PopoverController, public dataService : DataService) { }
 
   ngOnInit() {}
 

@@ -22,15 +22,16 @@ export class DataService {
     this.appwrite.setEndpoint(environment.API_ENDPOINT);
     this.appwrite.setProject(environment.API_PROJECT);
     this.loadFailedRequests();
+    // this.init();
+} 
 
-  this.getFromStorage('offlineMode').then((res) =>
-  {
-    if(res.value === "false"){
-      this.offlineMode = false;
-    }else{
-      this.offlineMode = true;
+  async init(){
+    const res = await this.getFromStorage('offlineMode');
+      if(res.value === "false"){
+        this.offlineMode = false;
+      }else{
+        this.offlineMode = true;
     }
-  });
   }
 
   saveOfflineModeSetting(){
@@ -200,26 +201,20 @@ export class DataService {
 
   async fetchOnlineCollection(collectionName: string){
     if(!this.offlineMode){
-      const prom =  this.appwrite.database.listDocuments(environment.collectionMap[collectionName],[],100);
-      const res = await this.userNotifierService.notifyOnPromiseReject(prom,"(Online) Fetching "+collectionName);
-      if(res.success){
-        let documents = [];
-        let offset = 0;
-        let prom = this.appwrite.database.listDocuments(environment.collectionMap[collectionName],[],0,0);
+        let prom = this.appwrite.database.listDocuments(environment.collectionMap[collectionName],[],100,0);
         const list = await this.userNotifierService.notifyOnPromiseReject(prom,"(Online) Fetching "+collectionName);
+        let documents = [].concat(list.result.documents);
+        let offset = list.result.documents.length;
         if(list.success){
         let totalAmount = list.result.sum;
-        do {
+        while(documents.length < totalAmount){
           let prom = this.appwrite.database.listDocuments(environment.collectionMap[collectionName],[],100,offset);
           const res = await this.userNotifierService.notifyOnPromiseReject(prom,"(Online) Fetching "+collectionName);
           if(!res.success){ break; }
-
           documents = documents.concat(res.result.documents);
           offset += res.result.documents.length;
-        } while (documents.length < totalAmount);
-
+        }
       }
-
         let collection = await this.getCollectionFromStorage(collectionName);
         // collection.clear();
         documents.forEach((doc) => {
@@ -228,11 +223,12 @@ export class DataService {
         this.saveCollectionToStorage(collectionName,collection);
         
         return collection;
-      }
+      
     }
   }
 
   async fetchCollection(collectionName: string){
+    console.log("Fetching " + collectionName);
     if(!this.offlineMode){
       await this.fetchOnlineCollection(collectionName);
     }
@@ -274,17 +270,17 @@ export class DataService {
   async deleteAllFromServer(collectionName: string){
     if(!this.offlineMode){
       const prom =  this.appwrite.database.listDocuments(environment.collectionMap[collectionName],[],100);
-      const res = await this.userNotifierService.notifyOnPromiseReject(prom,"(Online) Fetching "+collectionName);
+      const res = await this.userNotifierService.notifyOnPromiseReject(prom,"(Online) Deleting "+collectionName);
       if(res.success){
         let documents = [];
         let offset = 0;
         let prom = this.appwrite.database.listDocuments(environment.collectionMap[collectionName],[],0,0);
-        const list = await this.userNotifierService.notifyOnPromiseReject(prom,"(Online) Fetching "+collectionName);
+        const list = await this.userNotifierService.notifyOnPromiseReject(prom,"(Online) Deleting "+collectionName);
         if(list.success){
         let totalAmount = list.result.sum;
         do {
           let prom = this.appwrite.database.listDocuments(environment.collectionMap[collectionName],[],100,offset);
-          const res = await this.userNotifierService.notifyOnPromiseReject(prom,"(Online) Fetching "+collectionName);
+          const res = await this.userNotifierService.notifyOnPromiseReject(prom,"(Online) Deleting "+collectionName);
           if(!res.success){ break; }
 
           documents = documents.concat(res.result.documents);
@@ -309,5 +305,9 @@ export class DataService {
         this.userNotifierService.notify("Deleted server copy","","success");
       }
     }
+  }
+
+  public trackByID(obj : {localID: string}){
+    return obj.localID;
   }
 }
