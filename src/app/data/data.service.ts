@@ -19,6 +19,8 @@ export class DataService {
 
   public busy: boolean = false;
 
+  public prefs : any = {};
+
   constructor(private userNotifierService : UserNotifierService) {
     this.appwrite = new Appwrite();
     this.appwrite.setEndpoint(environment.API_ENDPOINT);
@@ -28,9 +30,11 @@ export class DataService {
 } 
 
   async init(){
+    await this.getPrefsFromStorage();
     const res = await this.getFromStorage('offlineMode');
       if(res.value === "false"){
         this.offlineMode = false;
+        await this.fetchPrefsFromServer();
       }else{
         this.offlineMode = true;
     }
@@ -358,6 +362,49 @@ export class DataService {
       }
     }
     this.busy = false;
+  }
+
+
+  async fetchPrefsFromServer(){
+    const prom =  this.appwrite.account.getPrefs();
+    const res = await this.userNotifierService.notifyOnPromiseReject(prom,"(Online) Fetching preferences");
+    if(res.success){
+      this.prefs = res.result;
+      await this.savePrefsToStorage(this.prefs);
+    }
+  }
+
+  async savePrefsToServer(prefs: any){
+    const prom =  this.appwrite.account.updatePrefs(prefs);
+    const res = await this.userNotifierService.notifyOnPromiseReject(prom,"(Online) Saving preferences");
+    if(res.success){
+      // this.prefs = res.result;
+    }
+  }
+
+  async savePrefsToStorage(prefs: any){
+    await this.saveToStorage("prefs",JSON.stringify(prefs));
+  }
+
+  async savePrefs(prefs: any){
+    for(const key in prefs){
+      this.prefs[key] = prefs[key];
+    }
+    await this.savePrefsToStorage(this.prefs);
+    if(!this.offlineMode){
+      this.savePrefsToServer(this.prefs);
+    }
+  }
+
+  async getPrefsFromStorage(){
+    this.prefs = JSON.parse((await this.getFromStorage("prefs")).value);
+    if(!this.prefs){
+      this.prefs = {};
+    }
+  }
+
+  async refresh(){
+    await this.fetchPrefsFromServer();
   }
 
 }

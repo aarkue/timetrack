@@ -14,7 +14,11 @@ const { Storage } = Plugins;
 
 
 export class AccountService {
+
+
   private account : any | undefined;
+
+  private prefs : any;
 
   private appwrite : Appwrite;
 
@@ -36,6 +40,7 @@ export class AccountService {
     }
     return res.success;
   }
+  
 
   async loginWithGoogle() {
     const oathSession =  this.appwrite.account.createOAuth2Session("google",environment.BASE_URL+"/settings?oauth=1",environment.BASE_URL+"/settings?oauth=-1")
@@ -92,8 +97,11 @@ export class AccountService {
 
   async updateAcc() {
     this.appwrite.account.get()
-    .then((acc) => this.account = acc)
+    .then((acc) => {
+      this.account = acc;
+    })
     .catch((error) => this.account = undefined)
+
   }
 
   getAcc(): any | undefined {

@@ -21,9 +21,12 @@ import {
   PopoverController,
 } from '@ionic/angular';
 import { PomodoroOptionsDialogComponent } from './pomodoro-options-dialog/pomodoro-options-dialog.component';
-const { LocalNotifications, Haptics, Storage } = Plugins;
+const { LocalNotifications, Haptics } = Plugins;
 import { Platform } from '@ionic/angular';
 import { EditCurrentComponent } from './edit-current/edit-current.component';
+import { AccountService } from '../services/account.service';
+import { DataService } from '../data/data.service';
+
 @Component({
   selector: 'app-pomodoro',
   templateUrl: './pomodoro.component.html',
@@ -34,6 +37,8 @@ export class PomodoroComponent implements OnInit, OnDestroy {
   private shortBreakSeconds = 3 * 60;
   private longBreakSeconds = 15 * 60;
   private workSessionReward = 4;
+
+  public readonly PREFS_PREFIX = "POMODORO_"
 
   currDuration: number = this.workSeconds;
   startDate: number;
@@ -73,22 +78,12 @@ export class PomodoroComponent implements OnInit, OnDestroy {
     public modalController: ModalController,
     public platform: Platform,
     public popoverController: PopoverController,
-    private alertController: AlertController
+    private alertController: AlertController,
+    private dataService: DataService
   ) {}
 
   ngOnInit(): void {
-    this.loadOptions().then(async () => {
-      this.initDefaults();
-      await this.retrieveCurrentState();
-      setTimeout(() => {
-        this.scrollHistoryIntoView();
-      }, 100);
-      this.calcTimePassed();
-      this.startClock();
-      this.saveCurrentState();
-      this.isInitialized = true;
-    });
-
+    this.refresh();
 
     if(this.platform.is('hybrid')){
           LocalNotifications.registerActionTypes({
@@ -104,16 +99,15 @@ export class PomodoroComponent implements OnInit, OnDestroy {
                 }]
               }]
           });
-        LocalNotifications.addListener("localNotificationActionPerformed",(act) => {
+        LocalNotifications.addListener("localNotificationActionPerformed",async (act) => {
           if(this.isInitialized){
-          console.log(act);
           if(act.actionId === 'pause'){
             this.calcTimePassed();
             this.setTimePassedBefore(this.timePassed);
             this.startDate = null;
             this.cancelNotificationInAdvance();
             this.setIsPaused(true);
-            this.saveCurrentState();
+            await this.saveCurrentState();
           }else if(act.actionId === 'skip'){
             this.nextTimer();
           }
@@ -126,15 +120,19 @@ export class PomodoroComponent implements OnInit, OnDestroy {
   
 
   async refresh() {
-    this.loadOptions().then(async () => {
-      this.initDefaults();
-      await this.retrieveCurrentState();
-      setTimeout(() => {
-        this.scrollHistoryIntoView();
-      }, 100);
-      this.startClock();
-      this.saveCurrentState();
-    });
+    this.dataService.init().then(() => {
+      this.loadOptions().then(async () => {
+        this.initDefaults();
+        await this.retrieveCurrentState();
+        setTimeout(() => {
+          this.scrollHistoryIntoView();
+        }, 100);
+        this.calcTimePassed();
+        this.startClock();
+        this.saveCurrentState();
+        this.isInitialized = true;
+      });
+    })
   }
 
   ngOnDestroy(): void {
@@ -176,6 +174,7 @@ export class PomodoroComponent implements OnInit, OnDestroy {
       }
       this.scheduleNotificationInAdvance();
       this.calcTimePassed();
+      await this.saveCurrentState();
     } else {
       this.calcTimePassed();
       this.setTimePassedBefore(this.timePassed);
@@ -187,7 +186,7 @@ export class PomodoroComponent implements OnInit, OnDestroy {
         this.setIsPaused(true);
       }
     }
-    this.saveCurrentState();
+    await this.saveCurrentState();
   }
 
 
@@ -270,7 +269,7 @@ export class PomodoroComponent implements OnInit, OnDestroy {
     }
   }
 
-  nextTimer() {
+  async nextTimer() {
     this.isOvertime = false;
     this.setTimePassedBefore(0);
     this.timePassed = 0;
@@ -303,10 +302,12 @@ export class PomodoroComponent implements OnInit, OnDestroy {
       endDate: null,
     });
     this.scrollHistoryIntoView();
-    this.saveCurrentState();
+    
 
     if (this.autoStart) {
-      this.buttonClick();
+      await this.buttonClick();
+    }else{
+      await this.saveCurrentState();
     }
   }
 
@@ -334,7 +335,6 @@ export class PomodoroComponent implements OnInit, OnDestroy {
         },
       ],
     });
-    console.log(result);
 
     if (this.platform.is('hybrid')) {
       Haptics.vibrate();
@@ -347,83 +347,74 @@ export class PomodoroComponent implements OnInit, OnDestroy {
 
   setCurrDuration(duration: number) {
     this.currDuration = duration;
-    this.saveCurrentState();
+    // this.saveCurrentState();
   }
 
   setPomodoros(pomodoros: number) {
     this.pomodoros = pomodoros;
-    this.saveCurrentState();
+    // this.saveCurrentState();
   }
 
   setTimePassedBefore(time: number) {
-    console.log('setTimePassedBefore called', time);
     this.timePassedBefore = time;
-    this.saveCurrentState();
+    // this.saveCurrentState();
   }
 
   setStatus(status: PomodoroStatus) {
     this.status = status;
-    this.saveCurrentState();
+    // this.saveCurrentState();
   }
 
   setIsPaused(paused: boolean) {
     this.isPaused = paused;
-    this.saveCurrentState();
+    // this.saveCurrentState();
   }
 
   async saveCurrentState() {
-    await this.saveToStorage(
-      'timePassedBefore',
-      this.timePassedBefore.toString()
-    );
-    await this.saveToStorage('status', this.status.toString());
-    await this.saveToStorage('paused', this.isPaused + '');
-    await this.saveToStorage('pomodoros', this.pomodoros.toString());
-    await this.saveToStorage('currDuration', this.currDuration.toString());
-    await this.saveToStorage('timerHistory', JSON.stringify(this.timerHistory));
-    if (this.startDate) {
-      await this.saveToStorage('startDate', this.startDate.toString());
-    } else {
-      await this.saveToStorage('startDate', null);
-    }
+    this.dataService.savePrefs({
+      'POMODORO_status': this.status.toString(),
+      'POMODORO_paused': this.isPaused + '',
+      'POMODORO_pomodoros': this.pomodoros.toString(),
+      'POMODORO_currDuration': this.currDuration.toString(),
+      'POMODORO_timerHistory': JSON.stringify(this.timerHistory),
+      'POMODORO_startDate': this.startDate? this.startDate.toString() : undefined,
+      'POMODORO_timePassedBefore': this.timePassedBefore.toString()
+    })
   }
 
   async retrieveCurrentState() {
-    let timePassedBefore = await this.getFromStorage('timePassedBefore');
-    let status = await this.getFromStorage('status');
-    let isPaused = await this.getFromStorage('paused');
-    let pomodoros = await this.getFromStorage('pomodoros');
-    let currDuration = await this.getFromStorage('currDuration');
-    let timerHistory = await this.getFromStorage('timerHistory');
-    let startDate = await this.getFromStorage('startDate');
+    ;
+    let timePassedBefore = await this.getFromPrefs('timePassedBefore');
+    let status = await this.getFromPrefs('status');
+    let isPaused = await this.getFromPrefs('paused');
+    let pomodoros = await this.getFromPrefs('pomodoros');
+    let currDuration = await this.getFromPrefs('currDuration');
+    let timerHistory = await this.getFromPrefs('timerHistory');
+    let startDate = await this.getFromPrefs('startDate');
+    this.isPaused = !('false' === isPaused);
 
-    this.isPaused = !('false' === isPaused.value);
-
-    let parsedPomodoros = parseInt(pomodoros.value);
+    let parsedPomodoros = parseInt(pomodoros);
     if (!isNaN(parsedPomodoros)) {
       this.pomodoros = parsedPomodoros;
     }
 
-    let parsedCurrDuration = parseInt(currDuration.value);
+    let parsedCurrDuration = parseInt(currDuration);
     if (!isNaN(parsedCurrDuration)) {
-      console.log(parsedCurrDuration);
       this.currDuration = parsedCurrDuration;
     }
 
     let parsedStatus =
-      PomodoroStatus[status.value as keyof typeof PomodoroStatus];
+      PomodoroStatus[status as keyof typeof PomodoroStatus];
     if (parsedStatus) {
       this.status = parsedStatus;
     }
 
-    let parsedTimePassedBefore = parseFloat(timePassedBefore.value);
+    let parsedTimePassedBefore = parseFloat(timePassedBefore);
     if (!isNaN(parsedTimePassedBefore)) {
-      console.log('parsedTimePassedBefore', parsedTimePassedBefore);
       this.setTimePassedBefore(parsedTimePassedBefore);
     }
 
-    let parsedstartDate = parseInt(startDate.value);
-    console.log(parsedstartDate);
+    let parsedstartDate = parseInt(startDate);
     if (!isNaN(parsedstartDate)) {
       this.startDate = parsedstartDate;
       this.scheduleNotificationInAdvance();
@@ -434,8 +425,8 @@ export class PomodoroComponent implements OnInit, OnDestroy {
       let dif = Date.now() - parsedstartDate;
     }
 
-    if (timerHistory.value && timerHistory.value.length > 0) {
-      this.timerHistory = JSON.parse(timerHistory.value);
+    if (timerHistory && timerHistory.length > 0) {
+      this.timerHistory = JSON.parse(timerHistory);
     } else {
       this.timerHistory = [
         {
@@ -498,6 +489,7 @@ export class PomodoroComponent implements OnInit, OnDestroy {
 
     this.timePassedBefore = 0;
     this.isOvertime = false;
+    this.startDate = null;
   }
 
   async showOptions() {
@@ -533,66 +525,54 @@ export class PomodoroComponent implements OnInit, OnDestroy {
     return await modalRef.present();
   }
 
-  async saveToStorage(key: string, value: string) {
-    await Storage.set({ key: key, value: value });
+
+  getFromPrefs(key: string) {
+    return this.dataService.prefs["POMODORO_"+key]
   }
 
-  getFromStorage(key: string) {
-    return Storage.get({ key: key });
-  }
+  
   async saveOptions() {
-    try {
-      this.saveToStorage(
-        'shortBreakSeconds',
-        this.shortBreakSeconds.toString()
-      );
-      this.saveToStorage('longBreakSeconds', this.longBreakSeconds.toString());
-      this.saveToStorage('workSeconds', this.workSeconds.toString());
-      this.saveToStorage(
-        'workSessionReward',
-        this.workSessionReward.toString()
-      );
-      this.saveToStorage('showSeconds', this.showSeconds.toString());
-      this.saveToStorage('showProgressBar', this.showProgressBar.toString());
-      this.saveToStorage('autoStart', this.autoStart.toString());
-      this.saveToStorage('autoFinish', this.autoFinish.toString());
-    } catch (error) {
-      console.log('Error saving localStorage Options for Pomodoro' + error);
-    }
+    this.dataService.savePrefs({
+      'POMODORO_shortBreakSeconds': this.shortBreakSeconds.toString(),
+      'POMODORO_longBreakSeconds': this.longBreakSeconds.toString(),
+      'POMODORO_workSeconds': this.workSeconds.toString(),
+      'POMODORO_workSessionReward': this.workSessionReward.toString(),
+      'POMODORO_showSeconds': this.showSeconds.toString(),
+      'POMODORO_showProgressBar': this.showProgressBar.toString(),
+      'POMODORO_autoStart': this.autoStart.toString(),
+      'POMODORO_autoFinish': this.autoFinish.toString()
+
+    })
   }
 
   async loadOptions() {
-    try {
       this.shortBreakSeconds = parseInt(
-        (await this.getFromStorage('shortBreakSeconds')).value ||
+        (await this.getFromPrefs('shortBreakSeconds')) ||
           this.shortBreakSeconds.toString()
       );
       this.longBreakSeconds = parseInt(
-        (await this.getFromStorage('longBreakSeconds')).value ||
+        (await this.getFromPrefs('longBreakSeconds')) ||
           this.longBreakSeconds.toString()
       );
       this.workSeconds = parseInt(
-        (await this.getFromStorage('workSeconds')).value ||
+        (await this.getFromPrefs('workSeconds')) ||
           this.workSeconds.toString()
       );
       this.workSessionReward = parseInt(
-        (await this.getFromStorage('workSessionReward')).value ||
+        (await this.getFromPrefs('workSessionReward')) ||
           this.workSessionReward.toString()
       );
 
       this.showSeconds =
-        (await this.getFromStorage('showSeconds')).value !== 'false';
+        (await this.getFromPrefs('showSeconds')) !== 'false';
 
       this.showProgressBar =
-        (await this.getFromStorage('showProgressBar')).value !== 'false';
+        (await this.getFromPrefs('showProgressBar')) !== 'false';
       this.autoStart =
-        (await this.getFromStorage('autoStart')).value !== 'false';
+        (await this.getFromPrefs('autoStart')) !== 'false';
       this.autoFinish = !(
-        (await this.getFromStorage('autoFinish')).value !== 'true'
+        (await this.getFromPrefs('autoFinish')) !== 'true'
       );
-    } catch (error) {
-      console.log('Error loading localStorage Options for Pomodoro' + error);
-    }
   }
 
   public getMinLeft() {

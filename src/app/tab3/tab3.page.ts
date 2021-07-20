@@ -88,7 +88,10 @@ export class Tab3Page implements OnInit{
 
   public async logIn(){
     this.loginForm.disable();
-    await this.accountService.login(this.loginForm.value["email"],this.loginForm.value["password"]);
+    const successfull = await this.accountService.login(this.loginForm.value["email"],this.loginForm.value["password"]);
+    if(successfull){
+      this.dataService.fetchPrefsFromServer();
+    }
     this.loginForm.enable();
   }
 
