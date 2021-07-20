@@ -282,7 +282,7 @@ export class DataService {
 
   async deleteAllFromServer(){
     this.busy = true;
-    for( let collectionName in environment.collectionMap){
+    for(let collectionName in environment.collectionMap){
       await this.deleteCollectionFromServer(collectionName);
     }
     this.busy = false;
@@ -330,4 +330,34 @@ export class DataService {
   public trackByID(index : number,obj : {localID: string}){
     return obj.localID;
   }
+
+  public async exportToJSON(){
+    this.busy = true;
+    let dict = {};
+    dict['dataVersion'] = environment.dataVersion;
+    for(let collectionName in environment.collectionMap){
+      dict[collectionName] = (await this.getFromStorage(collectionName)).value;
+    }
+    this.busy = false;
+    return JSON.stringify(dict);
+  }
+
+  public async importJSON(json: any){
+    this.busy = true;
+    for(let collectionName in environment.collectionMap){
+      if(json[collectionName]){
+        console.log(json[collectionName]);
+        const value = JSON.parse(json[collectionName]);
+        let collectionInJSON : Map<string,any> = new Map<string,any>(value);
+        console.log(collectionInJSON);
+        let localCollection : Map<string,any> = await this.getCollectionFromStorage(collectionName);
+        for(const key of collectionInJSON.keys()){
+          localCollection.set(key,collectionInJSON.get(key));
+        }
+        this.saveCollectionToStorage(collectionName,localCollection);
+      }
+    }
+    this.busy = false;
+  }
+
 }

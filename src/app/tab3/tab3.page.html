@@ -7,12 +7,19 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content
+      pullingIcon="bubbles"
+      pullingText="Pull to refresh"
+      refreshingSpinner="bubbles"
+      refreshingText="Refreshing...">
+    </ion-refresher-content>
+  </ion-refresher>
   <ion-header collapse="condense">
     <ion-toolbar>
       <ion-title size="large">Settings</ion-title>
     </ion-toolbar>
   </ion-header>
-
   <ion-card  *ngIf="accountService.isLoggedIn()" class="centeredCard">
     <ion-card-header>
       <ion-card-subtitle>{{accountService.getAcc().email}}</ion-card-subtitle>
@@ -98,7 +105,7 @@
 
   <ion-card>
     <ion-card-header>
-      <ion-card-title>Sync settings</ion-card-title>
+      <ion-card-title>Data settings</ion-card-title>
     </ion-card-header>
     <ion-card-content>
       <ion-progress-bar type="indeterminate" *ngIf="dataService.busy"></ion-progress-bar>
@@ -112,15 +119,16 @@
             All changes will be kept local only
           </p>
         </ion-label>
-        <ion-toggle [(ngModel)]="dataService.offlineMode" (ngModelChange)="dataService.saveOfflineModeSetting()"></ion-toggle>
+        <ion-toggle [(ngModel)]="dataService.offlineMode" (ngModelChange)="offlineModeChange()"></ion-toggle>
       </ion-item>
       <ion-item>
         <ion-label>
           Upload offline-only data
           <br>
-          <p>Uploads local data not on the server yet</p>
+          <p>Uploads local data to server <br>
+             Sends only data not on server yet</p>
         </ion-label>
-        <ion-button color="tertiary" mode="ios" size="small" (click)="dataService.sendAllOfflineToServer()" [disabled]="this.dataService.offlineMode">Upload</ion-button>
+        <ion-button slot="end" color="tertiary" mode="ios" size="small" (click)="dataService.sendAllOfflineToServer()" [disabled]="this.dataService.offlineMode">Upload</ion-button>
       </ion-item>
       <ion-item>
         <ion-label>
@@ -135,39 +143,30 @@
           Delete local
           <br>
           <p>Keeps server copy intact</p>
-          <p>Will first create a backup</p>
         </ion-label>
         <ion-button slot="end" color="danger" mode="ios" size="small" (click)="deleteLocal()">Delete local</ion-button>
       </ion-item>
+      <ion-item>
+        <ion-label>
+          Export local
+          <br>
+          <p>Exports local data to JSON</p>
+          <a #exportDownload></a>
+        </ion-label>
+        <ion-button slot="end" color="success" mode="ios" size="small" (click)="exportFile()">Export</ion-button>
+      </ion-item>
+      <ion-item>
+        <ion-label>
+          Import local
+          <br>
+          <p>Import local data from JSON</p>
+          <input type="file" #fileInputRef>
+        </ion-label>
+        
+        <ion-button slot="end" color="success" mode="ios" size="small" (click)="importFile()">Import</ion-button>
+      </ion-item>
     </ion-card-content>
   </ion-card>
-
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>Export</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <ion-button (click)="exportFile()">
-        Export
-      </ion-button>
-    </ion-card-content>
-  </ion-card>
-
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>Import</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <input type="file" #fileInputRef>
-      <br>
-      <ion-button (click)="importFile()">
-        Import
-      </ion-button>
-      <a #exportDownload></a>
-    </ion-card-content>
-  </ion-card>
-
-
 
   <ion-card>
     <ion-card-header>

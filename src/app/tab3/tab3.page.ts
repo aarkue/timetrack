@@ -9,6 +9,7 @@ import { DataService } from '../data/data.service';
 import { UserNotifierService } from '../notifier/user-notifier.service';
 import { AccountService } from '../services/account.service';
 import { TimeTrack } from '../time-tracker/time-track';
+import { TimeTrackerService } from '../time-tracker/time-tracker.service';
 const { Storage, Directory, Encoding, Filesystem, Share } = Plugins;
 
 @Component({
@@ -44,7 +45,8 @@ export class Tab3Page implements OnInit{
               private router: Router,
               private alertController: AlertController,
               public dataService: DataService,
-              private userNotifierService : UserNotifierService) {
+              private userNotifierService : UserNotifierService,
+              private timeTrackerService : TimeTrackerService) {
 
     this.platform = platform;
     this.loginForm = formBuilder.group({
@@ -131,6 +133,10 @@ export class Tab3Page implements OnInit{
       let reader = new FileReader();
       reader.onload = async (evt) => {
         let res = JSON.parse(evt.target.result+"");
+        if(res['dataVersion']){
+          this.dataService.importJSON(res);
+        }else{
+          // Legacy import
         for(const key in res){
           if(this.localKeys.indexOf(key) > -1){
             if(key === "activities"){
@@ -166,7 +172,10 @@ export class Tab3Page implements OnInit{
             }
           }
           }
-          this.userNotifierService.notify("Import successful!","If you want to sync to the server, you need to click the 'Send to server' botton in 'Sync settings'","success");
+                    
+        }
+        this.timeTrackerService.refresh();
+        this.userNotifierService.notify("Import successful!","If you want to sync to the server, you need to click the 'Send to server' botton in 'Sync settings'","success");
         this.fileInput.nativeElement.value = ""
 
       }
@@ -197,12 +206,13 @@ export class Tab3Page implements OnInit{
   }
 
   async exportFile(){
-    let dict = {};
-    for (const key of this.localKeys){
-      dict[key] = (await Storage.get({key: key})).value;
-    }
-    console.log(dict)
-    let json = JSON.stringify(dict);
+    // let dict = {};
+    // for (const key of this.localKeys){
+    //   dict[key] = (await Storage.get({key: key})).value;
+    // }
+    // console.log(dict)
+
+    let json = await this.dataService.exportToJSON();
     console.log(json);
     let toExport = new Blob([json],{type: 'text/plain'});
 
@@ -215,10 +225,6 @@ export class Tab3Page implements OnInit{
       let blobText = await toExport.text();
       console.log("blobtext:",blobText);
 
-      // this.socialSharing.shareWithOptions({files: blobText, subject: "Save data"}).then((res) => {
-      //   console.log("SHARE",res);
-      // })
-
       let perRes = await Filesystem.requestPermissions();
       console.log("Permission", perRes);
       const res : FileWriteResult = await Filesystem.writeFile({
@@ -227,24 +233,27 @@ export class Tab3Page implements OnInit{
         encoding: FilesystemEncoding.UTF8,
         directory: FilesystemDirectory.External
     });
-    console.log("URI",res.uri);
-    let shareRes = await Share.share({  title: 'See cool stuff',
-    url: res.uri,
-    dialogTitle: 'Share with buddies',});
+    
+    let shareRes = await Share.share({
+    url: res.uri});
+
     console.log(shareRes);
     }
-    const toastNot = await  this.toastController.create({
-      header: "Export successfull!",
-      position: "middle",
-      color: "success",
-      duration: 1500,
-      buttons: [{text: " Ok", icon: "checkmark-outline", role: "cancel", handler: () => {}}],
-    });
-    await toastNot.present();
+    this.userNotifierService.notify("Export successfull!","","success",true);
   }
 
   async deleteLocal(){
-    await this.exportFile();
     await this.dataService.deleteAllFromLocal();
+    this.timeTrackerService.refresh();
+  }
+
+  offlineModeChange(){
+    this.dataService.saveOfflineModeSetting();
+    this.timeTrackerService.refresh();
+  }
+
+  async doRefresh(event: any){
+    await this.accountService.updateAcc();
+    event.target.complete();
   }
 }
