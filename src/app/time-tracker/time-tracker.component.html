@@ -13,7 +13,6 @@
   </ion-fab>
 
   <app-time-tracker-list [limit]="limit"></app-time-tracker-list>
-  {{limit}}
   <ion-infinite-scroll threshold="100px" (ionInfinite)="loadMore($event)">
     <ion-infinite-scroll-content
       loadingSpinner="bubbles"
