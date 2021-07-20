@@ -42,7 +42,7 @@ jobs:
         run: npx @getmeli/cli upload --branch main --url https://siter.eu --site $SITER_SITE --token $SITER_TOKEN  www/
       
       - name: Prepare android build
-        run: ionic cap copy android
+        run: ionic cap copy android --prod
       - name: Prepare android
         env:
             KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
