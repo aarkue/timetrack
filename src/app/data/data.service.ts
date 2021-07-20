@@ -270,6 +270,16 @@ export class DataService {
     this.busy = false;
     this.userNotifierService.notify("Upload successfull!","","success");
   }
+
+  async deleteAllFromLocal(){
+    this.busy = true;
+    for( let collectionName in environment.collectionMap){
+      await this.saveCollectionToStorage(collectionName,new Map<string,any>());
+    }
+    this.busy = false;
+    this.userNotifierService.notify("Deleted local copy","","success");
+  }
+
   async deleteAllFromServer(){
     this.busy = true;
     for( let collectionName in environment.collectionMap){
@@ -308,8 +318,9 @@ export class DataService {
           const el = collection.get(doc.localID)
           const prom = this.appwrite.database.deleteDocument(environment.collectionMap[collectionName],doc.$id);
           const res = await this.userNotifierService.notifyOnPromiseReject(prom,"(Online) Deleting "+collectionName);
+          if(el){
           el.$id = undefined;
-          
+          }
         }
         this.saveCollectionToStorage(collectionName,collection);
       }

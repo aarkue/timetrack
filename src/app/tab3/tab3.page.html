@@ -118,7 +118,7 @@
         <ion-label>
           Upload offline-only data
           <br>
-          <p>Uploads all local data which is not stored on the server yet.</p>
+          <p>Uploads local data not on the server yet</p>
         </ion-label>
         <ion-button color="tertiary" mode="ios" size="small" (click)="dataService.sendAllOfflineToServer()" [disabled]="this.dataService.offlineMode">Upload</ion-button>
       </ion-item>
@@ -126,10 +126,18 @@
         <ion-label>
           Delete on server
           <br>
-          <p>Local data will stay as offline-only.</p>
+          <p>Local data will stay</p>
         </ion-label>
-      
-        <ion-button slot="end" color="danger" mode="ios" size="small" (click)="dataService.deleteAllFromServer()" [disabled]="this.dataService.offlineMode">Delete server copy</ion-button>
+        <ion-button slot="end" color="danger" mode="ios" size="small" (click)="dataService.deleteAllFromServer()" [disabled]="this.dataService.offlineMode">Delete server</ion-button>
+      </ion-item>
+      <ion-item>
+        <ion-label>
+          Delete local
+          <br>
+          <p>Keeps server copy intact</p>
+          <p>Will first create a backup</p>
+        </ion-label>
+        <ion-button slot="end" color="danger" mode="ios" size="small" (click)="deleteLocal()">Delete local</ion-button>
       </ion-item>
     </ion-card-content>
   </ion-card>
@@ -156,6 +164,28 @@
         Import
       </ion-button>
       <a #exportDownload></a>
+    </ion-card-content>
+  </ion-card>
+
+
+
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Information</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-item>
+        <ion-label>
+        More Information<br>
+        <p><a href="https://blog.aarkue.eu/timetrack">blog.aarkue.eu/timetrack</a></p>
+      </ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label>
+        Impress<br>
+        <p><a href="https://aarkue.eu/impress">aarkue.eu/impress</a></p>
+      </ion-label>
+      </ion-item>
     </ion-card-content>
   </ion-card>
 

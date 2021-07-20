@@ -243,8 +243,8 @@ export class Tab3Page implements OnInit{
     await toastNot.present();
   }
 
-  async appWriteTest(){
-
-    
+  async deleteLocal(){
+    await this.exportFile();
+    await this.dataService.deleteAllFromLocal();
   }
 }
