@@ -6,6 +6,7 @@ import { ActivityPopoverComponent } from '../activity-popover/activity-popover.c
 import { NewActivityModalComponent } from '../new-activity-modal/new-activity-modal.component';
 import {v4 as uuidv4} from 'uuid';
 import { DataService } from 'src/app/data/data.service';
+import { KeyValue } from '@angular/common';
 
 @Component({
   selector: 'app-activity-list',
@@ -85,6 +86,11 @@ export class ActivityListComponent implements OnInit {
     }
     })
     await modal.present()
+  }
+
+
+  trackByKeyValue(index :number, keyval : KeyValue<string,Activity>){
+    return keyval.value.localID;
   }
 
 }

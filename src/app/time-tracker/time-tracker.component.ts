@@ -9,6 +9,7 @@ import { TimeTrack } from './time-track'
 import { StatisticsComponent } from './statistics/statistics.component';
 import { TimeTrackerService } from './time-tracker.service';
 import { DataService } from '../data/data.service';
+import { Activity } from './activity';
 
 @Component({
   selector: 'app-time-tracker',
@@ -75,5 +76,9 @@ export class TimeTrackerComponent implements OnInit {
       cssClass: "fullscreenModal"
     });
     await modal.present()
+  }
+
+  trackByActivitiy(act : Activity){
+    return act.localID;
   }
 }
