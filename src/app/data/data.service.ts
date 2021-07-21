@@ -65,6 +65,11 @@ export class DataService {
     if(!parsedVal || !parsedVal['length']){
       parsedVal = [];
     }
+    if(parsedVal.length == 0 || parsedVal[0].length != 2){
+      parsedVal = [];
+    }else if(!parsedVal[0][1]['localID']){
+      parsedVal = [];
+    }
     return new Map<string,any>(parsedVal);
   }
 
