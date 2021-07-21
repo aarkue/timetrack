@@ -5,7 +5,6 @@ import {v4 as uuidv4} from 'uuid';
 import { Plugins } from '@capacitor/core';
 import { DataService } from '../data/data.service';
 import { ThrowStmt } from '@angular/compiler';
-const { Storage } = Plugins;
 @Injectable({
   providedIn: 'root'
 })
@@ -22,8 +21,6 @@ export class TimeTrackerService {
 
   async refresh(){
     let parsedActivities = await this.dataService.fetchCollection('activities');
-    // let activities = (await this.getFromStorage('activities')).value;
-    // let parsedActivities = JSON.parse(activities);
     if(parsedActivities){
       this.activities = parsedActivities;
     }
@@ -32,12 +29,6 @@ export class TimeTrackerService {
     for(const timeTrack of rawTimeTracks.values()){
       this.addTimeTrackedLocally(timeTrack);
     }
-    // let timeTracked = (await this.getFromStorage('timeTracked')).value;
-    // let parsedTimeTracked = new Map<number,TimeTrack[]>(JSON.parse(timeTracked));
-    // if(parsedTimeTracked){
-    //   console.log(parsedTimeTracked);
-    //   this.timeTracked = parsedTimeTracked;
-    // }
     this.updateGrouped();
     
   }
@@ -48,13 +39,6 @@ export class TimeTrackerService {
   }
 
 
-  getFromStorage(key: string){
-    return Storage.get({key: key})
-  }
-
-  async saveToStorage(key: string, value: string){
-    await Storage.set({key: key, value: value});
-  }
 
 
   async updateGrouped() {
