@@ -59,7 +59,8 @@ export class StatisticsComponent implements OnInit, AfterViewInit {
     this.customDateEnd = endDate.toISOString();
 
     let oneIncluded = false;
-    this.activities.forEach((act,) => {
+    this.activities.forEach((act) => {
+      if(act.tags){
       act.tags.forEach((tag,tagIndex)=> {
         if(oneIncluded){
           this.tagsDeactived.add(tag);
@@ -68,6 +69,7 @@ export class StatisticsComponent implements OnInit, AfterViewInit {
           oneIncluded = true;
         }
       })
+    }
     })
 
 
@@ -230,13 +232,14 @@ export class StatisticsComponent implements OnInit, AfterViewInit {
       });
     
     }
-    setTimeout(() => {
       this.updateHeatMapDataset();
-    },200)
   }
 
   checkActivityTags(act: Activity) : boolean{
     if(this.filterTags){
+      if(act.tags === undefined){
+        return false
+      }
     const res = act.tags.filter((tag) => {
       return this.tagsActivated.has(tag);
     });

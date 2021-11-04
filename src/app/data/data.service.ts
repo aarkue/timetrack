@@ -160,7 +160,7 @@ export class DataService {
           case 'update':
             console.log(req.data);
             this.updateDocumentOnline(req.collectionName,req.data);
-        
+          break;
           default:
             this.userNotifierService.notify("Invalid request type",this.stringify(req),"danger");
             break;

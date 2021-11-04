@@ -46,7 +46,7 @@ export class RegisterComponent implements OnInit {
 
   async register(){
     if(this.registerForm.valid && this.registerForm.get('password').value === this.registerForm.get('repeatPassword').value){
-      const success =  this.accountService.register(this.registerForm.get('email').value, this.registerForm.get('password').value);
+      const success =  await this.accountService.register(this.registerForm.get('email').value, this.registerForm.get('password').value);
       if(success){
         this.registerForm.get('password').setValue("");
         this.registerForm.get('repeatPassword').setValue("");
