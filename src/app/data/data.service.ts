@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 import { Plugins } from '@capacitor/core';
 import { Appwrite } from 'appwrite';
 import { environment } from 'src/environments/environment';
@@ -6,7 +6,7 @@ import { UserNotifierService } from '../notifier/user-notifier.service';
 const {  Storage } = Plugins;
 import {v4 as uuidv4} from 'uuid';
 import { FailedRequest } from './failed-request';
-
+import { TimeTrackerService } from '../time-tracker/time-tracker.service';
 @Injectable({
   providedIn: 'root'
 })
@@ -20,6 +20,8 @@ export class DataService {
   public busy: boolean = false;
 
   public prefs : any = {};
+
+  public refreshNeeded : EventEmitter<string> = new EventEmitter<string>();
 
   constructor(private userNotifierService : UserNotifierService) {
     this.appwrite = new Appwrite();
@@ -58,16 +60,62 @@ export class DataService {
     return Storage.get({ key: key });
   }
 
+
+  getDefaultCollectionValue(key: string){
+
+    // if user is not new, don't provide any defaults
+    if(!this.prefs['firstStart']){
+      return [];
+      }
+    
+    switch(key){
+      case 'activities':
+        return [['default_STUDY',{  localID: 'default_STUDY',
+        label: 'Study',
+        icon: 'library',
+        color: '#454333',
+        startDate: undefined,
+        tags: []}],
+        ['default_HOUSEDUTIES',{  localID: 'default_HOUSEDUTIES',
+        label: 'House duties',
+        icon: 'home',
+        color: '#B0C227',
+        startDate: undefined,
+        tags: []}],
+        ['default_WORKOUT',{  localID: 'default_WORKOUT',
+        label: 'Workout',
+        icon: 'barbell',
+        color: '#DB662C',
+        startDate: undefined,
+        tags: []}],
+        ['default_MEETINGS',{  localID: 'default_MEETINGS',
+        label: 'Meetings',
+        icon: 'megaphone',
+        color: '#8FF0A4',
+        startDate: undefined,
+        tags: []}],
+        ['default_MAILS',{  localID: 'default_MAILS',
+        label: 'Mails',
+        icon: 'mail-unread',
+        color: '#B5835A',
+        startDate: undefined,
+        tags: []}],
+      ];
+      default:
+        return [];
+    }
+  }
+
   async getCollectionFromStorage(key: string): Promise<Map<string,any>>{
     const val = await this.getFromStorage(key);
     // console.log("Got " +key +" locally:",val,JSON.parse(val.value),new Map<string,any>(JSON.parse(val.value)));
     let parsedVal = JSON.parse(val.value);
-    if(!parsedVal || !parsedVal['length']){
-      parsedVal = [];
+    if(parsedVal == undefined || !parsedVal['length']){
+      parsedVal = this.getDefaultCollectionValue(key);
     }
-    if(parsedVal.length == 0 || parsedVal[0].length != 2){
+    if(parsedVal.length == 0){
       parsedVal = [];
-    }else if(!parsedVal[0][1]['localID']){
+    }else if(parsedVal[0].length != 2 || !parsedVal[0][1]['localID']){
       parsedVal = [];
     }
     return new Map<string,any>(parsedVal);
@@ -84,8 +132,13 @@ export class DataService {
         data['$id'] = resID;
       }
     }
-
-      return await this.createDocumentOffline(collectionName,data);
+    const res = await this.createDocumentOffline(collectionName,data);
+    if(this.prefs['firstStart']){
+      this.saveCollectionToStorage(collectionName,await this.getCollectionFromStorage(collectionName));
+      this.prefs['firstStart'] = false;
+      this.savePrefs(this.prefs);
+      }
+      return res;
     }
 
   async createDocumentOffline(collectionName: string, data: {localID: string}){
@@ -103,7 +156,12 @@ export class DataService {
       if(!this.offlineMode){
         this.updateDocumentOnline(collectionName,data);
       }
-        this.putLocalObject(collectionName,data['localID'],data);
+      this.putLocalObject(collectionName,data['localID'],data);
+    }
+    if(this.prefs['firstStart']){
+      this.saveCollectionToStorage(collectionName,await this.getCollectionFromStorage(collectionName));
+      this.prefs['firstStart'] = false;
+      this.savePrefs(this.prefs);
       }
   }
 
@@ -260,6 +318,11 @@ export class DataService {
     const collection = await this.getCollectionFromStorage(collectionName);
     collection.delete(data.localID);
     this.saveCollectionToStorage(collectionName,collection);
+    if(this.prefs['firstStart']){
+      this.saveCollectionToStorage(collectionName,await this.getCollectionFromStorage(collectionName));
+      this.prefs['firstStart'] = false;
+      this.savePrefs(this.prefs);
+      }
   }
 
   async deleteDocumentOnline(collectionName : string, $id : string, data : {localID: string}){
@@ -290,9 +353,16 @@ export class DataService {
     this.busy = true;
     for( let collectionName in environment.collectionMap){
       await this.saveCollectionToStorage(collectionName,new Map<string,any>());
+      
     }
     this.busy = false;
     this.userNotifierService.notify("Deleted local copy","","success");
+    if(this.prefs['firstStart']){
+      this.prefs['firstStart'] = false;
+      this.savePrefs(this.prefs);
+      }
+    this.refreshNeeded.emit("Local Data deleted");
+    // setTimeout(() => location.reload(),100);
   }
 
   async deleteAllFromServer(){
@@ -302,6 +372,8 @@ export class DataService {
     }
     this.busy = false;
     this.userNotifierService.notify("Deleted server copy","","success");
+    this.refreshNeeded.emit("Server Data deleted");
+    // setTimeout(() => location.reload(),100);
   }
   async deleteCollectionFromServer(collectionName: string){
     if(!this.offlineMode){
@@ -413,7 +485,7 @@ export class DataService {
   async getPrefsFromStorage(){
     this.prefs = JSON.parse((await this.getFromStorage("prefs")).value);
     if(!this.prefs){
-      this.prefs = {};
+      this.prefs = {firstStart: true};
     }
   }
 

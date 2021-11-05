@@ -10,13 +10,21 @@ import { ThrowStmt } from '@angular/compiler';
 })
 export class TimeTrackerService {
 
-  public activities : Map<string,Activity> = new Map<string, Activity>(); 
+  study_activity : Activity = {  localID: 'deafult_STUDY',
+  label: 'Study',
+  icon: 'book',
+  color: '#FFF',
+  startDate: undefined,
+  tags: []}
+  public activities : Map<string,Activity> = new Map<string, Activity>([['default_STUDY',this.study_activity]]); 
   
   public timeTracked : Map<number,TimeTrack[]> = new Map<number,TimeTrack[]>();
 
   public groupedTimeTracked : {date: number, items: TimeTrack[]}[] = [];
   
-  constructor(private dataService : DataService) { }
+  constructor(private dataService : DataService) {
+    dataService.refreshNeeded.subscribe((reason : string) => this.refresh());
+   }
 
 
   async refresh(){

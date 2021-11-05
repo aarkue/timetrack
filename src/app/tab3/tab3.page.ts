@@ -91,6 +91,7 @@ export class Tab3Page implements OnInit{
     const successfull = await this.accountService.login(this.loginForm.value["email"],this.loginForm.value["password"]);
     if(successfull){
       this.dataService.fetchPrefsFromServer();
+      this.dataService.prefs['firstStart'] = false;
     }
     this.loginForm.enable();
   }
