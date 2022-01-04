@@ -1,0 +1,45 @@
+ion-progress-bar {
+    height: 50px;
+    margin-bottom: 5px;
+    --background: linear-gradient(90deg, rgba(32,241,161,0.3) 0%, rgba(32,241,212,0.3) 39%, rgba(0,217,255,0.3) 100%);;
+    --progress-background:  #00ff9d;
+    --buffer-background: var(--background);
+}
+
+.progressDiv {
+    width: 100%;
+    text-align: center;
+}
+
+.goalDurationInput {
+    display: inline-block;
+    width: 5rem;
+}
+
+.tagDiv {
+    text-align: center;
+    align-self: center;
+    height: 100%;
+    margin-right: 10px
+}
+.tagInput {
+    font-weight: bold;
+}
+.statusIconDiv {
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    border-radius: 10px;
+    background-color: rgba(66, 241, 124, 0.637);
+}
+ion-icon.statusIcon {
+    font-size: 32px;
+    align-self: center;
+}
+.statusText {
+    align-self: center;
+}
+
+.statusIconDiv.inProgress {
+    background-color: rgba(241, 66, 124, 0.637);
+}

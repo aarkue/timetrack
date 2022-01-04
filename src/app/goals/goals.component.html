@@ -1,0 +1,23 @@
+<h4>Goals</h4>
+<ion-item *ngFor="let goal of goals; let i = index" lines="full">
+  <div class="tagDiv">
+    <ion-chip
+      ><span>Tag:</span><ion-input class="tagInput" type="text" [(ngModel)]="goal.tag"></ion-input>
+      <ion-icon name="close-circle" (click)="removeGoal(i)"></ion-icon>
+    </ion-chip>
+    <div class="statusIconDiv" [ngClass]="{'inProgress': currDurationsForGoals[i] < (goal.goalDuration * 60)}">
+      <ion-icon class="statusIcon" name="{{ currDurationsForGoals[i] >= (goal.goalDuration * 60) ? 'checkmark-circle-outline' : 'hourglass'}}"></ion-icon>
+      <span class="statusText">{{ currDurationsForGoals[i] >= (goal.goalDuration * 60) ? 'DONE' : ((goal.goalDuration-(currDurationsForGoals[i]/60) | number: '1.0-0') + 'min left')}}</span>
+    </div>
+  </div>
+  <div class="progressDiv">
+    <span>
+      {{ (currDurationsForGoals[i] - (currDurationsForGoals[i] % 60)) / 60 | number: '1.0-0' }}min /
+      <ion-input class="goalDurationInput" type="number" [(ngModel)]="goal.goalDuration"></ion-input
+      ><span slot="end">min</span></span
+    >
+    <ion-progress-bar [value]="currDurationsForGoals[i] / (goal.goalDuration * 60)"></ion-progress-bar>
+  </div>
+  <br />
+</ion-item>
+<ion-button (click)="addNewGoal()">Add</ion-button>

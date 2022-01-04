@@ -56,7 +56,7 @@
     <ion-card-content  class="chartCardContent">
       <div class="chartWrapper">
         <ngx-charts-bar-vertical 
-        [results]="data"
+        [results]="this.data"
         [customColors]="customColors"
         [legend]="true"
         [showXAxisLabel]="true"
@@ -81,7 +81,7 @@
     <ion-card-content class="chartCardContent">
       <div class="chartWrapper">
         <ngx-charts-pie-chart
-          [results]="data"
+          [results]="this.data"
           [customColors]="customColors"
           [legend]="true"
           [legendPosition]="BELOW"
@@ -100,7 +100,7 @@
     <ion-card-content  class="chartCardContent">
       <div class="chartWrapper">
         <ngx-charts-heat-map 
-        [results]="heatMapData"
+        [results]="this.heatMapData"
         [customColors]="customColors"
         scheme="solar"
         [legend]="false"

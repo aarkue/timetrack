@@ -11,6 +11,7 @@ import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { PomodoroPageComponent } from './pomodoro-page/pomodoro-page.component';
 import { TimeTrackerModule } from '../time-tracker/time-tracker.module';
+import { GoalsComponent } from '../goals/goals.component';
 @NgModule({
   declarations: [
     PomodoroComponent,
@@ -18,7 +19,8 @@ import { TimeTrackerModule } from '../time-tracker/time-tracker.module';
     PomodoroOptionsDialogComponent,
     TimerHistoryChipComponent,
     EditCurrentComponent,
-    PomodoroPageComponent
+    PomodoroPageComponent,
+    GoalsComponent
   ],
   imports: [CommonModule, IonicModule, FormsModule, TimeTrackerModule],
   exports: [PomodoroPageComponent],
