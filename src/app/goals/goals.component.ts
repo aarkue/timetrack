@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Activity } from '../time-tracker/activity';
 import { StatisticsService } from '../time-tracker/statistics/statistics.service';
 import { TimeTrack } from '../time-tracker/time-track';
@@ -9,30 +9,31 @@ import { TimeTrackerService } from '../time-tracker/time-tracker.service';
   templateUrl: './goals.component.html',
   styleUrls: ['./goals.component.scss'],
 })
-export class GoalsComponent implements OnInit {
+export class GoalsComponent implements OnInit, OnDestroy {
 
   public currDurationsForGoals: number[] = [];
   public goals : {tag: string, goalDuration: number}[] = [{tag: 'uni', goalDuration: (60*3)}]
+
+  public updateInterval : any;
   
   constructor(public statisticsService: StatisticsService, private timeTrackerService: TimeTrackerService) { 
-    setInterval(()=> this.refresh(),1000)
+    this.updateInterval = setInterval(()=> this.refresh(),1000)
   }
 
   async ngOnInit() {
 
   }
 
-  async refresh(){
-    // await this.timeTrackerService.refresh();
-    console.log(this.timeTrackerService.activities.values())
+  ngOnDestroy(): void {
+    clearInterval(this.updateInterval)
+  }
+
+  async refresh(){  
     this.goals.forEach((goal,index) => {
       this.currDurationsForGoals[index] = 0;
       for(let act of this.timeTrackerService.activities.values()){
         if(this.statisticsService.checkActivityTags(act,new Set<string>([goal.tag]),true)) {
-          console.log(act.label + " is a match!")
           this.currDurationsForGoals[index] += this.statisticsService.getDurationTodayForActivity(act.localID,this.timeTrackerService.timeTracked,Array.from(this.timeTrackerService.activities.values()))
-        }else{
-          console.log(act.label + " is NOT a match!",act.tags)
         }
       }
     })

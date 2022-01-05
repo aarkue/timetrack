@@ -1,8 +1,8 @@
 ion-progress-bar {
-    height: 50px;
+    height: 30px;
     margin-bottom: 5px;
     --background: linear-gradient(90deg, rgba(32,241,161,0.3) 0%, rgba(32,241,212,0.3) 39%, rgba(0,217,255,0.3) 100%);;
-    --progress-background:  #00ff9d;
+    --progress-background:  #00d9ff;
     --buffer-background: var(--background);
 }
 
@@ -26,14 +26,14 @@ ion-progress-bar {
     font-weight: bold;
 }
 .statusIconDiv {
-    height: 50px;
+    height: 30px;
     display: flex;
     justify-content: center;
     border-radius: 10px;
     background-color: rgba(66, 241, 124, 0.637);
 }
 ion-icon.statusIcon {
-    font-size: 32px;
+    font-size: 24px;
     align-self: center;
 }
 .statusText {

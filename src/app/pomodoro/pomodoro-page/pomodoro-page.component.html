@@ -22,8 +22,14 @@
   </ion-refresher>
   <div class="mainContent">
   <app-pomodoro #pomodoro ></app-pomodoro>
-  <app-activity-list></app-activity-list>
-  <app-goals ></app-goals>
+  <app-activity-list></app-activity-list> 
+  <ion-item lines="full">
+    <h3>Goals</h3>
+      <ion-toggle #goalToggle slot="end" checked="true"></ion-toggle>
+  </ion-item>
+  <div  [ngClass]="{'hidden': !goalToggle.checked}">
+    <app-goals></app-goals>
+  </div>
   <app-recent-time-track></app-recent-time-track>
 </div>
 </ion-content>
