@@ -4,5 +4,5 @@ export interface Activity{
   icon: string;
   color: string;
   startDate?: number;
-  tags: string[]
+  tags?: string[]
 }

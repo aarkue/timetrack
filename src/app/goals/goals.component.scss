@@ -1,9 +1,10 @@
 ion-progress-bar {
     height: 30px;
     margin-bottom: 5px;
-    --background: linear-gradient(90deg, rgba(32,241,161,0.3) 0%, rgba(32,241,212,0.3) 39%, rgba(0,217,255,0.3) 100%);;
-    --progress-background:  #00d9ff;
+    --background: linear-gradient(90deg, rgba(32,241,161,0.15) 0%, rgba(32,241,212,0.15) 39%, rgba(0,217,255,0.15) 100%);;
+    --progress-background:  rgba(66, 241, 124, 0.8);
     --buffer-background: var(--background);
+    border-radius: 200px;
 }
 
 .progressDiv {
@@ -24,13 +25,18 @@ ion-progress-bar {
 }
 .tagInput {
     font-weight: bold;
+    width: 150px;
 }
 .statusIconDiv {
-    height: 30px;
+    height: 35px;
     display: flex;
     justify-content: center;
-    border-radius: 10px;
+    border-radius: 100px;
     background-color: rgba(66, 241, 124, 0.637);
+    width: 100%;
+    justify-self: center;
+    margin: 5px;
+    transition: all ease-in-out 1s;
 }
 ion-icon.statusIcon {
     font-size: 24px;
@@ -42,4 +48,29 @@ ion-icon.statusIcon {
 
 .statusIconDiv.inProgress {
     background-color: rgba(241, 66, 124, 0.637);
+}
+
+.durationOfDiv {
+    display: flex;
+    justify-content: center;
+}
+
+ion-datetime {
+    padding: 0;
+    justify-self: center;
+
+    button {
+        display: none;
+    }
+}
+
+.goalGrid {
+    display: grid;
+    grid-template-columns: minmax(175px,1fr) 3fr;
+    grid-gap: 0 10px;
+    width: 100%;
+}
+
+ion-item {
+    --padding-start: 3px
 }

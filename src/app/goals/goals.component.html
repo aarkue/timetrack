@@ -1,22 +1,51 @@
 <ion-item *ngFor="let goal of goals; let i = index" lines="full">
-  <div class="tagDiv">
-    <ion-chip
-      ><span>Tag:</span><ion-input class="tagInput" type="text" [(ngModel)]="goal.tag"></ion-input>
-      <ion-icon name="close-circle" (click)="removeGoal(i)"></ion-icon>
-    </ion-chip>
-    <div class="statusIconDiv" [ngClass]="{'inProgress': currDurationsForGoals[i] < (goal.goalDuration * 60)}">
-      <ion-icon class="statusIcon" name="{{ currDurationsForGoals[i] >= (goal.goalDuration * 60) ? 'checkmark-circle-outline' : 'hourglass'}}"></ion-icon>
-      <span class="statusText">{{ currDurationsForGoals[i] >= (goal.goalDuration * 60) ? 'DONE' : ((goal.goalDuration-(currDurationsForGoals[i]/60) | number: '1.0-0') + 'min left')}}</span>
+  <div class="goalGrid">
+    <ion-item>
+      <ion-select [(ngModel)]="goal.tag" (ngModelChange)="this.saveGoals()" interface="popover" class="tagInput" placeholder="Select...">
+        <ion-select-option *ngFor="let tag of allTags" [value]="tag">
+          {{ tag }}
+        </ion-select-option>
+      </ion-select>
+      <ion-button style="margin-left: 0" size="small" slot="end" fill="none" (click)="removeGoal(i)"
+        ><ion-icon name="close-circle"></ion-icon
+      ></ion-button>
+    </ion-item>
+    <div class="durationOfDiv">
+      <ion-item lines="none" style="text-align: center">
+        <ion-datetime
+          class="goalDurationInput"
+          picker-format="HH:mm"
+          display-format="HH:mm"
+          [value]="convertToDate(currDurationsForGoals[i] / 60)"
+          disabled=""
+        ></ion-datetime>
+        <span style="align-self: center">/</span
+        ><ion-datetime
+          class="goalDurationInput"
+          minuteValues="0,5,10,15,20,25,30,35,40,45,50,55,"
+          #durationPicker
+          picker-format="HH:mm"
+          display-format="HH:mm"
+          [value]="convertToDate(goal.goalDuration)"
+          (ionChange)="goal.goalDuration = convertToDuration(durationPicker.value); this.saveGoals()"
+        ></ion-datetime>
+        <ion-button size="small" fill="clear" (click)="updateGoalDurationManually(i)"
+          ><ion-icon name="keypad"></ion-icon
+        ></ion-button>
+      </ion-item>
     </div>
-  </div>
-  <div class="progressDiv">
-    <span>
-      {{ (currDurationsForGoals[i] - (currDurationsForGoals[i] % 60)) / 60 | number: '1.0-0' }}min /
-      <ion-input class="goalDurationInput" type="number" [(ngModel)]="goal.goalDuration"></ion-input
-      ><span slot="end">min</span></span
-    >
+    <div class="statusIconDiv" [ngClass]="{ inProgress: currDurationsForGoals[i] < goal.goalDuration * 60 }">
+      <ion-icon
+        class="statusIcon"
+        name="{{ currDurationsForGoals[i] >= goal.goalDuration * 60 ? 'checkmark-circle-outline' : 'hourglass' }}"
+      ></ion-icon>
+      <span class="statusText">{{
+        currDurationsForGoals[i] >= goal.goalDuration * 60
+          ? 'DONE'
+          : (goal.goalDuration - currDurationsForGoals[i] / 60 | number: '1.0-0') + 'm'
+      }}</span>
+    </div>
     <ion-progress-bar [value]="currDurationsForGoals[i] / (goal.goalDuration * 60)"></ion-progress-bar>
   </div>
-  <br />
 </ion-item>
 <ion-button (click)="addNewGoal()">Add</ion-button>

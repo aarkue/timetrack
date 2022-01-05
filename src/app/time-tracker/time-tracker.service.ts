@@ -5,6 +5,7 @@ import {v4 as uuidv4} from 'uuid';
 import { Plugins } from '@capacitor/core';
 import { DataService } from '../data/data.service';
 import { ThrowStmt } from '@angular/compiler';
+import { Subject } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
@@ -21,6 +22,8 @@ export class TimeTrackerService {
   public timeTracked : Map<number,TimeTrack[]> = new Map<number,TimeTrack[]>();
 
   public groupedTimeTracked : {date: number, items: TimeTrack[]}[] = [];
+
+  public activitiesUpdated: Subject<void> = new Subject<void>();
   
   constructor(private dataService : DataService) {
     dataService.refreshNeeded.subscribe((reason : string) => this.refresh());
@@ -31,6 +34,7 @@ export class TimeTrackerService {
     let parsedActivities = await this.dataService.fetchCollection('activities');
     if(parsedActivities){
       this.activities = parsedActivities;
+      this.activitiesUpdated.next();
     }
     let rawTimeTracks = await this.dataService.fetchCollection('timetracked');
     this.timeTracked.clear();

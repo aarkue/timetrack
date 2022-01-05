@@ -28,7 +28,6 @@ export class DataService {
     this.appwrite.setEndpoint(environment.API_ENDPOINT);
     this.appwrite.setProject(environment.API_PROJECT);
     this.loadFailedRequests();
-    // this.init();
 } 
 
   async init(){
@@ -46,6 +45,7 @@ export class DataService {
       }else{
         this.offlineMode = true;
     }
+    this.refreshNeeded.emit('Init');
   }
 
   saveOfflineModeSetting(){

@@ -15,3 +15,8 @@
   max-width: 70px;
   text-align: center;
 }
+.activityGrid {
+  max-height: 150px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
