@@ -8,6 +8,7 @@ import { TabsPageRoutingModule } from './tabs-routing.module';
 import { TabsPage } from './tabs.page';
 import { PomodoroModule } from '../pomodoro/pomodoro.module';
 import { TimeTrackerModule } from '../time-tracker/time-tracker.module';
+import { TimeplanModule } from '../time-plan/time-plan.module';
 
 @NgModule({
   imports: [
@@ -16,7 +17,8 @@ import { TimeTrackerModule } from '../time-tracker/time-tracker.module';
     FormsModule,
     TabsPageRoutingModule,
     PomodoroModule,
-    TimeTrackerModule
+    TimeTrackerModule,
+    TimeplanModule
   ],
   declarations: [TabsPage]
 })

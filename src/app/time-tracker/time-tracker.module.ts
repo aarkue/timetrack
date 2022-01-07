@@ -35,7 +35,7 @@ import { TimeTrackPageComponent } from './time-track-page/time-track-page.compon
     IonicModule,
     FormsModule,
     StatisticsModule,
-    RouterModule
+    RouterModule,
   ],
   exports: [TimeTrackerComponent, ActivityListComponent, RecentTimeTrackComponent,TimeTrackPageComponent],
 })

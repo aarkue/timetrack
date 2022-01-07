@@ -24,6 +24,8 @@ export class TimeTrackerService {
   public groupedTimeTracked : {date: number, items: TimeTrack[]}[] = [];
 
   public activitiesUpdated: Subject<void> = new Subject<void>();
+
+  public timeTrackUpdated: Subject<void> = new Subject<void>();
   
   constructor(private dataService : DataService) {
     dataService.refreshNeeded.subscribe((reason : string) => this.refresh());
@@ -42,7 +44,7 @@ export class TimeTrackerService {
       this.addTimeTrackedLocally(timeTrack);
     }
     this.updateGrouped();
-    
+    this.timeTrackUpdated.next();
   }
 
   saveChanges(){
@@ -221,6 +223,25 @@ export class TimeTrackerService {
     
     return duration;
   }
+
+  getTimeTracksOfToday() : TimeTrack[]{
+    const today = new Date(new Date().toDateString()).getTime();
+    if(this.timeTracked.has(today)){
+      return this.timeTracked.get(today);
+    }else{
+      return [];
+    }
+  }
+
+  getTimeTracksOfDate(date: Date) : TimeTrack[]{
+    const day = new Date(date.toDateString()).getTime();
+    if(this.timeTracked.has(day)){
+      return this.timeTracked.get(day);
+    }else{
+      return [];
+    }
+  }
+
 
 
   formatDuration(durationSec: number){

@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { PasswordRecoveryComponent } from '../account/password-recovery/password-recovery.component';
+import { DayTimelineComponent } from '../day-timeline/day-timeline.component';
 import { PomodoroPageComponent } from '../pomodoro/pomodoro-page/pomodoro-page.component';
 import { RegisterComponent } from '../register/register.component';
 import { TimeTrackPageComponent } from '../time-tracker/time-track-page/time-track-page.component';
@@ -20,6 +21,16 @@ const routes: Routes = [
         path: 'timetrack',
         loadChildren: () => import('../time-tracker/time-tracker.module').then(m => m.TimeTrackerModule),
         component: TimeTrackPageComponent
+      },
+      {
+        path: 'timetrack',
+        loadChildren: () => import('../time-tracker/time-tracker.module').then(m => m.TimeTrackerModule),
+        component: TimeTrackPageComponent
+      },
+      {
+        path: 'timeplan',
+        loadChildren: () => import('../time-plan/time-plan.module').then(m => m.TimeplanModule),
+        component: DayTimelineComponent
       },
       {
         path: 'settings',

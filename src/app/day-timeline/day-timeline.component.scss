@@ -1,0 +1,14 @@
+.daySelecter {
+    justify-content: center;
+    ion-datetime {
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+ion-item {
+    --padding-start: 10px;
+    --inner-padding-start: 0px;
+    --padding-end: 0px;
+    --inner-padding-end: 10px;
+}

@@ -1,0 +1,20 @@
+<ion-item lines="none" class="daySelecter">
+  <ion-button (click)="prevDay()" fill="clear"><ion-icon name="chevron-back-circle-outline"></ion-icon></ion-button>
+  <ion-datetime
+    [ngModel]="date.toISOString()"
+    (ngModelChange)="setDateFromISOString($event)"
+    display-format="DD.MM.YYYY"
+    picker-format="DD.MM.YYYY"
+  ></ion-datetime>
+  <ion-button (click)="nextDay()" fill="clear"><ion-icon name="chevron-forward-circle-outline"></ion-icon></ion-button>
+</ion-item>
+<div (window:resize)="onResize($event)">
+  <mwl-calendar-day-view
+    [viewDate]="date"
+    [events]="events"
+    [dayStartHour]="7"
+    [dayEndHour]="22"
+    [hourSegmentHeight]="segmentHeight"
+  >
+  </mwl-calendar-day-view>
+</div>
