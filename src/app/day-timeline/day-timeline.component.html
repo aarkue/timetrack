@@ -8,13 +8,31 @@
   ></ion-datetime>
   <ion-button (click)="nextDay()" fill="clear"><ion-icon name="chevron-forward-circle-outline"></ion-icon></ion-button>
 </ion-item>
-<div (window:resize)="onResize($event)">
+<div (window:resize)="onResize($event)" mwlDroppable (drop)="externalDrop($event.dropData.event)" class="calendarDiv">
+  <div *ngIf="isToday(date)" class="planDay">
+    <h3>Plan today</h3>
+    <div class="planActivities">
+      <app-activity-button
+        *ngFor="let act of activities"
+        mwlDraggable
+        [dropData]="{ event: getPlanEventFromActivity(act) }"
+        class="planActivity"
+        [activity]="act"
+        [active]="false"
+      ></app-activity-button>
+    </div>
+  </div>
   <mwl-calendar-day-view
+    class="adjustedHeightCalendar"
+    [ngClass]="{'todayCalendar': isToday(date)}"
+    [hourSegmentHeight]="segmentHeight"
+    [hourSegments]="4"
     [viewDate]="date"
     [events]="events"
-    [dayStartHour]="7"
-    [dayEndHour]="22"
-    [hourSegmentHeight]="segmentHeight"
+    [minimumEventHeight]="15"
+    [dayStartHour]="6"
+    [dayEndHour]="24"
+    (eventTimesChanged)="eventDropped($event)"
   >
   </mwl-calendar-day-view>
 </div>

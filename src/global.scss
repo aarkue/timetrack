@@ -86,3 +86,25 @@ max-width: 1000px;
 margin-left: auto;
 margin-right: auto;
 }
+
+.cal-event-title {
+    font-size: 1.2rem;
+    color: black;
+    font-weight: bold;
+}
+
+mwl-calendar-day-view {
+    display: block;
+    overflow: scroll;
+}
+.cal-week-view .cal-time-events .cal-event {
+    line-height: unset;
+}
+.deleteIcon {
+    background-image: url(/assets/other_icons/close-circle-outline.svg);
+    background-repeat: no-repeat;
+    background-size: contain;
+    height: 15px;
+    width: 15px;
+    display: inline-block;
+}

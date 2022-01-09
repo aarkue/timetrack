@@ -6,7 +6,7 @@ import { DateAdapter } from 'angular-calendar';
 import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
-
+import { TimeTrackerModule } from '../time-tracker/time-tracker.module'
 @NgModule({
   declarations: [DayTimelineComponent],
   imports: [
@@ -17,6 +17,7 @@ import { IonicModule } from '@ionic/angular';
       provide: DateAdapter,
       useFactory: adapterFactory,
     }),
+    TimeTrackerModule
   ],
   providers: [{
     provide: CalendarDateFormatter,

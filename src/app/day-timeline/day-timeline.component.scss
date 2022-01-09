@@ -12,3 +12,24 @@ ion-item {
     --padding-end: 0px;
     --inner-padding-end: 10px;
 }
+
+.calendarDiv {
+    height: calc(100% - 30px);
+}
+
+.planActivities {
+    height: 60px;
+    white-space: nowrap;
+    overflow-y: hidden;
+    overflow-x: auto;
+}
+
+.planDay {
+    text-align: center;
+}
+.adjustedHeightCalendar {
+    height: calc(100vh - 100px);
+}
+.adjustedHeightCalendar.todayCalendar {
+    height: calc(100vh - 200px);
+}
