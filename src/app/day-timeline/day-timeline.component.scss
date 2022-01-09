@@ -6,6 +6,11 @@
     }
 }
 
+.scrollHelper {
+    height: 30px;
+    
+}
+
 ion-item {
     --padding-start: 10px;
     --inner-padding-start: 0px;
@@ -14,14 +19,27 @@ ion-item {
 }
 
 .calendarDiv {
-    height: calc(100% - 30px);
+    height: calc(100% - 40px);
 }
 
 .planActivities {
-    height: 60px;
+    // height: 80px;
     white-space: nowrap;
     overflow-y: hidden;
     overflow-x: auto;
+
+    app-activity-button {
+        border: 1px black solid;
+        background-color: #fafafa;
+        display: inline-block;
+        border-radius: 10px;
+        margin: 5px;
+        z-index: 3;
+
+        ion-icon {
+            z-index: 4;
+        }
+    }
 }
 
 .planDay {
