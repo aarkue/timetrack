@@ -52,11 +52,12 @@ export class TimeTrackerComponent implements OnInit, OnDestroy {
   }
 
   loadMore(event: any){
-    event.target.complete()
-    this.limit += 20;
+    console.log('loading more',this.limit)
+    this.limit += 50;
     if(this.limit >= Number.MAX_SAFE_INTEGER){
-        event.target.disabled = true;
-      }
+      event.target.disabled = true;
+    }
+    event.target.complete();    
   }
 
   resetLoaded(){

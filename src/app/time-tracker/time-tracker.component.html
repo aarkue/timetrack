@@ -8,7 +8,7 @@
   </ion-button>
 
   <app-time-tracker-list [limit]="limit"></app-time-tracker-list>
-  <ion-infinite-scroll threshold="200px" (ionInfinite)="loadMore($event)">
+  <ion-infinite-scroll threshold="100px" (ionInfinite)="loadMore($event)">
     <ion-infinite-scroll-content
       loadingSpinner="bubbles"
       loadingText="Loading more data...">
