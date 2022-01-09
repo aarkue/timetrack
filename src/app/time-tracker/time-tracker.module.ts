@@ -37,6 +37,6 @@ import { TimeTrackPageComponent } from './time-track-page/time-track-page.compon
     StatisticsModule,
     RouterModule,
   ],
-  exports: [TimeTrackerComponent, ActivityListComponent, RecentTimeTrackComponent,TimeTrackPageComponent],
+  exports: [TimeTrackerComponent, ActivityListComponent, RecentTimeTrackComponent,TimeTrackPageComponent, ActivityButtonComponent],
 })
 export class TimeTrackerModule { }

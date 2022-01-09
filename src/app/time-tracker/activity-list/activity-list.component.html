@@ -2,7 +2,7 @@
   <ion-row>
     <ion-col size-sm="2" size-md="2" size-lg="2" size-xl="2" *ngFor="let el of this.timeTrackerService.activities | keyvalue;let i=index; trackBy: trackByKeyValue">
     <app-activity-button [activity]="el.value"  [badgeText]="this.timeTrackerService.formatDuration(this.timeTrackerService.getDurationTodayForActivity(el.key))"
-      (activityClick)="onActivityButtonClick($event)" (activityHold)="onActivityButtonHold($event)"
+      (activityClick)="onActivityButtonClick($event)" (activityHold)="onActivityButtonHold($event)" [active]="el.value.startDate != undefined"
       >
     </app-activity-button>
     </ion-col>
