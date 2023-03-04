@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
 import { AccountService } from '../services/account.service';
@@ -11,7 +11,7 @@ import { AccountService } from '../services/account.service';
 })
 export class RegisterComponent implements OnInit {
 
-  public registerForm : FormGroup;
+  public registerForm : UntypedFormGroup;
 
   public isVerifying : boolean = false;
 
@@ -19,7 +19,7 @@ export class RegisterComponent implements OnInit {
   public verifyUserid: string = '';
 
   public startEmailVerificationDisabled = false;
-  constructor(private formBuilder : FormBuilder, public accountService : AccountService, private route: ActivatedRoute, private router: Router) { 
+  constructor(private formBuilder : UntypedFormBuilder, public accountService : AccountService, private route: ActivatedRoute, private router: Router) { 
     this.registerForm = formBuilder.group({
       email : ['', [Validators.required,Validators.email]],
       password : ['', [Validators.required,Validators.minLength(environment.MIN_PW_LENGTH),Validators.maxLength(environment.MAX_PW_LENGTH)]],

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AccountService } from 'src/app/services/account.service';
 import { environment } from 'src/environments/environment';
@@ -14,8 +14,8 @@ export class PasswordRecoveryComponent implements OnInit {
   public recoveryUserId : string = "";
   public recoverySecret : string = "";
 
-  public recoveryForm : FormGroup;
-  constructor(private route: ActivatedRoute, private router: Router, private formBuilder : FormBuilder, private accountService : AccountService) { 
+  public recoveryForm : UntypedFormGroup;
+  constructor(private route: ActivatedRoute, private router: Router, private formBuilder : UntypedFormBuilder, private accountService : AccountService) { 
     this.recoveryForm = formBuilder.group({
       recoveryUserId : ['', [Validators.required]],
       recoverySecret : ['', [Validators.required]],

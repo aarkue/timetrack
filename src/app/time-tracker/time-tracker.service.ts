@@ -1,11 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Activity } from './activity';
 import { TimeTrack } from './time-track';
-import {v4 as uuidv4} from 'uuid';
-import { Plugins } from '@capacitor/core';
 import { DataService } from '../data/data.service';
-import { ThrowStmt } from '@angular/compiler';
 import { Subject } from 'rxjs';
+
 @Injectable({
   providedIn: 'root'
 })

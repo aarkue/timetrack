@@ -1,5 +1,5 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FilesystemDirectory, FilesystemEncoding, FileWriteOptions, FileWriteResult, Plugins } from '@capacitor/core';
 import { AlertController, IonInput, Platform, ToastController } from '@ionic/angular';
@@ -19,7 +19,7 @@ const { Storage, Directory, Encoding, Filesystem, Share } = Plugins;
 })
 
 export class Tab3Page implements OnInit{
-  loginForm: FormGroup;
+  loginForm: UntypedFormGroup;
 
   private readonly localKeys : string[] = 
   // Time Tracker
@@ -39,7 +39,7 @@ export class Tab3Page implements OnInit{
   
   constructor(public accountService : AccountService,
               public toastController: ToastController, 
-              public formBuilder: FormBuilder,
+              public formBuilder: UntypedFormBuilder,
               platform : Platform,
               private route: ActivatedRoute,
               private router: Router,
