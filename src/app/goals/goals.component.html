@@ -12,7 +12,7 @@
     </ion-item>
     <div class="durationOfDiv">
       <ion-item lines="none" style="text-align: center">
-        <ion-datetime
+        <ion-datetime  presentation="date-time" [preferWheel]="true" hourCycle="h23"
           class="goalDurationInput"
           picker-format="HH:mm"
           display-format="HH:mm"
@@ -20,7 +20,7 @@
           disabled=""
         ></ion-datetime>
         <span style="align-self: center">/</span
-        ><ion-datetime
+        ><ion-datetime  presentation="date-time" [preferWheel]="true" hourCycle="h23"
           class="goalDurationInput"
           minuteValues="0,5,10,15,20,25,30,35,40,45,50,55,"
           #durationPicker

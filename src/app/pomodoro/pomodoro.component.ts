@@ -26,6 +26,7 @@ import { Platform } from '@ionic/angular';
 import { EditCurrentComponent } from './edit-current/edit-current.component';
 import { AccountService } from '../services/account.service';
 import { DataService } from '../data/data.service';
+import { OverviewDialogComponent } from './overview-dialog/overview-dialog.component';
 
 @Component({
   selector: 'app-pomodoro',
@@ -526,6 +527,40 @@ export class PomodoroComponent implements OnInit, OnDestroy {
   }
 
 
+  async showEndOfDayDialog() {
+    const modalRef = await this.modalController.create({
+      component: OverviewDialogComponent,
+      componentProps: {
+        // workMinutes: this.workSeconds / 60,
+        // shortBreakMinutes: this.shortBreakSeconds / 60,
+        // longBreakMinutes: this.longBreakSeconds / 60,
+        // workSessionsBeforeLongBreak: this.workSessionReward,
+        // showSeconds: this.showSeconds,
+        // showProgressBar: this.showProgressBar,
+        // autoStart: this.autoStart,
+        // autoFinish: this.autoFinish,
+      },
+    });
+    modalRef.onWillDismiss().then((res) => {
+      if (res.data) {
+        this.workSeconds = res.data.workMinutes * 60;
+        this.shortBreakSeconds = res.data.shortBreakMinutes * 60;
+        this.longBreakSeconds = res.data.longBreakMinutes * 60;
+        this.workSessionReward = res.data.workSessionsBeforeLongBreak;
+        this.showSeconds = res.data.showSeconds;
+        this.showProgressBar = res.data.showProgressBar;
+        this.autoStart = res.data.autoStart;
+        this.autoFinish = res.data.autoFinish;
+        this.saveOptions();
+        if (this.timePassed === 0 && this.timePassedBefore === 0) {
+          this.clear();
+        }
+      }
+    });
+    return await modalRef.present();
+  }
+
+  
   getFromPrefs(key: string) {
     return this.dataService.prefs["POMODORO_"+key]
   }

@@ -33,6 +33,7 @@
     "angular-calendar": "^0.29.0",
     "appwrite": "^3.2.0",
     "date-fns": "^2.23.0",
+    "date-fns-tz": "^2.0.0",
     "howler": "^2.2.1",
     "rxjs": "~6.6.0",
     "tslib": "^2.0.0",

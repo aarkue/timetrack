@@ -3,6 +3,8 @@ import { Activity } from './activity';
 import { TimeTrack } from './time-track';
 import { DataService } from '../data/data.service';
 import { Subject } from 'rxjs';
+import { zonedTimeToUtc, utcToZonedTime } from 'date-fns-tz'
+import { parse, fromUnixTime, formatISO9075, formatISO } from 'date-fns';
 
 @Injectable({
   providedIn: 'root'
@@ -124,11 +126,21 @@ export class TimeTrackerService {
   
 
   getLocalIsoDatetime(time: number){
+    const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    // return utcToZonedTime(time,userTimeZone).toISOString();
     // console.log(Date.parse( new Date(time).toISOString()));
-    return new Date(time).toISOString();
+    // console.log(new Date(time).toISOString());
+    return formatISO(time,{})
+    // return utcToZonedTime(time,userTimeZone).toISOString();
+    // return new Date(time).toISOString();
+    
   }
 
   getNumberFromIsoDatetime(iso: string){
+
+    // const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    // return zonedTimeToUtc(iso,userTimeZone).getTime();
+    console.log({iso});
     // console.log(Date.parse(iso));
     return Date.parse(iso);
   }

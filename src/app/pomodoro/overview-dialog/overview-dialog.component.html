@@ -1,0 +1,22 @@
+
+<ion-header translucent>
+  <ion-toolbar>
+    <ion-title>Overview</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismissModal()">Close</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  
+<h1 class="mainHeading">You did it! 🥳🥳🥳</h1>
+<p class="text">Congratulations! You finished your work for today!</p>
+<h2 class="subHeading">Statistics for today</h2>
+<ul>
+<li *ngFor="let el of this.activitiesWithDuration">
+  {{ el.label }}: {{this.timeTrackerService.formatDuration(el.durationSec)}}
+</li>
+
+</ul>
+</ion-content>

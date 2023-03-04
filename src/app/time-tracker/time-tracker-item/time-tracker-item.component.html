@@ -6,9 +6,9 @@
     <p class="detailLabel">{{timeTrackerService.getFormattedDuration(t.startDate,t.endDate)}}</p>
     <div class="timePickers">
       <ion-item lines="none">
-        <ion-datetime [ngModel]="this.timeTrackerService.getLocalIsoDatetime(t.startDate)" (ngModelChange)="this.timeTrackerService.setStartDateByID(t.localID,this.timeTrackerService.getNumberFromIsoDatetime($event))" display-format="HH:mm" picker-format="DD.MM.YYYY | HH:mm">
+        <ion-datetime presentation="date-time" [preferWheel]="true" hourCycle="h23" [ngModel]="this.timeTrackerService.getLocalIsoDatetime(t.startDate)" (ngModelChange)="this.timeTrackerService.setStartDateByID(t.localID,this.timeTrackerService.getNumberFromIsoDatetime($event))" display-format="HH:mm" picker-format="DD.MM.YYYY | HH:mm">
         </ion-datetime>
-        <ion-datetime [ngModel]="this.timeTrackerService.getLocalIsoDatetime(t.endDate)" (ngModelChange)="this.timeTrackerService.setEndDateByID(t.localID,this.timeTrackerService.getNumberFromIsoDatetime($event))" display-format="HH:mm" picker-format="DD.MM.YYYY | HH:mm">
+        <ion-datetime  presentation="date-time" [preferWheel]="true" hourCycle="h23" [ngModel]="this.timeTrackerService.getLocalIsoDatetime(t.endDate)" (ngModelChange)="this.timeTrackerService.setEndDateByID(t.localID,this.timeTrackerService.getNumberFromIsoDatetime($event))" display-format="HH:mm" picker-format="DD.MM.YYYY | HH:mm">
         </ion-datetime>
       </ion-item>
   </div>

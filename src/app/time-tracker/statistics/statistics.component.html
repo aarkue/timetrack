@@ -25,13 +25,13 @@
         <ion-col col-2>
           <ion-item>
             <ion-label>Start</ion-label>
-            <ion-datetime picker-format="DD.MM.YYYY | HH:mm" display-format="DD.MM" [(ngModel)]="customDateStart" (ngModelChange)="updateDataset()"></ion-datetime>
+            <ion-datetime  presentation="date-time" [preferWheel]="true" hourCycle="h23" picker-format="DD.MM.YYYY | HH:mm" display-format="DD.MM" [(ngModel)]="customDateStart" (ngModelChange)="updateDataset()"></ion-datetime>
           </ion-item>
         </ion-col>
         <ion-col col-2>
           <ion-item>
           <ion-label>End</ion-label>
-          <ion-datetime picker-format="DD.MM.YYYY | HH:mm" display-format="DD.MM" [(ngModel)]="customDateEnd" (ngModelChange)="updateDataset()"></ion-datetime>
+          <ion-datetime  presentation="date-time" [preferWheel]="true" hourCycle="h23" picker-format="DD.MM.YYYY | HH:mm" display-format="DD.MM" [(ngModel)]="customDateEnd" (ngModelChange)="updateDataset()"></ion-datetime>
         </ion-item>
         </ion-col>
       </ion-row>

@@ -12,11 +12,14 @@ import { IonicModule } from '@ionic/angular';
 import { PomodoroPageComponent } from './pomodoro-page/pomodoro-page.component';
 import { TimeTrackerModule } from '../time-tracker/time-tracker.module';
 import { GoalsComponent } from '../goals/goals.component';
+import { OverviewDialogComponent } from './overview-dialog/overview-dialog.component';
+import { BrowserModule } from '@angular/platform-browser';
 @NgModule({
   declarations: [
     PomodoroComponent,
     SvgClockComponent,
     PomodoroOptionsDialogComponent,
+    OverviewDialogComponent,
     TimerHistoryChipComponent,
     EditCurrentComponent,
     PomodoroPageComponent,

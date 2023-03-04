@@ -1,6 +1,7 @@
 <ion-item lines="none" class="daySelecter">
   <ion-button (click)="prevDay()" fill="clear"><ion-icon name="chevron-back-circle-outline"></ion-icon></ion-button>
   <ion-datetime
+  presentation="date-time" [preferWheel]="true" hourCycle="h23"
     [ngModel]="date.toISOString()"
     (ngModelChange)="setDateFromISOString($event)"
     display-format="DD.MM.YYYY"
